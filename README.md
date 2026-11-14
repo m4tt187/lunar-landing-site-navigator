@@ -119,7 +119,7 @@ The engine, module by module: [contract](docs/engine/contract.md),
 | Ten-minute sampling: interpolated Sun and Earth directions against the exact ones, 25,000 cases | largest difference 1.4 × 10⁻⁷ ° |
 | Planning (operating window, landing calendar) against a minute-by-minute simulation | same answer in 700 random cases |
 | Whole-map sweep against an independent ray march over the same model | same answer for 98.9 % (Sun) and 99.5 % (Earth) of 1,280 place-and-time pairs; above 99.3 % away from shadow edges |
-| Automated tests | 287 tests in 16 files, run with `npm test` |
+| Automated tests | 287 tests in 16 files, run with `npm test` (one compares the terrain tiles with the 116 MB NASA source file and is skipped when that file has not been downloaded) |
 
 Reproduce: `npm test`, `python3 tools/horizons/fetch_fixtures.py`,
 `npx tsx tools/validation/illumination.ts`, `npx tsx tools/validation/tiles.ts`,
