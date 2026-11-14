@@ -1,0 +1,455 @@
+{
+ "note": "Curated lunar sites. Latitude north-positive, longitude east-positive in -180..180 (converted from the source where noted). Every coordinate is taken from the cited source.",
+ "sites": [
+  {
+   "id": "apollo-11",
+   "name": "Apollo 11",
+   "group": "apollo",
+   "agency": "NASA (USA)",
+   "latDeg": 0.67416,
+   "lonDeg": 23.4731,
+   "kind": "measured landing point",
+   "date": "1969-07-20",
+   "note": "Lunar Module descent stage",
+   "source": {
+    "title": "NASA NSSDCA, Lunar Artifacts and Impact Sites table",
+    "url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html"
+   }
+  },
+  {
+   "id": "apollo-12",
+   "name": "Apollo 12",
+   "group": "apollo",
+   "agency": "NASA (USA)",
+   "latDeg": -3.0128,
+   "lonDeg": -23.4219,
+   "kind": "measured landing point",
+   "date": "1969-11-19",
+   "note": "Lunar Module descent stage",
+   "source": {
+    "title": "NASA NSSDCA, Lunar Artifacts and Impact Sites table",
+    "url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html"
+   }
+  },
+  {
+   "id": "apollo-14",
+   "name": "Apollo 14",
+   "group": "apollo",
+   "agency": "NASA (USA)",
+   "latDeg": -3.64589,
+   "lonDeg": -17.4719,
+   "kind": "measured landing point",
+   "date": "1971-02-05",
+   "note": "Lunar Module descent stage",
+   "source": {
+    "title": "NASA NSSDCA, Lunar Artifacts and Impact Sites table",
+    "url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html"
+   }
+  },
+  {
+   "id": "apollo-15",
+   "name": "Apollo 15",
+   "group": "apollo",
+   "agency": "NASA (USA)",
+   "latDeg": 26.13239,
+   "lonDeg": 3.6333,
+   "kind": "measured landing point",
+   "date": "1971-07-30",
+   "note": "Lunar Module descent stage",
+   "source": {
+    "title": "NASA NSSDCA, Lunar Artifacts and Impact Sites table",
+    "url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html"
+   }
+  },
+  {
+   "id": "apollo-16",
+   "name": "Apollo 16",
+   "group": "apollo",
+   "agency": "NASA (USA)",
+   "latDeg": -8.9734,
+   "lonDeg": 15.5011,
+   "kind": "measured landing point",
+   "date": "1972-04-21",
+   "note": "Lunar Module descent stage",
+   "source": {
+    "title": "NASA NSSDCA, Lunar Artifacts and Impact Sites table",
+    "url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html"
+   }
+  },
+  {
+   "id": "apollo-17",
+   "name": "Apollo 17",
+   "group": "apollo",
+   "agency": "NASA (USA)",
+   "latDeg": 20.1911,
+   "lonDeg": 30.7723,
+   "kind": "measured landing point",
+   "date": "1972-12-11",
+   "note": "Lunar Module descent stage",
+   "source": {
+    "title": "NASA NSSDCA, Lunar Artifacts and Impact Sites table",
+    "url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html"
+   }
+  },
+  {
+   "id": "im-2-athena",
+   "name": "IM-2 Athena",
+   "group": "robotic",
+   "agency": "Intuitive Machines / NASA CLPS (USA)",
+   "latDeg": -84.7906,
+   "lonDeg": 29.1957,
+   "kind": "measured landing point",
+   "date": "2025-03-06",
+   "note": "Mons Mouton region; the lander came to rest on its side",
+   "source": {
+    "title": "LROC: IM-2 Athena Seen Obliquely",
+    "url": "https://www.lroc.asu.edu/images/1408"
+   }
+  },
+  {
+   "id": "im-1-odysseus",
+   "name": "IM-1 Odysseus",
+   "group": "robotic",
+   "agency": "Intuitive Machines / NASA CLPS (USA)",
+   "latDeg": -80.13,
+   "lonDeg": 1.44,
+   "kind": "measured landing point",
+   "date": "2024-02-22",
+   "note": "Near Malapert A",
+   "source": {
+    "title": "LROC: Intuitive Machines IM-1 On The Moon!",
+    "url": "https://www.lroc.asu.edu/images/1360"
+   }
+  },
+  {
+   "id": "chandrayaan-3",
+   "name": "Chandrayaan-3 Vikram",
+   "group": "robotic",
+   "agency": "ISRO (India)",
+   "latDeg": -69.3741,
+   "lonDeg": 32.32,
+   "kind": "measured landing point",
+   "date": "2023-08-23",
+   "note": "",
+   "source": {
+    "title": "LROC: Chandrayaan-3 Landing Site",
+    "url": "https://www.lroc.asu.edu/images/1314"
+   }
+  },
+  {
+   "id": "blue-ghost-1",
+   "name": "Blue Ghost Mission 1",
+   "group": "robotic",
+   "agency": "Firefly Aerospace / NASA CLPS (USA)",
+   "latDeg": 18.5623,
+   "lonDeg": 61.8103,
+   "kind": "measured landing point",
+   "date": "2025-03-02",
+   "note": "Mare Crisium",
+   "source": {
+    "title": "LROC: Blue Ghost Lunar Lander Seen From Above",
+    "url": "https://www.lroc.asu.edu/images/1407"
+   }
+  },
+  {
+   "id": "slim",
+   "name": "SLIM",
+   "group": "robotic",
+   "agency": "JAXA (Japan)",
+   "latDeg": -13.316,
+   "lonDeg": 25.251,
+   "kind": "measured landing point",
+   "date": "2024-01-19",
+   "note": "",
+   "source": {
+    "title": "LROC: JAXA SLIM Landing",
+    "url": "https://www.lroc.asu.edu/images/1358"
+   }
+  },
+  {
+   "id": "change-6",
+   "name": "Chang'e 6",
+   "group": "robotic",
+   "agency": "CNSA (China)",
+   "latDeg": -41.6385,
+   "lonDeg": -153.9852,
+   "kind": "measured landing point",
+   "date": "2024-06-01",
+   "note": "Far side, Apollo basin; source gives 206.0148 E",
+   "source": {
+    "title": "LROC: First Look: Chang'e 6",
+    "url": "https://www.lroc.asu.edu/images/1374"
+   }
+  },
+  {
+   "id": "change-5",
+   "name": "Chang'e 5",
+   "group": "robotic",
+   "agency": "CNSA (China)",
+   "latDeg": 43.0576,
+   "lonDeg": -51.9161,
+   "kind": "measured landing point",
+   "date": "2020-12-01",
+   "note": "Source gives 308.0839 E",
+   "source": {
+    "title": "LROC: First Look: Chang'e 5",
+    "url": "https://www.lroc.asu.edu/images/1172"
+   }
+  },
+  {
+   "id": "change-4",
+   "name": "Chang'e 4",
+   "group": "robotic",
+   "agency": "CNSA (China)",
+   "latDeg": -45.4562,
+   "lonDeg": 177.5885,
+   "kind": "measured landing point",
+   "date": "2019-01-03",
+   "note": "Far side, Von Karman crater",
+   "source": {
+    "title": "LROC: Keeps on Roving!",
+    "url": "https://www.lroc.asu.edu/images/1168"
+   }
+  },
+  {
+   "id": "change-3",
+   "name": "Chang'e 3",
+   "group": "robotic",
+   "agency": "CNSA (China)",
+   "latDeg": 44.1214,
+   "lonDeg": -19.5116,
+   "kind": "measured landing point",
+   "date": "2013-12-14",
+   "note": "Source gives 340.4884 E",
+   "source": {
+    "title": "LROC: Chang'e 3 Lander and Rover From Above",
+    "url": "https://www.lroc.asu.edu/images/637"
+   }
+  },
+  {
+   "id": "feature-5450",
+   "name": "Shackleton crater (centre)",
+   "group": "feature",
+   "agency": "Named lunar feature",
+   "latDeg": -89.67,
+   "lonDeg": 129.78,
+   "kind": "feature location",
+   "date": "",
+   "note": "",
+   "source": {
+    "title": "IAU/USGS Gazetteer of Planetary Nomenclature",
+    "url": "https://planetarynames.wr.usgs.gov/Feature/5450"
+   }
+  },
+  {
+   "id": "feature-16007",
+   "name": "Spudis crater (centre)",
+   "group": "feature",
+   "agency": "Named lunar feature",
+   "latDeg": -89.51,
+   "lonDeg": -84.61,
+   "kind": "feature location",
+   "date": "",
+   "note": "",
+   "source": {
+    "title": "IAU/USGS Gazetteer of Planetary Nomenclature",
+    "url": "https://planetarynames.wr.usgs.gov/Feature/16007"
+   }
+  },
+  {
+   "id": "feature-16008",
+   "name": "Marvin crater (centre)",
+   "group": "feature",
+   "agency": "Named lunar feature",
+   "latDeg": -89.13,
+   "lonDeg": -87.78,
+   "kind": "feature location",
+   "date": "",
+   "note": "",
+   "source": {
+    "title": "IAU/USGS Gazetteer of Planetary Nomenclature",
+    "url": "https://planetarynames.wr.usgs.gov/Feature/16008"
+   }
+  },
+  {
+   "id": "feature-1439",
+   "name": "de Gerlache crater (centre)",
+   "group": "feature",
+   "agency": "Named lunar feature",
+   "latDeg": -88.48,
+   "lonDeg": -88.34,
+   "kind": "feature location",
+   "date": "",
+   "note": "",
+   "source": {
+    "title": "IAU/USGS Gazetteer of Planetary Nomenclature",
+    "url": "https://planetarynames.wr.usgs.gov/Feature/1439"
+   }
+  },
+  {
+   "id": "feature-16004",
+   "name": "Henson crater (centre)",
+   "group": "feature",
+   "agency": "Named lunar feature",
+   "latDeg": -88.57,
+   "lonDeg": -130.63,
+   "kind": "feature location",
+   "date": "",
+   "note": "",
+   "source": {
+    "title": "IAU/USGS Gazetteer of Planetary Nomenclature",
+    "url": "https://planetarynames.wr.usgs.gov/Feature/16004"
+   }
+  },
+  {
+   "id": "feature-5782",
+   "name": "Sverdrup crater (centre)",
+   "group": "feature",
+   "agency": "Named lunar feature",
+   "latDeg": -88.32,
+   "lonDeg": -153.39,
+   "kind": "feature location",
+   "date": "",
+   "note": "",
+   "source": {
+    "title": "IAU/USGS Gazetteer of Planetary Nomenclature",
+    "url": "https://planetarynames.wr.usgs.gov/Feature/5782"
+   }
+  },
+  {
+   "id": "feature-5494",
+   "name": "Shoemaker crater (centre)",
+   "group": "feature",
+   "agency": "Named lunar feature",
+   "latDeg": -88.14,
+   "lonDeg": 45.91,
+   "kind": "feature location",
+   "date": "",
+   "note": "",
+   "source": {
+    "title": "IAU/USGS Gazetteer of Planetary Nomenclature",
+    "url": "https://planetarynames.wr.usgs.gov/Feature/5494"
+   }
+  },
+  {
+   "id": "feature-15325",
+   "name": "Slater crater (centre)",
+   "group": "feature",
+   "agency": "Named lunar feature",
+   "latDeg": -88.08,
+   "lonDeg": 111.29,
+   "kind": "feature location",
+   "date": "",
+   "note": "",
+   "source": {
+    "title": "IAU/USGS Gazetteer of Planetary Nomenclature",
+    "url": "https://planetarynames.wr.usgs.gov/Feature/15325"
+   }
+  },
+  {
+   "id": "feature-14502",
+   "name": "Haworth crater (centre)",
+   "group": "feature",
+   "agency": "Named lunar feature",
+   "latDeg": -87.45,
+   "lonDeg": -5.17,
+   "kind": "feature location",
+   "date": "",
+   "note": "",
+   "source": {
+    "title": "IAU/USGS Gazetteer of Planetary Nomenclature",
+    "url": "https://planetarynames.wr.usgs.gov/Feature/14502"
+   }
+  },
+  {
+   "id": "feature-1919",
+   "name": "Faustini crater (centre)",
+   "group": "feature",
+   "agency": "Named lunar feature",
+   "latDeg": -87.18,
+   "lonDeg": 84.31,
+   "kind": "feature location",
+   "date": "",
+   "note": "",
+   "source": {
+    "title": "IAU/USGS Gazetteer of Planetary Nomenclature",
+    "url": "https://planetarynames.wr.usgs.gov/Feature/1919"
+   }
+  },
+  {
+   "id": "feature-16338",
+   "name": "Mons Malapert",
+   "group": "feature",
+   "agency": "Named lunar feature",
+   "latDeg": -85.98,
+   "lonDeg": -1.67,
+   "kind": "feature location",
+   "date": "",
+   "note": "",
+   "source": {
+    "title": "IAU/USGS Gazetteer of Planetary Nomenclature",
+    "url": "https://planetarynames.wr.usgs.gov/Feature/16338"
+   }
+  },
+  {
+   "id": "feature-953",
+   "name": "Cabeus crater (centre)",
+   "group": "feature",
+   "agency": "Named lunar feature",
+   "latDeg": -85.33,
+   "lonDeg": -42.13,
+   "kind": "feature location",
+   "date": "",
+   "note": "",
+   "source": {
+    "title": "IAU/USGS Gazetteer of Planetary Nomenclature",
+    "url": "https://planetarynames.wr.usgs.gov/Feature/953"
+   }
+  },
+  {
+   "id": "feature-4321",
+   "name": "Nobile crater (centre)",
+   "group": "feature",
+   "agency": "Named lunar feature",
+   "latDeg": -85.28,
+   "lonDeg": 53.27,
+   "kind": "feature location",
+   "date": "",
+   "note": "",
+   "source": {
+    "title": "IAU/USGS Gazetteer of Planetary Nomenclature",
+    "url": "https://planetarynames.wr.usgs.gov/Feature/4321"
+   }
+  },
+  {
+   "id": "feature-16070",
+   "name": "Mons Mouton",
+   "group": "feature",
+   "agency": "Named lunar feature",
+   "latDeg": -84.6,
+   "lonDeg": 31.0,
+   "kind": "feature location",
+   "date": "",
+   "note": "",
+   "source": {
+    "title": "IAU/USGS Gazetteer of Planetary Nomenclature",
+    "url": "https://planetarynames.wr.usgs.gov/Feature/16070"
+   }
+  },
+  {
+   "id": "feature-247",
+   "name": "Amundsen crater (centre)",
+   "group": "feature",
+   "agency": "Named lunar feature",
+   "latDeg": -84.44,
+   "lonDeg": 83.07,
+   "kind": "feature location",
+   "date": "",
+   "note": "",
+   "source": {
+    "title": "IAU/USGS Gazetteer of Planetary Nomenclature",
+    "url": "https://planetarynames.wr.usgs.gov/Feature/247"
+   }
+  }
+ ]
+}

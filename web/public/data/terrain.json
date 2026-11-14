@@ -1,0 +1,19 @@
+{
+ "source": "NASA LRO LOLA gridded data record LDEM_75S_120M (PDS data set LRO-L-LOLA-4-GDR-V1.0)",
+ "coarse": {
+  "file": "ldem_75s_480m.i16",
+  "n": 1906,
+  "scaleM": 480,
+  "heightScale": 0.5,
+  "sampleType": "int16 little-endian, block mean of 4 x 4 source pixels"
+ },
+ "map": {
+  "file": "south-pole-relief.png",
+  "sizePx": 1400,
+  "halfWidthM": 304005.6080198807,
+  "minLatDeg": -80
+ },
+ "check": {
+  "southPoleHeightM": 1292
+ }
+}
