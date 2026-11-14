@@ -27,8 +27,29 @@ The build checks the checksum and writes, in `web/public/data/`:
 
 - `ldem_75s_480m.i16` — the same model reduced to 480 m by 4 x 4 block mean, used in the
   browser for skylines at custom coordinates;
-- `south-pole-relief.png` — shaded relief of everything south of 80 S, rendered by
+- `south-pole-relief.jpg` (PNG where the macOS `sips` tool is not available) — shaded relief of everything south of 80 S, rendered by
   `tools/terrain/build.ts` from the elevation model (not a photograph, not AI-generated);
 - `sites.json` — the curated sites (`data/sites/catalog.json`) with their terrain skylines
   computed at the full 120 m resolution for antenna/panel heights of 2, 10 and 50 m;
 - `terrain.json` — metadata for the files above.
+
+## NASA illumination maps
+
+Two map products of the LOLA team (method: Mazarico et al. 2011) are used as an independent
+reference and as map layers. They give, for every 60 m cell south of 85 S, the share of
+time in which any part of the solar disc (or of the Earth's disc) is above the terrain.
+
+| File | Bytes | SHA-256 |
+|---|---|---|
+| `avgvisib_85s_060m_201608.img` | 51,166,728 | `82dadf321dee28f1947c1fed81858d4cf50fe8eb2aa405aae114e8ab21c1efe1` |
+| `avgvisib_85s_060m_201608_earth.img` | 51,166,728 | `0958313069d6039b2474c875ff662f28dbcba2bd853d9ea458aa807b7948c11f` |
+
+Both are downloaded from
+https://pds-geosciences.wustl.edu/lro/lro-l-lola-3-rdr-v1/lrolol_1xxx/extras/illumination/img/
+into `data/raw/` (not committed). From them the build writes the two colour layers
+(`nasa-average-*.png`), the 240 m one-byte grids (`nasa-average-*-240m.u8`), the long-term
+values stored with each site, and the eight best-lit points added to the site list.
+`npx tsx tools/validation/illumination.ts` compares this project's own computation with the
+two maps at 400 points; the result is in `docs/validation-illumination.json`
+(correlation 0.98, mean absolute difference 0.01 for both Sun and Earth).
+

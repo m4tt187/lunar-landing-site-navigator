@@ -4,9 +4,11 @@ import { FLAT_HORIZON, computeTerrainHorizon, makePolarDem } from '@engine/index
 import type { HorizonProfile, PolarDem } from '@engine/index';
 
 export interface CatalogSite {
-  id: string; name: string; group: 'apollo' | 'robotic' | 'feature'; agency: string;
+  id: string; name: string; group: 'apollo' | 'robotic' | 'feature' | 'sunlit'; agency: string;
   latDeg: number; lonDeg: number; kind: string; date: string; note: string;
   source: { title: string; url: string };
+  /** Long-term averages from the NASA LOLA-team maps (surface level), where the maps cover the site. */
+  nasaLongTerm?: { sunlight: number; earth: number } | null;
   terrain: null | {
     groundHeightM: number; azStepDeg: number; modelEdgeReached: boolean; profiles: Record<string, number[]>;
   };

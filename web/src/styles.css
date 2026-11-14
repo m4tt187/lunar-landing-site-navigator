@@ -112,3 +112,5 @@ table.compare tbody tr { cursor: pointer; }
 table.compare tbody tr:hover { background: #161b25; }
 table.compare td.best { color: var(--both); font-weight: 700; }
 .badge.small { width: 20px; height: 20px; font-size: 0.8rem; vertical-align: middle; }
+
+.site-dot circle.sunlit { fill: var(--sun); stroke: #000; }

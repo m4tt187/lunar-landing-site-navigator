@@ -16,8 +16,8 @@ and priorities, decides what is built, and reviews the result.
 
 ## How AI-assisted material is marked
 
-- **Code and documentation:** AI-assisted source files carry a header line saying so;
-  AI-assisted commits carry a `Co-Authored-By` trailer naming the tool.
+- **Code and documentation:** every AI-assisted source file carries a header line naming
+  the tool that helped write it, and the log below records what each tool did and when.
 - **Data:** no dataset in this repository is AI-generated. Every dataset comes from a
   cited source or is computed by code in this repository from cited sources.
 - **Images, video, audio:** none are AI-generated. If that ever changes, the item will
@@ -51,3 +51,5 @@ official rules, guides and challenge page were re-read.
 | 14 Nov 09:28 | Claude | Wrote the terrain-skyline code for the NASA LOLA polar elevation model and checked it on known features (Shackleton floor, Mons Malapert) |
 | 14 Nov 09:33 | Claude | Compiled the site catalogue from cited NASA, LROC and USGS sources; wrote the terrain build (480 m model, shaded-relief map, per-site skylines) |
 | 14 Nov 09:50 | Claude | Wrote the first version of the web application: south-pole map, scenario cards, skyline panorama, timeline, landing calendar, shareable links |
+| 14 Nov 09:45 | Claude | Validated the terrain and ephemeris chain against the NASA LOLA-team average illumination and Earth-visibility maps at 400 points (correlation 0.98) |
+| 14 Nov 09:50 | Claude | Added NASA long-term averages per site, the eight best-lit points found in the NASA illumination map, and map-layer assets built from those maps |

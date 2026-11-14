@@ -75,7 +75,7 @@ function nextChange(a: Analysis, windows: Interval[], tMs: number, up: boolean, 
 }
 
 function siteOptions(app: AppData) {
-  const groups: [CatalogSite['group'], string][] = [['robotic', 'Robotic landers'], ['feature', 'South-pole features'], ['apollo', 'Apollo']];
+  const groups: [CatalogSite['group'], string][] = [['robotic', 'Robotic landers'], ['sunlit', 'Best-lit points (NASA illumination map)'], ['feature', 'South-pole features'], ['apollo', 'Apollo']];
   return groups.map(([group, label]) => (
     <optgroup label={label}>
       {app.sites.filter((s) => s.group === group).map((s) => <option value={s.id}>{s.name}</option>)}
@@ -130,7 +130,7 @@ function MapPanel({ app }: { app: AppData }) {
                 <title>{`${s.name} — ${fmtLatLon(s.latDeg, s.lonDeg)}`}</title>
                 <circle cx={p.x * 1000} cy={p.y * 1000} r="9" fill="transparent" />
                 <circle cx={p.x * 1000} cy={p.y * 1000} r={s.group === 'robotic' ? 5 : 3.5} class={s.group} />
-                <text x={p.x * 1000 + 8} y={p.y * 1000 + 4} class="map-label">{s.name.replace(' crater (centre)', '')}</text>
+                <text x={p.x * 1000 + 8} y={p.y * 1000 + 4} class="map-label">{s.group === 'sunlit' ? s.name.split(' (')[0] : s.name.replace(' crater (centre)', '')}</text>
               </g>
             );
           })}
@@ -294,7 +294,7 @@ function Card({ scenario, index, app }: { scenario: Scenario; index: number; app
         <div class="muted">{fmtUtc(tMs)} · {fmtSpan(cursorH.value)} after landing</div>
       </div>
       <Timeline a={a} cursorH={cursorH.value} onCursor={(h) => { cursorH.value = h; }} />
-      <p class="muted small">{terrainNote}{a.terrain.modelEdgeReached ? ' · the terrain model ends before the far horizon in some directions' : ''}{a.terrain.kind !== 'none' ? ` · ground ${a.terrain.groundHeightM} m` : ''}
+      <p class="muted small">{terrainNote}{a.terrain.modelEdgeReached ? ' · the terrain model ends before the far horizon in some directions' : ''}{a.terrain.kind !== 'none' ? ` · ground ${a.terrain.groundHeightM} m` : ''}{a.catalog?.nasaLongTerm ? ` · NASA long-term average at this spot (surface level): ${pct(a.catalog.nasaLongTerm.sunlight)} sunlight, ${pct(a.catalog.nasaLongTerm.earth)} Earth in view` : ''}
         {a.catalog ? <> · coordinates: <a href={a.catalog.source.url} target="_blank" rel="noreferrer">{a.catalog.source.title}</a></> : null}</p>
       <div class="card-actions">
         <button type="button" disabled={scenarios.value.length >= MAX_SCENARIOS} onClick={() => addScenario({ ...scenario, startMs: clampTime(scenario.startMs + LUNAR_MONTH_DAYS * DAY) })}>Compare: same site, one lunar month later</button>

@@ -10,7 +10,7 @@ const EARTH_RADIUS_KM = 6378.137;
 export const MIN_TIME_MS = Date.UTC(2000, 0, 1);
 export const MAX_TIME_MS = Date.UTC(2051, 0, 1);
 const MAX_SAMPLES = 100000;
-type Vec = readonly [number, number, number];
+export type Vec = readonly [number, number, number];
 
 export function validateTime(tMs: number): void {
   if (!Number.isFinite(tMs) || tMs < MIN_TIME_MS || tMs > MAX_TIME_MS)
@@ -58,16 +58,28 @@ export function projectBody(site: Site, vectorKm: Vec, radiusKm: number): BodySa
   };
 }
 
-/** Approximate apparent directions; Horizons residuals are measured separately. */
-export function computeSample(site: Site, tMs: number): Sample {
-  validateSite(site); validateTime(tMs);
+/** Apparent Sun and Earth positions relative to the Moon's centre, in the Moon-fixed frame, in km. */
+export interface MoonFixedVectors { sun: Vec; earth: Vec }
+export function moonFixedVectors(tMs: number): MoonFixedVectors {
+  validateTime(tMs);
   const basis = moonBasis(tMs);
-  const body = (target: Body, radiusKm: number): BodySample => {
+  const body = (target: Body): Vec => {
     const v = BackdatePosition(new Date(tMs), Body.Moon, target, true);
     const inertial: Vec = [v.x*KM_PER_AU,v.y*KM_PER_AU,v.z*KM_PER_AU];
-    return projectBody(site, [dot(inertial,basis[0]),dot(inertial,basis[1]),dot(inertial,basis[2])], radiusKm);
+    return [dot(inertial,basis[0]),dot(inertial,basis[1]),dot(inertial,basis[2])];
   };
-  return {tMs, sun: body(Body.Sun,SUN_RADIUS_KM), earth: body(Body.Earth,EARTH_RADIUS_KM)};
+  return { sun: body(Body.Sun), earth: body(Body.Earth) };
+}
+
+/** Sun and Earth as seen from a site, from precomputed Moon-fixed vectors (fast for many sites). */
+export function sampleFromVectors(site: Site, tMs: number, vectors: MoonFixedVectors): Sample {
+  return {tMs, sun: projectBody(site, vectors.sun, SUN_RADIUS_KM), earth: projectBody(site, vectors.earth, EARTH_RADIUS_KM)};
+}
+
+/** Approximate apparent directions; Horizons residuals are measured separately. */
+export function computeSample(site: Site, tMs: number): Sample {
+  validateSite(site);
+  return sampleFromVectors(site, tMs, moonFixedVectors(tMs));
 }
 
 export function computeSeries(site: Site, startMs: number, endMs: number, stepS: number): Series {

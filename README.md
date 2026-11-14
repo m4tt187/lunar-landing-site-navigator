@@ -53,10 +53,9 @@ added.
 ## Use of AI tools
 
 This project is built with substantial help from AI coding tools (Anthropic Claude via
-Claude Code, and OpenAI Codex), working under the direction of the team. AI-assisted
-source files say so in their header, AI-assisted commits carry a `Co-Authored-By`
-trailer, and [docs/ai-usage-log.md](docs/ai-usage-log.md) records how the tools were
-used. No AI-generated images, video or audio are included unless explicitly marked.
+Claude Code, and OpenAI Codex), working under the direction of the team. Every
+AI-assisted source file says so in its header, and
+[docs/ai-usage-log.md](docs/ai-usage-log.md) records what each tool did and when. No AI-generated images, video or audio are included unless explicitly marked.
 
 ## Licence
 
