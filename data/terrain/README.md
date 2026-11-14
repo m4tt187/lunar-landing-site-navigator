@@ -33,6 +33,20 @@ The build checks the checksum and writes, in `web/public/data/`:
   computed at the full 120 m resolution for antenna/panel heights of 2, 10 and 50 m;
 - `terrain.json` — metadata for the files above.
 
+## 120 m tiles for sites picked on the map
+
+`npx tsx tools/terrain/tiles.ts` cuts the same source file into tiles of 256 x 256
+samples (30.7 km a side) and writes, in `web/public/data/tiles/120m/`, the 431 tiles
+needed for every point south of 80 S to have the complete 3 x 3 block around it, plus
+`index.json` (grid description, list of tiles, highest point). Each tile holds the
+original samples, unchanged: prediction residuals (sample minus left + up - upper-left)
+as little-endian 16-bit integers, gzip-compressed; 23.1 MB in all. The output is the same
+on every run. `npx tsx tools/terrain/tiles.ts --verify` reads the source again and
+checks every sample of every tile (28,246,016 samples) and the index.
+
+`npx tsx tools/validation/tiles.ts` measures what the tiles are worth; the result is in
+`docs/validation-tiles.json` and summarised in `docs/engine/tiles.md`.
+
 ## NASA illumination maps
 
 Two map products of the LOLA team (method: Mazarico et al. 2011) are used as an independent

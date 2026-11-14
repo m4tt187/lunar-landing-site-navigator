@@ -7,7 +7,9 @@ import { computed, effect, signal } from '@preact/signals';
 import type { PolarDem, Thresholds } from '@engine/index';
 import { analyze } from './compute';
 import type { Analysis } from './compute';
-import { catalogSiteAt, loadDem } from './data';
+import type { Scenario } from './state';
+import { catalogSiteAt, fineTerrainReady, loadDem, loadFineTerrainAround } from './data';
+import type { AppData, FineTerrain } from './data';
 import {
   cursorH, data, durationDays, earthRule, encodeState, scenarios, selectedId, sunRule, updateScenario,
 } from './state';
@@ -19,10 +21,33 @@ export const thresholds = computed<Thresholds>(() => ({
   sunMinDiskFraction: sunRule.value, earthMinElevationAboveHorizonDeg: earthRule.value,
 }));
 
+// The 120 m terrain around picked sites. `fineArrivals` counts the loads that have
+// finished, so that the analyses are redone when tiles arrive; `fineFailed` is set
+// when tiles cannot be had (an old browser, no network): the 480 m model is then used.
+const fine = signal<FineTerrain | null>(null);
+const fineArrivals = signal(0);
+export const fineFailed = signal(false);
+/** Picked points that turned out to lie outside the area the tiles cover. */
+const withoutFine = new Set<string>();
+
+/** A picked site that needs a skyline computed from the elevation data (not a catalogue site, inside the mapped area). */
+function pickedPoint(s: Scenario, app: AppData): { latDeg: number; lonDeg: number } | null {
+  const c = s.custom;
+  return c && c.latDeg <= app.terrain.map.minLatDeg && !catalogSiteAt(app, c.latDeg, c.lonDeg) ? c : null;
+}
+
+function fineFor(s: Scenario, app: AppData): FineTerrain | 'pending' | null {
+  const point = pickedPoint(s, app);
+  if (!point || fineFailed.value || withoutFine.has(`${point.latDeg}|${point.lonDeg}`)) return null;
+  const store = fine.value;
+  return store && fineTerrainReady(store, point.latDeg, point.lonDeg) ? store : 'pending';
+}
+
 export const analyses = computed<(Analysis | null)[]>(() => {
   const app = data.value;
   if (!app) return [];
-  return scenarios.value.map((s) => analyze(s, app, dem.value, durationDays.value, thresholds.value));
+  void fineArrivals.value;
+  return scenarios.value.map((s) => analyze(s, app, dem.value, fineFor(s, app), durationDays.value, thresholds.value));
 });
 
 export const selectedIndex = computed(() => Math.max(0, scenarios.value.findIndex((s) => s.id === selectedId.value)));
@@ -35,11 +60,27 @@ export function needDem(): void {
   loadDem(app.terrain).then((d) => { dem.value = d; }, (e: unknown) => { demError.value = String(e); });
 }
 
+/** Fetch the 120 m tiles around a picked point (each tile once). */
+function needFine(latDeg: number, lonDeg: number): void {
+  if (fineFailed.value) return;
+  loadFineTerrainAround(latDeg, lonDeg).then(
+    (store) => {
+      if (store) fine.value = store; else withoutFine.add(`${latDeg}|${lonDeg}`);
+      fineArrivals.value++;
+    },
+    () => { fineFailed.value = true; },
+  );
+}
+
 effect(() => {
   const app = data.value;
   if (!app) return;
-  if (scenarios.value.some((s) => s.custom && s.custom.latDeg <= app.terrain.map.minLatDeg && !catalogSiteAt(app, s.custom.latDeg, s.custom.lonDeg)))
+  for (const s of scenarios.value) {
+    const point = pickedPoint(s, app);
+    if (!point) continue;
     needDem();
+    needFine(point.latDeg, point.lonDeg);
+  }
 });
 
 // Keep the cursor inside the span and the address bar in step with the state.

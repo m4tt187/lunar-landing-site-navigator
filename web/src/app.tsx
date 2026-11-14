@@ -216,6 +216,7 @@ function Card({ scenario, index, app }: { scenario: Scenario; index: number; app
     : <>{EVENT_VERB[kind]}s in <b>{fmtSpan((at - instant.tMs) / HOUR)}</b></>);
   const s = a.summary;
   const terrainNote = a.terrain.kind === 'lola-120m' ? 'Skyline from NASA LOLA terrain on a 120 m grid, out to 400 km.'
+    : a.terrain.kind === 'lola-120m-near' ? 'Skyline from NASA LOLA terrain: the 120 m grid for at least 30 km around the site, a 480 m grid beyond, out to 400 km.'
     : a.terrain.kind === 'lola-480m' ? 'Skyline from NASA LOLA terrain on a coarser 480 m grid: an estimate. Small ridges close to the site are smoothed out, and sunlight can differ by ten points or more from a 120 m result. The marked sites use the finer model.'
     : 'No terrain model for this latitude yet: the horizon is that of a smooth sphere, so hills and crater walls are not counted.';
   return (

@@ -5,5 +5,7 @@ export * from './geometry';
 export * from './analysis';
 export * from './terrain';
 export * from './sweep';
+export * from './eclipse';
 export * from './ephemeris';
 export * from './planning';
+export * from './tiles';
