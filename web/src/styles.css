@@ -53,9 +53,10 @@ button.ghost { background: none; border: none; font-size: 1.3rem; line-height: 1
 .scrub b { color: var(--fg); }
 .play { min-width: 92px; }
 
-.layout { display: grid; grid-template-columns: minmax(320px, 0.82fr) 2fr; gap: 14px; align-items: start; }
+.layout { display: grid; grid-template-columns: minmax(340px, 1.1fr) 2fr; gap: 14px; align-items: start; }
+.side { position: sticky; top: 8px; }
 .cards { display: grid; grid-template-columns: repeat(var(--columns, 2), minmax(0, 1fr)); gap: 14px; }
-@media (max-width: 1150px) { .layout { grid-template-columns: 1fr; } .side { max-width: 640px; } }
+@media (max-width: 1150px) { .layout { grid-template-columns: 1fr; } .side { max-width: 640px; position: static; } }
 @media (max-width: 760px) { .cards { grid-template-columns: 1fr; } }
 
 .layers { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
