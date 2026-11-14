@@ -238,7 +238,7 @@ function main(): void {
     const nearest = features.map((f) => ({ f, km: distanceKm(peak.latDeg, peak.lonDeg, f.latDeg, f.lonDeg) })).sort((a, b) => a.km - b.km)[0]!;
     const near = nearest.f.name.replace(' crater (centre)', '');
     return {
-      id: `sunlit-${i + 1}`, name: `Sunlit peak ${String.fromCharCode(65 + i)} (near ${near})`, group: 'sunlit',
+      id: `sunlit-${i + 1}`, name: `Sunlit peak ${i + 1} (near ${near})`, group: 'sunlit',
       agency: 'Found in the NASA LOLA-team average-sunlight map', latDeg: peak.latDeg, lonDeg: peak.lonDeg,
       kind: 'derived from NASA data', date: '',
       note: `One of the eight best-lit places in NASA's long-term sunlight map, ${Math.round(nearest.km)} km from the centre of ${near}`,
