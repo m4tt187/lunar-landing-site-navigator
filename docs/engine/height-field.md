@@ -45,6 +45,41 @@ It must be synchronous when called by the engine. Unknown observer ground height
 is an error; unknown height along a ray sets `truncated`. A composite should use
 its coarse fallback before returning NaN.
 
+`HorizonOptions.originHeightM` fixes the observer's absolute eye height above the
+reference sphere. When supplied it replaces `groundHeightM + observerHeightM`;
+the returned `groundHeightM` still describes this field's actual ground. This
+lets near rays over fine terrain and far rays over coarse terrain share one
+observer position even when interpolation gives different heights at the site.
+The absolute height must be finite and above the lunar centre. It can be zero,
+negative, or below the coarse model's local ground. The usual mast argument
+still must be in [0, 20000], and unknown observer ground remains an error.
+
+An analytic regression combines near and far skylines with a distant wide
+ridge and deliberately inconsistent fine/coarse origin heights. The maximum
+matches a single march over the same physical terrain within 1e-6 degrees.
+This checks observer geometry, not general equivalence of different ray
+sampling grids: `firstStepM` sets both the first sampled distance
+and the minimum subsequent increment. Setting it to 30000 samples at 30 km
+intervals and can miss narrow mountains; it is not a safe way to skip nearby
+terrain while retaining the coarse DEM's spatial resolution.
+
+Use `minDistanceM` to skip the near region while keeping the ray's normal
+sampling lattice. For example, the far coarse call can use
+`{ minDistanceM: 30000, originHeightM: fineGroundHeightM + mastHeightM }`.
+The engine advances its existing distance recurrence without reading terrain
+until that minimum is reached; it does not reset the sampling phase at the
+boundary. The mandatory ground lookup is still performed. The minimum must be
+finite, nonnegative and no greater than the maximum distance. A range that
+contains no eligible sample throws instead of returning an empty skyline.
+
+Regressions include a narrow ridge at 45 km missed by a 30 km increment, and
+exact near/far agreement of both skyline angles and winning distances over
+an asymmetric terrain field. Exact partition equivalence requires the **same
+explicit `firstStepM`** in both calls, as well as the same eye height, terrain,
+and azimuth grid. Different default resolutions intentionally produce different
+sampling lattices and do not carry that exact-equality guarantee. The preflight
+work budget remains conservatively based on the full ray distance.
+
 The direct `PolarDem` call retains its existing grid lookup inside the ray loop;
 it does not use a callback adapter. In one local warmed benchmark (720 rays over
 the same synthetic grid), median time was 3.78 ms before and 3.99 ms after the

@@ -96,12 +96,16 @@ export function demHeightAt(dem: PolarDem, latDeg: number, lonDeg: number): numb
 }
 
 export interface HorizonOptions {
+  /** Absolute eye height above the 1737.4 km sphere; replaces ground + observerHeightM. */
+  originHeightM?: number;
   /** Positive azimuth step dividing 360 degrees; at most 36000 bins (default 0.5). */
   azStepDeg?: number;
   /** Positive distance in km along the surface, at most a semicircle (default 400). */
   maxDistanceKm?: number;
   /** Positive first step in metres, no farther than maxDistanceKm (default: half a pixel). */
   firstStepM?: number;
+  /** Skip samples nearer than this distance without changing the ray's sampling lattice (default 0). */
+  minDistanceM?: number;
 }
 
 export interface TerrainHorizon {
@@ -116,7 +120,8 @@ export interface TerrainHorizon {
 
 /**
  * Skyline elevation angle for every azimuth as seen from `observerHeightM` above
- * the ground at the given site. Angles are relative to the local horizontal
+ * the ground at the given site, or the absolute `originHeightM` when supplied.
+ * Angles are relative to the local horizontal
  * plane; on a smooth sphere the result would be slightly negative (the dip).
  * Observer height is in [0, 20000] m. Requests exceeding five million ray
  * samples are rejected; increase the azimuth or distance step to reduce work.
@@ -145,6 +150,9 @@ export function computeTerrainHorizon(
     throw new RangeError('Maximum distance must be positive, finite and no greater than a lunar semicircle.');
   if (!Number.isFinite(first) || first <= 0 || first > maxDist)
     throw new RangeError('First step must be positive, finite and no greater than the maximum distance.');
+  const minDist = options.minDistanceM ?? 0;
+  if (!Number.isFinite(minDist) || minDist < 0 || minDist > maxDist)
+    throw new RangeError('Minimum distance must be finite, nonnegative and no greater than the maximum distance.');
   // At most 250 fixed steps, then geometric growth. Bound work before allocating
   // the profile, including tiny steps whose distance ratio would overflow.
   const ratio = maxDist / first;
@@ -152,11 +160,20 @@ export function computeTerrainHorizon(
     Math.ceil(Math.max(0, Math.log(ratio * RAY_GROWTH)) / Math.log1p(RAY_GROWTH)) + 1;
   if (bins * raySamples > MAX_TERRAIN_SAMPLES)
     throw new RangeError('Requested horizon exceeds five million terrain samples; increase a sampling step.');
+  // Preserve the full ray's lattice so adjacent distance ranges can be composed
+  // without a sampling-phase shift. This bounded walk runs once, not per ray.
+  let startDistance = first;
+  while (startDistance < minDist) startDistance += Math.max(first, startDistance * RAY_GROWTH);
+  if (startDistance > maxDist)
+    throw new RangeError('Requested distance range contains no terrain samples; widen the range or reduce the step.');
   const ground = dem ? demHeightAt(dem, latDeg, lonDeg) : field!.heightAt(latDeg, lonDeg);
   if (!Number.isFinite(ground)) throw new RangeError('Site is outside the elevation model or has a non-finite height.');
   if (R_M + ground <= 0) throw new RangeError('Terrain height must be above the lunar centre.');
   if (ground > source.maxHeightM + maxHeightTolerance) throw new RangeError('Terrain height exceeds the declared maximum.');
-  const r0 = R_M + ground + observerHeightM;
+  const originHeight = options.originHeightM === undefined ? ground + observerHeightM : options.originHeightM;
+  if (!Number.isFinite(originHeight) || R_M + originHeight <= 0)
+    throw new RangeError('Absolute observer height must be finite and above the lunar centre.');
+  const r0 = R_M + originHeight;
   const rMax = R_M + source.maxHeightM;
   const lat1 = latDeg * DEG, lon1 = lonDeg * DEG;
   const sinLat1 = Math.sin(lat1), cosLat1 = Math.cos(lat1);
@@ -173,7 +190,7 @@ export function computeTerrainHorizon(
     const rayY = -sinLat1 * sinLon1 * cosAz + cosLon1 * sinAz;
     const rayZ = cosLat1 * cosAz;
     let best = -Math.PI / 2, bestD = 0;
-    let d = first;
+    let d = startDistance;
     while (d <= maxDist) {
       const g = d / R_M, sinG = Math.sin(g), cosG = Math.cos(g);
       // No terrain farther out can rise above the current skyline: stop.

@@ -16,6 +16,9 @@ The public entry is `engine/src/index.ts` (UI alias `@engine`). Types are in
 - `computeSeries(site, startMs, endMs, stepS)` includes both endpoints. `timesMs`
   and `endMs` are additions to the initial proposal: the last interval can be
   shorter than `stepS`. Consumers MUST use `timesMs[i]` for timestamps.
+  A finite step larger than the span yields exactly the two endpoints, including
+  if seconds-to-milliseconds conversion would overflow. A step that cannot
+  produce strictly increasing timestamps at the requested epoch is rejected.
 - `HorizonProfile` samples a periodic 360-degree skyline. `elDeg.length *
   azStepDeg` must equal 360 (within floating-point tolerance). A singleton with
   step 360 is a constant horizon. A zero profile represents a smooth tangent
@@ -68,6 +71,13 @@ existing grid. The synchronous provider supplies heights in the same lunar
 reference sphere, a conservative global maximum, and its finest resolution.
 Unknown coverage is NaN. See [height-field.md](height-field.md) for composition,
 validation requirements and the unchanged direct-grid path.
+The optional `HorizonOptions.originHeightM` replaces ground plus mast with an
+absolute eye height above the reference sphere, allowing different-resolution
+fields to share one physical observer. It must be finite and above the lunar
+centre; the field must still contain the observer's ground location.
+`minDistanceM` skips near samples on the original ray sampling lattice, without
+enlarging the increment. Use it rather than a large `firstStepM` to partition
+near and far terrain. Empty sampling ranges are rejected.
 
 Invalid or nonfinite inputs throw descriptive errors; there are no silent fake
 ephemerides or implicit network fallbacks. Use a Web Worker for long series;

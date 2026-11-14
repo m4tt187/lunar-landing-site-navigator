@@ -86,7 +86,11 @@ export function computeSeries(site: Site, startMs: number, endMs: number, stepS:
   validateSite(site); validateTime(startMs); validateTime(endMs);
   if (!(endMs > startMs)) throw new RangeError('End time must be after start time.');
   if (!Number.isFinite(stepS) || stepS <= 0) throw new RangeError('Step must be a positive finite number of seconds.');
-  const n = Math.ceil((endMs-startMs)/(stepS*1000))+1;
+  // An oversized finite cadence still means two endpoints. Clamp before using
+  // it in timestamps, including when converting seconds to ms would overflow.
+  const stepMs = Math.min(stepS*1000,endMs-startMs);
+  if (!(startMs+stepMs>startMs)) throw new RangeError('Step must advance the timestamp at the requested time precision.');
+  const n = Math.ceil((endMs-startMs)/stepMs)+1;
   if (n > MAX_SAMPLES) throw new RangeError('Requested series exceeds 100000 samples; increase the step.');
   const series: Series = {
     site: {...site}, startMs, endMs, stepS, n, timesMs: new Float64Array(n),
@@ -94,7 +98,9 @@ export function computeSeries(site: Site, startMs: number, endMs: number, stepS:
     earthAz:new Float64Array(n),earthEl:new Float64Array(n),earthRadius:new Float64Array(n),
   };
   for (let i=0;i<n;i++) {
-    const tMs = Math.min(endMs,startMs+i*stepS*1000);
+    const tMs = i===n-1 ? endMs : Math.min(endMs,startMs+i*stepMs);
+    if (i>0 && !(tMs>series.timesMs[i-1]!))
+      throw new RangeError('Series timestamps do not advance; increase the step to match time precision.');
     const sample = computeSample(site,tMs);
     series.timesMs[i] = tMs;
     series.sunAz[i] = sample.sun.azDeg; series.sunEl[i] = sample.sun.elDeg; series.sunRadius[i] = sample.sun.angularRadiusDeg;
