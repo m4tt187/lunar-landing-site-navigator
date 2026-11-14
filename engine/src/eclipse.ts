@@ -463,6 +463,22 @@ export function sunCoverAt(site: Site, tMs: number): { coveredFraction: number; 
 }
 
 /**
+ * True when the Earth alone keeps the Sun from counting as up at a site and
+ * instant: with "any part shows" (0) when the whole Sun is covered, otherwise
+ * when less than the required fraction of the disc is left. Terrain is not
+ * considered. Used by the map layers, which treat an eclipse as one event for the
+ * whole mapped area.
+ */
+export function sunHiddenByEarth(site: Site, tMs: number, minVisibleFraction: number): boolean {
+  validateSite(site);
+  if (!(minVisibleFraction >= 0 && minVisibleFraction <= 1))
+    throw new RangeError('Minimum visible fraction must be between 0 and 1.');
+  const s = discStateAt(site, tMs);
+  const visible = 1 - lensFraction(s.separationDeg, s.sunRadiusDeg, s.earthDiscDeg);
+  return minVisibleFraction > 0 ? visible < minVisibleFraction : visible <= 0;
+}
+
+/**
  * Every interval in [fromMs, toMs] during which the Earth covers part of the
  * Sun at a site, ignoring terrain. Contact times are refined to about a second.
  *

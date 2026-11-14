@@ -5,7 +5,8 @@
 // the map layers: "now" (one instant) and the mission layers (many instants,
 // added up into a share of the mission).
 import { signal } from '@preact/signals';
-import { directionFromPole, moonFixedVectors, raiseDirection } from '@engine/index';
+import { directionFromPole, moonFixedVectors, raiseDirection, sunHiddenByEarth } from '@engine/index';
+import type { Site } from '@engine/index';
 import { loadDem } from '../data';
 import type { TerrainMeta } from '../data';
 import type { InitMessage, RunMessage, WorkerReply } from './worker';
@@ -42,7 +43,14 @@ const BATCH = 2;
 const SUN_RADIUS_KM = 695700;
 const DEG = Math.PI / 180;
 
-interface Batch { job: number; mastM: number; binM: number; sun: Float64Array; earth: Float64Array }
+interface Batch { job: number; mastM: number; binM: number; sun: Float64Array; earth: Float64Array; sunHidden: Uint8Array }
+
+/**
+ * An eclipse is one event for the whole map: the Earth's direction differs by
+ * less than 0.05 degrees across the mapped area, which shifts the contacts by a
+ * few minutes at most. It is judged at the pole.
+ */
+const POLE: Site = { id: 'south-pole', name: 'South pole', latDeg: -90, lonDeg: 0, heightM: 0 };
 interface Slot { worker: Worker; busy: boolean }
 
 const slots: Slot[] = [];
@@ -61,16 +69,18 @@ function vanDerCorput(index: number): number {
   return result;
 }
 
-function directionsFor(request: LayerRequest, times: number[]): { sun: Float64Array; earth: Float64Array } {
+function directionsFor(request: LayerRequest, times: number[]): { sun: Float64Array; earth: Float64Array; sunHidden: Uint8Array } {
   const sun = new Float64Array(times.length * 3), earth = new Float64Array(times.length * 3);
+  const sunHidden = new Uint8Array(times.length);
   times.forEach((tMs, i) => {
+    sunHidden[i] = sunHiddenByEarth(POLE, tMs, request.sunFraction) ? 1 : 0;
     const v = moonFixedVectors(tMs);
     const sunRadiusDeg = Math.asin(SUN_RADIUS_KM / Math.hypot(v.sun[0], v.sun[1], v.sun[2])) / DEG;
     // Raise or lower the tested direction so that the rule ("any part", "half", "whole disc") becomes a point test.
     sun.set(raiseDirection(v.sun, (1 - 2 * request.sunFraction) * sunRadiusDeg), 3 * i);
     earth.set(raiseDirection(directionFromPole(v.earth), -request.earthMarginDeg), 3 * i);
   });
-  return { sun, earth };
+  return { sun, earth, sunHidden };
 }
 
 function pump(): void {
@@ -138,11 +148,14 @@ export function requestMission(request: LayerRequest): void {
   if (!grid || missionResult.value?.key === key) return;
   const times: number[] = [];
   for (let i = 0; i < MISSION_SAMPLES; i++) times.push(request.startMs + vanDerCorput(i + 1) * (request.endMs - request.startMs));
-  const { sun, earth } = directionsFor(request, times);
+  const { sun, earth, sunHidden } = directionsFor(request, times);
   missionJob = ++jobCounter;
   missionQueue = [];
   for (let i = 0; i < MISSION_SAMPLES; i += BATCH)
-    missionQueue.push({ job: missionJob, mastM: request.mastM, binM: scaleM, sun: sun.slice(3 * i, 3 * (i + BATCH)), earth: earth.slice(3 * i, 3 * (i + BATCH)) });
+    missionQueue.push({
+      job: missionJob, mastM: request.mastM, binM: scaleM,
+      sun: sun.slice(3 * i, 3 * (i + BATCH)), earth: earth.slice(3 * i, 3 * (i + BATCH)), sunHidden: sunHidden.slice(i, i + BATCH),
+    });
   const cells = grid.size * grid.size;
   missionResult.value = { key, samples: 0, total: MISSION_SAMPLES, sun: new Uint16Array(cells), earth: new Uint16Array(cells), both: new Uint16Array(cells) };
   pump();
@@ -153,8 +166,8 @@ export function requestNow(request: LayerRequest): void {
   const key = keyOf(request);
   if (!mapGrid.value || key === nowKey) return;
   nowKey = key;
-  const { sun, earth } = directionsFor(request, [request.startMs]);
+  const { sun, earth, sunHidden } = directionsFor(request, [request.startMs]);
   nowJob = ++jobCounter;
-  nowQueue = { job: nowJob, mastM: request.mastM, binM: request.coarse ? scaleM * 2 : scaleM, sun, earth };
+  nowQueue = { job: nowJob, mastM: request.mastM, binM: request.coarse ? scaleM * 2 : scaleM, sun, earth, sunHidden };
   pump();
 }

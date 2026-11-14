@@ -16,7 +16,7 @@ import { marginsOf, sampleMargins, summarize, sunDiskFractionVisible } from '../
 import {
   EARTH_ATMOSPHERE_KM, EARTH_MEAN_RADIUS_FACTOR, MAX_SEPARATION_RATE_DEG_PER_H, earthOffsetFromSun, eclipseMarginDeg, eclipseState,
   eclipsesInSeries, enlargedEarthRadiusDeg, findEclipses, separationDeg, sunCoverAt, sunDiskFractionVisibleWithEarth,
-  sunFractionCoveredByEarth, sunMarginWithEarth,
+  sunFractionCoveredByEarth, sunHiddenByEarth, sunMarginWithEarth,
 } from '../../engine/src/eclipse.ts';
 import { buildVectorTable, seriesFromTable } from '../../engine/src/ephemeris.ts';
 import { MOON_RADIUS_KM, computeSample, moonFixedVectors, sampleFromVectors } from '../../engine/src/geometry.ts';
@@ -590,6 +590,24 @@ describe('eclipses seen from a site', () => {
         expect(sunCoverAt(SOUTH_POLE, event.totalEndMs! + 5000).coveredFraction).toBeLessThan(1);
       }
     }
+  });
+
+  it('says when the Earth alone hides the Sun under each rule', () => {
+    const event = south.find((e) => e.totalStartMs !== null)!;
+    const rules = [0, 0.5, 1];
+    const hidden = (tMs: number): boolean[] => rules.map((rule) => sunHiddenByEarth(SOUTH_POLE, tMs, rule));
+    // Before first contact nothing is hidden; just after it only "the whole disc" fails.
+    expect(hidden(event.startMs - MIN)).toEqual([false, false, false]);
+    expect(hidden(event.startMs + MIN)).toEqual([false, false, true]);
+    // During totality every rule fails; a minute before it "any part" still holds.
+    expect(hidden(event.maxAtMs)).toEqual([true, true, true]);
+    expect(hidden(event.totalStartMs! - MIN)).toEqual([false, true, true]);
+    expect(hidden(event.totalEndMs! + MIN)).toEqual([false, true, true]);
+    // "Half the disc" fails exactly while more than half is covered.
+    for (let tMs = event.startMs; tMs <= event.endMs; tMs += 7 * MIN)
+      expect(sunHiddenByEarth(SOUTH_POLE, tMs, 0.5)).toBe(sunCoverAt(SOUTH_POLE, tMs).coveredFraction > 0.5);
+    expect(() => sunHiddenByEarth(SOUTH_POLE, event.maxAtMs, 1.5)).toThrow(RangeError);
+    expect(() => sunHiddenByEarth({ ...SOUTH_POLE, lonDeg: 400 }, event.maxAtMs, 0)).toThrow(RangeError);
   });
 
   it('never sees the gap between the discs change faster than the bound the search relies on', () => {

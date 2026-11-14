@@ -17,6 +17,8 @@ export interface RunMessage {
   sun: Float64Array;
   /** Three numbers per time sample: the direction to test for the Earth. */
   earth: Float64Array;
+  /** One flag per time sample: 1 when an eclipse hides the Sun from the whole mapped area. */
+  sunHidden: Uint8Array;
 }
 export interface ReadyMessage { type: 'ready'; size: number; origin: number; inside: Uint8Array }
 export interface DoneMessage { type: 'done'; job: number; samples: number; sun: Uint16Array; earth: Uint16Array; both: Uint16Array }
@@ -59,7 +61,8 @@ scope.onmessage = (event: MessageEvent<InitMessage | RunMessage>): void => {
     const sun = new Uint16Array(cells), earth = new Uint16Array(cells), both = new Uint16Array(cells);
     const sunMask = new Uint8Array(cells), earthMask = new Uint8Array(cells);
     for (let i = 0; i < samples; i++) {
-      s.run([message.sun[3 * i]!, message.sun[3 * i + 1]!, message.sun[3 * i + 2]!], sunMask);
+      if (message.sunHidden[i]) sunMask.fill(0);
+      else s.run([message.sun[3 * i]!, message.sun[3 * i + 1]!, message.sun[3 * i + 2]!], sunMask);
       s.run([message.earth[3 * i]!, message.earth[3 * i + 1]!, message.earth[3 * i + 2]!], earthMask);
       for (let k = 0; k < cells; k++) {
         const a = sunMask[k]!, b = earthMask[k]!;

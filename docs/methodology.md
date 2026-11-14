@@ -238,8 +238,11 @@ answer of the sweep bin it falls in.
 **Limits of the map.** The sweep is the approximate method of the two, and it works on
 the 480 m model. It is used to draw the map and to suggest a better place nearby; the
 numbers of a site always come from its own skyline. Terrain outside the elevation model
-(north of 75° S, 150 km beyond the mapped area) does not exist for the sweep. The map
-layers do not take eclipses into account.
+(north of 75° S, 150 km beyond the mapped area) does not exist for the sweep. An eclipse
+is one event for the whole map: when the Earth hides the Sun at the pole under the chosen
+rule, the map shows no sunlight anywhere. Across the mapped area the Earth's direction
+differs by less than 0.05°, so the contacts of an eclipse differ by a few minutes at
+most, which the map ignores.
 
 ## 6. Reproducing everything
 
