@@ -1,0 +1,31 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+/* AI-assisted: written with Anthropic Claude under the direction of the team. */
+
+:root {
+  color-scheme: dark;
+  --bg: #07090d;
+  --fg: #e8ecf2;
+  --muted: #8b95a5;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--fg);
+}
+
+#app {
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: 3rem 1rem;
+}
+
+p {
+  color: var(--muted);
+}

@@ -1,0 +1,34 @@
+# dependencies and build output
+node_modules/
+dist/
+web/dist/
+.vite/
+coverage/
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# operating-system and editor noise
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# never commit secrets or local environment files
+.env
+.env.*
+*.pem
+*.key
+
+# raw third-party datasets are downloaded on demand and never committed
+# (see data/terrain/README.md for sources and reproduction steps)
+data/raw/
+*.IMG
+*.JP2
+*.tif
+*.tiff
+
+# logs
+*.log
