@@ -66,11 +66,12 @@ with the same order (at most one landing per site unless asked for more).
   has lasted longer than its tolerance: 300 random cases for `operatingWindow`, 400 for
   the calendar (same answer, including landings in the dark, touching windows and the end
   of the data).
-- **The exact ephemeris.** The first row of each table below was recomputed without the
-  interpolated table (exact ephemeris every 20 minutes): the Sun stays above the skyline
-  at Sunlit peak 1 until 19 February 2028 02:53 UTC (the tool says power lasts 187 d 4 h
-  from 15 August 23:00), and the Earth is in view there from 15 August 22:07 to 30 August
-  06:26, which covers the 14-day mission.
+- **The exact ephemeris.** The first row of the first table below was recomputed without
+  the interpolated table. At Sunlit peak 8 the Sun stays above the skyline from the
+  landing until 12 January 2028 03:45:46 UTC, when the Earth covers it completely for 46
+  minutes (the eclipse of that date, total at this site from 03:45:46 to 04:32:04): 149
+  days and 22 hours after a landing on 15 August at 06:00, as the tool says. The Earth is
+  in view there from 15 August 05:39 to 30 August 17:04, which covers the 14-day mission.
 
 ## What it finds (2027)
 
@@ -80,10 +81,10 @@ catalogue sites that have a real skyline:
 
 | Rank | Site | Landing (UTC) | Power lasts | Earth in view | Longest link gap |
 |---|---|---|---|---|---|
-| 1 | Sunlit peak 1 (near Spudis) | 2027-08-15 23:00 | 187 d 4 h | 100% | none |
-| 2 | Sunlit peak 8 (near de Gerlache) | 2027-08-15 06:00 | 167 d 8 h | 100% | none |
-| 3 | Sunlit peak 3 (near Mons Mouton) | 2027-08-15 09:00 | 161 d 9 h | 100% | none |
-| 4 | Sunlit peak 5 (near Slater) | 2027-09-11 18:00 | 127 d 8 h | 100% | none |
+| 1 | Sunlit peak 8 (near de Gerlache) | 2027-08-15 06:00 | 149 d 22 h | 100% | none |
+| 2 | Sunlit peak 3 (near Mons Mouton) | 2027-08-15 09:00 | 149 d 19 h | 100% | none |
+| 3 | Sunlit peak 1 (near Spudis) | 2027-08-15 23:00 | 149 d 5 h | 100% | none |
+| 4 | Sunlit peak 5 (near Slater) | 2027-09-11 18:00 | 122 d 10 h | 100% | none |
 | 5 | Sunlit peak 7 (near Mons Malapert) | 2027-09-09 09:00 | 115 d 17 h | 100% | none |
 | 6 | Sunlit peak 2 (near Marvin) | 2027-09-11 16:00 | 82 d 20 h | 100% | none |
 
@@ -97,10 +98,18 @@ survives a day of darkness:
 | 3 | Sunlit peak 3 (near Mons Mouton) | 2027-09-11 13:00 | 158 d 3 h | 61% | 11 d 19 h |
 | 4 | Sunlit peak 2 (near Marvin) | 2027-09-11 16:00 | 112 d 0 h | 60% | 11 d 23 h |
 
-Two things are worth noticing. For the short mission every proposed landing puts the
-whole fortnight inside an Earth-visibility window: the date is chosen, not just the
-place. For the long mission the ridge near Mons Malapert comes first: it has less
-sunlight than the peaks nearer the pole, but it sees the Earth for more of each month.
+Three things are worth noticing.
+
+- **The date is chosen, not just the place.** For the short mission every proposed
+  landing puts the whole fortnight inside an Earth-visibility window.
+- **An eclipse ends the longest stretches.** The first three rows of the first table all
+  end on 12 January 2028: these peaks are still in sunlight then, but the Earth covers the
+  Sun for about three quarters of an hour and this lander survives no darkness. With an
+  hour of tolerance (`--tolerance-h 1`) the same landings last 167, 161 and 187 days, and
+  Sunlit peak 1 comes first.
+- **For a long mission the best-lit place is not the best place.** With 90 days wanted,
+  the ridge near Mons Malapert comes first: it has less sunlight than the peaks nearer
+  the pole, but it sees the Earth for more of each month.
 
 ## Limits
 

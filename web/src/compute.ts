@@ -31,7 +31,8 @@ export const earthUp = (marginDeg: number): boolean => earthVisible(marginDeg);
 /**
  * Every mission is analysed from samples ten minutes apart: the skyline is known
  * every 0.25 degrees of azimuth and the Sun moves about half a degree an hour at
- * the poles, so this resolves everything the terrain model can show.
+ * the poles, a third of a skyline bin between two samples. An event shorter than
+ * the step can still be missed.
  */
 export const ANALYSIS_STEP_S = 600;
 

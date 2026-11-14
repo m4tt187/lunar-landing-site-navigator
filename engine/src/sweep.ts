@@ -14,7 +14,16 @@
 // bin size limits the resolution.
 //
 // This is an independent method from the per-site skyline in terrain.ts and is
-// tested against it (tests/engine/sweep.test.ts).
+// tested against it (tests/engine/sweep.test.ts). It is the approximate one of
+// the two: a receiver takes the answer of the bin it falls in, so on steep slopes
+// and at the edges of shadows about one cell in a hundred differs from the
+// per-site skyline. Numbers quoted for a site always come from the skyline.
+//
+// Terrain outside the elevation model does not exist for the sweep: it cannot
+// hide anything. Receivers therefore have to lie well inside the model. With the
+// shipped model (75 S to the pole) and receivers south of 80 S the nearest edge is
+// 150 km beyond the receivers; the per-site skyline has the same limit and
+// reports it (`truncated`).
 import type { PolarDem } from './terrain';
 
 const R_M = 1737400;
@@ -87,13 +96,20 @@ export function directionFromPole(moonCentredKm: Direction): [number, number, nu
   return normalize([moonCentredKm[0], moonCentredKm[1], moonCentredKm[2] + R_M / 1000]);
 }
 
+/** Most sweep bins that one sweep may allocate (five bytes each). */
+const MAX_SWEEP_BINS = 40000000;
+
 export function createSweep(dem: PolarDem, options: SweepOptions): Sweep {
   if (!(options.minLatDeg < -60 && options.minLatDeg > -90)) throw new RangeError('Latitude limit must be between -90 and -60 degrees.');
   if (!(options.observerHeightM >= 0 && options.observerHeightM <= 1000)) throw new RangeError('Observer height must be between 0 and 1000 metres.');
   const scale = dem.scaleM, n = dem.n, raw = dem.raw, heightScale = dem.heightScale;
+  if (!Number.isSafeInteger(n) || n < 2 || !(raw instanceof Int16Array) || raw.length !== n * n ||
+      !Number.isFinite(scale) || scale <= 0 || !Number.isFinite(heightScale) || heightScale <= 0)
+    throw new RangeError('Elevation grid must be a square of Int16 samples with positive finite scales.');
   const bin = options.binM ?? scale;
   const reach = options.reachM ?? 250000;
-  if (!(bin > 0) || !(reach >= 0)) throw new RangeError('Bin size and reach must be positive.');
+  if (!Number.isFinite(bin) || bin <= 0 || !Number.isFinite(reach) || reach < 0)
+    throw new RangeError('Bin size must be positive and reach zero or more, both finite.');
   const mast = options.observerHeightM;
   const centre = n / 2 - 0.5;
 
@@ -128,6 +144,7 @@ export function createSweep(dem: PolarDem, options: SweepOptions): Sweep {
   const na = 2 * Math.ceil(aMax / bin) + 1;
   const a0 = -((na - 1) / 2) * bin;
   const nu = Math.ceil((2 * aMax + reach) / bin) + 1;
+  if (!(na * nu <= MAX_SWEEP_BINS)) throw new RangeError('The sweep would need more than forty million bins; use larger bins.');
   // The terrain must be a single-valued surface in the sweep frame: lights near the polar horizon only.
   const maxSinElevation = Math.sin(25 * DEG);
   const height = new Float32Array(na * nu);
@@ -140,7 +157,8 @@ export function createSweep(dem: PolarDem, options: SweepOptions): Sweep {
   function run(direction: Direction, out: Uint8Array): void {
     if (out.length !== size * size) throw new RangeError('Output array does not match the receiver window.');
     const s = normalize(direction);
-    if (Math.abs(s[2]) > maxSinElevation) throw new RangeError('The sweep handles lights within 25 degrees of the polar horizon.');
+    // The margin only absorbs rounding: a light raised to exactly 25 degrees is accepted.
+    if (Math.abs(s[2]) > maxSinElevation + 1e-12) throw new RangeError('The sweep handles lights within 25 degrees of the polar horizon.');
     const b = upAcross(s);
     // The receivers are centred on the pole, whose u coordinate is -R * s_z; the bins start one
     // receiver radius before it and extend `reach` beyond the receivers towards the light.

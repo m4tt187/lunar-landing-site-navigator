@@ -6,11 +6,12 @@
 //
 // Why: finding when a ridge hides the Sun needs samples close together. The
 // skyline is known every 0.25 degrees of azimuth and at the poles the Sun moves
-// about half a degree of azimuth per hour, so a ten-minute step sees everything
-// the terrain model can show; a three-hour step can step over a whole ridge or an
-// eclipse. The exact ephemeris call is too slow to make every ten minutes of a
-// year, but the vectors it returns are smooth in time and do not depend on the
-// site. So they are computed exactly at widely spaced knots, once for all sites,
+// about half a degree of azimuth per hour: in ten minutes it moves a third of a
+// skyline bin, in three hours it can step over a whole ridge or an eclipse. Ten
+// minutes is a large improvement, not a guarantee: an event shorter than the step
+// can still fall between two samples. The exact ephemeris call is too slow to
+// make every ten minutes of a year, but the vectors it returns are smooth in time
+// and do not depend on the site. So they are computed exactly at widely spaced knots, once for all sites,
 // and interpolated in between. The interpolation error is measured in
 // tests/engine/ephemeris.test.ts and is thousands of times smaller than the
 // difference between this engine and NASA/JPL Horizons.

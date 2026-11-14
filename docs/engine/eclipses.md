@@ -31,8 +31,7 @@ that page before any comparison was run; nothing was tuned.
 - `findEclipses(site, from, to)` — every eclipse seen from a site between two dates,
   contacts to the second; `sunCoverAt(site, t)` — one instant.
 - `eclipsesInSeries(series)` — the eclipses inside a sampled mission, from the samples
-  alone; with ten-minute samples the contacts are within about 15 seconds of the exact
-  search. `summarize()` returns them as `Summary.eclipses`.
+  alone (accuracy below). `summarize()` returns them as `Summary.eclipses`.
 
 ## How it enters the answers
 
@@ -48,6 +47,24 @@ obstruction alone leaves "some of the Sun" visible; together they leave nothing.
 "any part shows" and "whole disc shows" rules are exact for a straight skyline; for a
 fraction in between the sign is exact and the size of the margin, which only places a
 crossing between two samples, is an estimate.
+
+### How exact the sampled eclipses are
+
+The mission analysis works on samples ten minutes apart and places every crossing on a
+straight line between two samples. For eclipses this was measured against the exact
+search: 73 eclipses seen from six places (both poles, three points of the equator, Mare
+Crisium), 2025–2030. None was missed and none was mislabelled total or partial.
+
+| Contact | Median difference | 95 % within | Largest |
+|---|---|---|---|
+| First and last contact | 0.5 s | 6 s | 24 s |
+| Start and end of totality | 1.8 s | 20 s | 126 s |
+
+The largest belongs to the briefest totality of the set: 12.7 minutes at latitude 0°,
+longitude 0° on 15 June 2030, reported 3.7 minutes shorter than it is. Where totality is
+that brief the separation of the two discs is far from a straight line in time, and the
+sunlight windows of the mission analysis carry the same error. `findEclipses` has none of
+it.
 
 ## Checked against NASA's predictions
 

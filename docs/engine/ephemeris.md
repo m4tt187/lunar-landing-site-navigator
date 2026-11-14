@@ -75,7 +75,8 @@ the ten-minute series from the table finds it, within ten minutes of the referen
 
 ## Limits
 
-- The step that matters is the series step, not the knot spacing: an event shorter than
-  the series step (ten minutes in the application) can still be missed. The terrain
-  model's azimuth resolution makes shorter events meaningless anyway.
+- The step that matters is the series step, not the knot spacing. Ten minutes makes
+  missed events far rarer than three hours did; it is not a guarantee. An event shorter
+  than the series step can still fall between two samples, and the ends of every window
+  are placed by straight-line interpolation between two samples.
 - A table holds at most 200,000 knots; a series at most 100,000 samples.

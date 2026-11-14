@@ -322,8 +322,33 @@ function visibleFractionUnchecked(
   if (b >= a && d <= b - a) return 0;
   const skyline = horizonElDeg - sunElDeg;
   if (skyline <= -a) return 1 - lensFraction(d, a, b);
+  // The Earth may cover only sunlight that the skyline hides anyway. The answer is
+  // then exactly the skyline-only fraction; integrating a region that has not
+  // changed would return it a few rounding errors off, enough to fail a rule such
+  // as "at least half the disc" when exactly half shows.
+  if (distanceToVisiblePart(a, skyline, earthAcrossDeg, earthUpDeg) >= b) return aboveSkyline;
   const fraction = visibleAreaAbove(skyline, a, earthAcrossDeg, earthUpDeg, b) / (Math.PI * a * a);
   return Math.min(aboveSkyline, Math.max(0, fraction));
+}
+
+/**
+ * Distance from the Earth's centre (ex, ey) to the part of the solar disc
+ * (radius a, centred on the origin) that is above the line y = skyline, zero
+ * when the centre is inside that part. The part is not empty (-a < skyline < a).
+ */
+function distanceToVisiblePart(a: number, skyline: number, ex: number, ey: number): number {
+  const d = Math.hypot(ex, ey);
+  if (d <= a) {
+    if (ey >= skyline) return 0;
+  } else if ((a * ey) / d >= skyline) {
+    // From outside the disc the nearest point is on the limb, straight towards the Sun's centre,
+    // when that point is above the skyline.
+    return d - a;
+  }
+  // Otherwise the nearest point is on the chord that the skyline cuts across the disc.
+  const halfChord = Math.sqrt(Math.max(0, a * a - skyline * skyline));
+  const x = Math.max(-halfChord, Math.min(halfChord, ex));
+  return Math.hypot(ex - x, ey - skyline);
 }
 
 /**
@@ -528,8 +553,11 @@ function zeroBetween(t0: number, g0: number, t1: number, g1: number): number {
  * The eclipses during a sampled series, from its samples alone (no ephemeris
  * call): the intervals in which the Earth's disc overlaps the Sun's, with the
  * contacts interpolated between samples and the deepest moment found from the
- * three samples around the smallest separation. With samples ten minutes apart
- * the contacts are good to a few seconds; findEclipses gives them to the second.
+ * three samples around the smallest separation. findEclipses gives the contacts
+ * to the second; here they are as good as a straight line between two samples.
+ * Measured with samples ten minutes apart (73 eclipses, docs/engine/eclipses.md):
+ * first and last contact within 25 seconds, the ends of totality usually within
+ * 20 seconds but up to two minutes inside the true ones when totality is brief.
  * An eclipse shorter than the sampling step can be missed, like any other event.
  */
 export function eclipsesInSeries(series: Series): EclipseEvent[] {

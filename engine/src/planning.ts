@@ -222,8 +222,10 @@ export function landingCalendar(
   if (!Number.isFinite(gridS) || !(gridS > 0)) throw new RangeError('The landing grid must be a positive finite number of seconds.');
   const count = positiveInteger(options.count, 3, 'The number of options');
   const stepMs = gridS * 1000;
+  if (!Number.isFinite(stepMs)) throw new RangeError('The landing grid must be finite when expressed in milliseconds.');
   const searchMs = Math.min(options.searchDays * DAY_MS, dataEndMs - dataStartMs);
-  const cells = Math.max(1, Math.floor(searchMs / stepMs));
+  // Every grid time earlier than the end of the search, also when the search is not a whole number of steps.
+  const cells = Math.max(1, Math.ceil(searchMs / stepMs));
   if (cells > MAX_CELLS) throw new RangeError('The search has more than a million landing times; use a coarser grid.');
 
   const toleranceMs = needs.toleranceH * HOUR_MS, missionMs = needs.missionDays * DAY_MS;

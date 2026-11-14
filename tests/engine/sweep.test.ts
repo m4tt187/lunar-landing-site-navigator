@@ -110,3 +110,46 @@ describe('whole-map sweep vs independent per-site ray march', () => {
     expect(() => sweep.run([0, 0, -1], out)).toThrow(/polar horizon/);
   });
 });
+
+describe('whole-map sweep: limits and bad input', () => {
+  // A small smooth model: 64 x 64 cells of 1 km around the pole, all at the reference radius.
+  const flat: PolarDem = makePolarDem(new Int16Array(64 * 64), 64, 1000, 0.5);
+
+  it('accepts a light at exactly 25 degrees from the polar horizon, on either side, and rejects one just beyond', () => {
+    const sweep = createSweep(flat, { minLatDeg: -89.5, observerHeightM: 2 });
+    const out = new Uint8Array(sweep.size * sweep.size);
+    for (const deg of [25, -25, 24.99999, -24.99999]) expect(() => sweep.run(raiseDirection([1, 0, 0], deg), out)).not.toThrow();
+    for (const deg of [25.00001, -25.00001, 40]) expect(() => sweep.run(raiseDirection([1, 0, 0], deg), out)).toThrow(RangeError);
+  });
+
+  it('rejects bins and reaches that are not finite, and sweeps too large to allocate', () => {
+    const options = { minLatDeg: -89.5, observerHeightM: 2 };
+    expect(() => createSweep(flat, { ...options, binM: Number.POSITIVE_INFINITY })).toThrow(RangeError);
+    expect(() => createSweep(flat, { ...options, binM: Number.NaN })).toThrow(RangeError);
+    expect(() => createSweep(flat, { ...options, binM: 0 })).toThrow(RangeError);
+    expect(() => createSweep(flat, { ...options, reachM: Number.POSITIVE_INFINITY })).toThrow(RangeError);
+    expect(() => createSweep(flat, { ...options, reachM: -1 })).toThrow(RangeError);
+    expect(() => createSweep(flat, { ...options, binM: 0.5 })).toThrow(/forty million/);
+    expect(() => createSweep(flat, { ...options, binM: 500, reachM: 0 })).not.toThrow();
+  });
+
+  it('rejects an elevation grid that is not what it says it is', () => {
+    const options = { minLatDeg: -89.5, observerHeightM: 2 };
+    expect(() => createSweep({ ...flat, n: 63 }, options)).toThrow(RangeError);
+    expect(() => createSweep({ ...flat, scaleM: 0 }, options)).toThrow(RangeError);
+    expect(() => createSweep({ ...flat, heightScale: Number.NaN }, options)).toThrow(RangeError);
+    expect(() => createSweep(flat, { minLatDeg: -50, observerHeightM: 2 })).toThrow(RangeError);
+    expect(() => createSweep(flat, { minLatDeg: -89.5, observerHeightM: Number.NaN })).toThrow(RangeError);
+  });
+
+  it('on a smooth sphere lights everything when the light is above the horizon and nothing when it is well below, away from the edge of the model', () => {
+    // Receivers within 0.5 degrees of the pole (15 km); the model reaches 32 km.
+    const sweep = createSweep(flat, { minLatDeg: -89.5, observerHeightM: 2 });
+    const out = new Uint8Array(sweep.size * sweep.size);
+    const receivers = sweep.inside.reduce((sum, v) => sum + v, 0);
+    expect(receivers).toBeGreaterThan(500);
+    const count = (deg: number): number => { sweep.run(raiseDirection([1, 0, 0], deg), out); return out.reduce((sum, v) => sum + v, 0); };
+    expect(count(3)).toBe(receivers);
+    expect(count(-3)).toBe(0);
+  });
+});
