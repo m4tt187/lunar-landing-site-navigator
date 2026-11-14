@@ -24,9 +24,21 @@ The public entry is `engine/src/index.ts` (UI alias `@engine`). Types are in
   step 360 is a constant horizon. A zero profile represents a smooth tangent
   horizon, without terrain or height-dependent curvature dip.
 - `horizonElevationAt` uses periodic linear interpolation, including 359→0.
-- Solar visibility is the fraction of a circular solar disk above the local
-  skyline (straight-edge approximation). It is geometric visibility, not power
-  output; it does not include eclipses, slopes, equipment, or dust.
+- Solar visibility is the fraction of a circular solar disk that is above the
+  local skyline (straight-edge approximation) and not covered by the Earth (an
+  eclipse; see [eclipses.md](eclipses.md)). It is geometric visibility, not power
+  output; it does not include slopes, equipment, or dust.
+- `Margins.sunDeg` is positive while at least the required fraction of the disk
+  is above the skyline and uncovered by the Earth; `Margins.sunDiskFraction` is
+  that visible fraction; `Margins.eclipseFraction` is the fraction covered by the
+  Earth (0 outside an eclipse). `sampleMargins`, `seriesMargins`, `summarize` and
+  `nextEvent` always take the Earth into account. `marginsOf` does so when its
+  optional last argument, the Earth's angular radius, is given; without it the
+  result is the skyline alone, as before.
+- `Summary.eclipses` lists the eclipses inside the series (first and last
+  contact, the deepest moment, totality), from the samples; their darkness is
+  already part of the sunlight windows. They are listed whether or not the
+  skyline lets the site see the Sun.
 - `sunMinDiskFraction` lies in [0,1]. Zero means any nonzero visible disk;
   one means the full disk. Intermediate thresholds are inclusive. Earth
   visibility uses the centre at or above skyline plus the requested elevation margin;
@@ -78,6 +90,14 @@ centre; the field must still contain the observer's ground location.
 `minDistanceM` skips near samples on the original ray sampling lattice, without
 enlarging the increment. Use it rather than a large `firstStepM` to partition
 near and far terrain. Empty sampling ranges are rejected.
+
+## Further modules
+
+Each has its own page: the interpolated vector table that makes ten-minute
+sampling affordable ([ephemeris.md](ephemeris.md)), eclipses
+([eclipses.md](eclipses.md)), planning and site-and-date recommendation
+([planning.md](planning.md)), and the 120 m terrain tiles for picked sites
+([tiles.md](tiles.md)).
 
 Invalid or nonfinite inputs throw descriptive errors; there are no silent fake
 ephemerides or implicit network fallbacks. Use a Web Worker for long series;

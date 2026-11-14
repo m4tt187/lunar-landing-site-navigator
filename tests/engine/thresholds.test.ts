@@ -10,7 +10,8 @@ function series(timesH: number[], sun: number[], earth = sun.map(() => 1)): Seri
   const n = timesH.length;
   return {site:{id:'test',name:'Test site',latDeg:0,lonDeg:0,heightM:0}, n,
     startMs:timesH[0]!*HOUR, endMs:timesH[n-1]!*HOUR, stepS:3600,
-    timesMs:Float64Array.from(timesH,x=>x*HOUR),sunAz:new Float64Array(n),earthAz:new Float64Array(n),
+    // The Earth is put opposite the Sun: these cases are about the skyline, not about eclipses.
+    timesMs:Float64Array.from(timesH,x=>x*HOUR),sunAz:new Float64Array(n),earthAz:new Float64Array(n).fill(180),
     sunEl:Float64Array.from(sun),earthEl:Float64Array.from(earth),
     sunRadius:new Float64Array(n).fill(0.25),earthRadius:new Float64Array(n).fill(1)};
 }

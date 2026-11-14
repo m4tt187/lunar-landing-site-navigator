@@ -4,6 +4,7 @@
 // Turns Sun/Earth directions into mission answers: is the Sun above the local
 // skyline (power), is the Earth above it (direct-to-Earth link), for how long,
 // and when the next change happens.
+import { eclipseState, eclipsesInSeries, sunFractionVisibleInEclipse, sunMarginWithEarth } from './eclipse';
 import { computeSample, validateSite, validateTime } from './geometry';
 import type { HorizonProfile, Interval, Sample, Series, Site, Summary, Thresholds } from './types';
 
@@ -108,37 +109,60 @@ function diskOffsetForFraction(fraction: number): number {
 
 /**
  * Signed margins in degrees. Positive sun margin: at least the required fraction
- * of the solar disk is above the skyline. Positive earth margin: the Earth's
- * centre is above the skyline by at least the required elevation.
+ * of the solar disk is above the skyline and not covered by the Earth. Positive
+ * earth margin: the Earth's centre is above the skyline by at least the required
+ * elevation.
  */
-export interface Margins { sunDeg: number; earthDeg: number; sunDiskFraction: number }
+export interface Margins {
+  sunDeg: number; earthDeg: number;
+  /** Fraction of the solar disk that is above the skyline and not covered by the Earth. */
+  sunDiskFraction: number;
+  /** Fraction of the solar disk covered by the Earth (0 outside an eclipse), whatever the skyline does. */
+  eclipseFraction: number;
+}
 
+/**
+ * `earthRadiusDeg` is the Earth's angular radius from a Sample. When it is given,
+ * the Earth passing in front of the Sun (an eclipse) is taken into account; when
+ * it is left out, only the skyline is.
+ */
 export function marginsOf(
   sunAz: number, sunEl: number, sunRadius: number, earthAz: number, earthEl: number,
   profile: HorizonProfile, thresholds: Thresholds, diskOffset = diskOffsetForFraction(thresholds.sunMinDiskFraction),
+  earthRadiusDeg?: number,
 ): Margins {
   validateProfile(profile); validateThresholds(thresholds);
   if (!Number.isFinite(sunAz) || !Number.isFinite(earthAz) || !Number.isFinite(diskOffset) || Math.abs(diskOffset) > 1)
     throw new RangeError('Azimuths and the disk offset must be finite; disk offset must be within [-1, 1].');
   validateElevation(sunEl); validateElevation(earthEl); validateRadius(sunRadius);
-  return marginsUnchecked(sunAz, sunEl, sunRadius, earthAz, earthEl, profile, thresholds, diskOffset);
+  if (earthRadiusDeg !== undefined) validateRadius(earthRadiusDeg);
+  return marginsUnchecked(sunAz, sunEl, sunRadius, earthAz, earthEl, profile, thresholds, diskOffset, earthRadiusDeg ?? 0);
 }
 
 function marginsUnchecked(
   sunAz: number, sunEl: number, sunRadius: number, earthAz: number, earthEl: number,
-  profile: HorizonProfile, thresholds: Thresholds, diskOffset: number,
+  profile: HorizonProfile, thresholds: Thresholds, diskOffset: number, earthRadius: number,
 ): Margins {
   const sunHorizon = horizonAtUnchecked(profile, sunAz);
-  return {
+  const margins: Margins = {
     sunDeg: sunEl - sunHorizon + diskOffset * sunRadius,
     earthDeg: earthEl - horizonAtUnchecked(profile, earthAz) - thresholds.earthMinElevationAboveHorizonDeg,
     sunDiskFraction: diskFractionUnchecked(sunEl, sunRadius, sunHorizon),
+    eclipseFraction: 0,
   };
+  // The Earth in front of the Sun: rare, and ruled out cheaply for almost every sample.
+  const eclipse = earthRadius > 0 ? eclipseState(sunAz, sunEl, sunRadius, earthAz, earthEl, earthRadius) : null;
+  if (eclipse) {
+    margins.sunDeg = sunMarginWithEarth(margins.sunDeg, sunEl, sunRadius, sunHorizon, eclipse, thresholds.sunMinDiskFraction);
+    margins.sunDiskFraction = sunFractionVisibleInEclipse(sunEl, sunRadius, sunHorizon, eclipse);
+    margins.eclipseFraction = eclipse.coveredFraction;
+  }
+  return margins;
 }
 
 export function sampleMargins(sample: Sample, profile: HorizonProfile, thresholds: Thresholds): Margins {
   return marginsOf(sample.sun.azDeg, sample.sun.elDeg, sample.sun.angularRadiusDeg,
-    sample.earth.azDeg, sample.earth.elDeg, profile, thresholds);
+    sample.earth.azDeg, sample.earth.elDeg, profile, thresholds, undefined, sample.earth.angularRadiusDeg);
 }
 
 /** Intervals where a sampled margin is positive; crossings are linearly interpolated. */
@@ -208,7 +232,7 @@ export function seriesMargins(series: Series, profile: HorizonProfile, threshold
   const offset = diskOffsetForFraction(thresholds.sunMinDiskFraction);
   for (let i = 0; i < n; i++) {
     const m = marginsUnchecked(series.sunAz[i]!, series.sunEl[i]!, series.sunRadius[i]!,
-      series.earthAz[i]!, series.earthEl[i]!, profile, thresholds, offset);
+      series.earthAz[i]!, series.earthEl[i]!, profile, thresholds, offset, series.earthRadius[i]!);
     out.sun[i] = m.sunDeg; out.earth[i] = m.earthDeg; out.sunDiskFraction[i] = m.sunDiskFraction;
   }
   return out;
@@ -238,6 +262,7 @@ export function summarize(series: Series, profile: HorizonProfile, thresholds: T
     longestCommGapH: longestGap(earthWindows, series.startMs, series.endMs) / HOUR_MS,
     bothFraction: total(bothWindows) / span,
     bothWindows,
+    eclipses: eclipsesInSeries(series),
   };
 }
 
@@ -265,7 +290,8 @@ export function nextEvent(
   const rising = kind === 'sunrise' || kind === 'earthrise';
   const marginAt = (tMs: number): number => {
     const s = computeSample(site, tMs);
-    const m = marginsUnchecked(s.sun.azDeg, s.sun.elDeg, s.sun.angularRadiusDeg, s.earth.azDeg, s.earth.elDeg, profile, thresholds, offset);
+    const m = marginsUnchecked(s.sun.azDeg, s.sun.elDeg, s.sun.angularRadiusDeg, s.earth.azDeg, s.earth.elDeg, profile, thresholds, offset,
+      s.earth.angularRadiusDeg);
     return sun ? m.sunDeg : m.earthDeg;
   };
   const active = (margin: number): boolean => sun ? sunVisible(margin, thresholds) : earthVisible(margin);

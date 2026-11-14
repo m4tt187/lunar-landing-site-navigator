@@ -1,0 +1,311 @@
+{
+ "source": "NASA Goddard Space Flight Center eclipse web site: Five Millennium Canon of Lunar Eclipses, -1999 to +3000 (F. Espenak and J. Meeus, NASA TP-2009-214172)",
+ "catalogueUrl": "https://eclipse.gsfc.nasa.gov/LEcat5/LE2001-2100.html",
+ "conventionsUrls": [
+  "https://eclipse.gsfc.nasa.gov/LEcat5/shadow.html",
+  "https://eclipse.gsfc.nasa.gov/LEcat5/figure.html",
+  "https://eclipse.gsfc.nasa.gov/LEcat5/deltat.html"
+ ],
+ "retrievedUtc": "2026-11-14T17:50:00Z",
+ "note": "Every lunar eclipse from 2025 to 2030. Type, Terrestrial Dynamical Time of greatest eclipse, Delta T, gamma, magnitudes and phase durations are the rows of the catalogue page. Contact times are those printed on each eclipse's figure (P1/P4: the Moon's limb touches the penumbra; U1/U4: the umbra; U2/U3: the whole Moon is inside the umbra), in Universal Time as NASA gives them, that is Dynamical Time minus NASA's predicted Delta T. The figures are images: the times were transcribed from them and checked against the catalogue durations (P4 - P1, U4 - U1, U3 - U2 agree to the 0.1 minute printed). Shadow rule: Danjon. Ephemerides: VSOP87/ELP2000-85. Values are NASA's, unmodified.",
+ "eclipses": [
+  {
+   "date": "2025-03-14",
+   "type": "total",
+   "figureUrl": "https://eclipse.gsfc.nasa.gov/LEplot/LEplot2001/LE2025Mar14T.pdf",
+   "greatestEclipseTd": "2025-03-14T06:59:56",
+   "deltaTSeconds": 75,
+   "gamma": 0.3484,
+   "penumbralMagnitude": 2.2595,
+   "umbralMagnitude": 1.1784,
+   "durationsMinutes": {
+    "penumbral": 362.6,
+    "partial": 218.3,
+    "total": 65.4
+   },
+   "contactsUt": {
+    "P1": "2025-03-14T03:57:24Z",
+    "U1": "2025-03-14T05:09:33Z",
+    "U2": "2025-03-14T06:25:59Z",
+    "U3": "2025-03-14T07:31:23Z",
+    "U4": "2025-03-14T08:47:48Z",
+    "P4": "2025-03-14T10:00:01Z"
+   }
+  },
+  {
+   "date": "2025-09-07",
+   "type": "total",
+   "figureUrl": "https://eclipse.gsfc.nasa.gov/LEplot/LEplot2001/LE2025Sep07T.pdf",
+   "greatestEclipseTd": "2025-09-07T18:12:58",
+   "deltaTSeconds": 75,
+   "gamma": -0.2752,
+   "penumbralMagnitude": 2.344,
+   "umbralMagnitude": 1.3619,
+   "durationsMinutes": {
+    "penumbral": 326.7,
+    "partial": 209.4,
+    "total": 82.1
+   },
+   "contactsUt": {
+    "P1": "2025-09-07T15:28:21Z",
+    "U1": "2025-09-07T16:27:02Z",
+    "U2": "2025-09-07T17:30:41Z",
+    "U3": "2025-09-07T18:52:47Z",
+    "U4": "2025-09-07T19:56:26Z",
+    "P4": "2025-09-07T20:55:00Z"
+   }
+  },
+  {
+   "date": "2026-03-03",
+   "type": "total",
+   "figureUrl": "https://eclipse.gsfc.nasa.gov/LEplot/LEplot2001/LE2026Mar03T.pdf",
+   "greatestEclipseTd": "2026-03-03T11:34:52",
+   "deltaTSeconds": 75,
+   "gamma": -0.3765,
+   "penumbralMagnitude": 2.1838,
+   "umbralMagnitude": 1.1507,
+   "durationsMinutes": {
+    "penumbral": 338.6,
+    "partial": 207.2,
+    "total": 58.3
+   },
+   "contactsUt": {
+    "P1": "2026-03-03T08:44:22Z",
+    "U1": "2026-03-03T09:50:00Z",
+    "U2": "2026-03-03T11:04:26Z",
+    "U3": "2026-03-03T12:02:45Z",
+    "U4": "2026-03-03T13:17:10Z",
+    "P4": "2026-03-03T14:22:59Z"
+   }
+  },
+  {
+   "date": "2026-08-28",
+   "type": "partial",
+   "figureUrl": "https://eclipse.gsfc.nasa.gov/LEplot/LEplot2001/LE2026Aug28P.pdf",
+   "greatestEclipseTd": "2026-08-28T04:14:04",
+   "deltaTSeconds": 75,
+   "gamma": 0.4964,
+   "penumbralMagnitude": 1.9645,
+   "umbralMagnitude": 0.9299,
+   "durationsMinutes": {
+    "penumbral": 337.8,
+    "partial": 198.1,
+    "total": null
+   },
+   "contactsUt": {
+    "P1": "2026-08-28T01:23:55Z",
+    "U1": "2026-08-28T02:33:48Z",
+    "U4": "2026-08-28T05:51:55Z",
+    "P4": "2026-08-28T07:01:41Z"
+   }
+  },
+  {
+   "date": "2027-02-20",
+   "type": "penumbral",
+   "figureUrl": "https://eclipse.gsfc.nasa.gov/LEplot/LEplot2001/LE2027Feb20N.pdf",
+   "greatestEclipseTd": "2027-02-20T23:14:06",
+   "deltaTSeconds": 76,
+   "gamma": -1.048,
+   "penumbralMagnitude": 0.9266,
+   "umbralMagnitude": -0.0569,
+   "durationsMinutes": {
+    "penumbral": 241.0,
+    "partial": null,
+    "total": null
+   },
+   "contactsUt": {
+    "P1": "2027-02-20T21:12:20Z",
+    "P4": "2027-02-21T01:13:19Z"
+   }
+  },
+  {
+   "date": "2027-07-18",
+   "type": "penumbral",
+   "figureUrl": "https://eclipse.gsfc.nasa.gov/LEplot/LEplot2001/LE2027Jul18N.pdf",
+   "greatestEclipseTd": "2027-07-18T16:04:09",
+   "deltaTSeconds": 76,
+   "gamma": -1.5758,
+   "penumbralMagnitude": 0.0014,
+   "umbralMagnitude": -1.068,
+   "durationsMinutes": {
+    "penumbral": 11.8,
+    "partial": null,
+    "total": null
+   },
+   "contactsUt": {
+    "P1": "2027-07-18T15:56:57Z",
+    "P4": "2027-07-18T16:08:45Z"
+   }
+  },
+  {
+   "date": "2027-08-17",
+   "type": "penumbral",
+   "figureUrl": "https://eclipse.gsfc.nasa.gov/LEplot/LEplot2001/LE2027Aug17N.pdf",
+   "greatestEclipseTd": "2027-08-17T07:14:59",
+   "deltaTSeconds": 76,
+   "gamma": 1.2797,
+   "penumbralMagnitude": 0.5456,
+   "umbralMagnitude": -0.5254,
+   "durationsMinutes": {
+    "penumbral": 218.6,
+    "partial": null,
+    "total": null
+   },
+   "contactsUt": {
+    "P1": "2027-08-17T05:24:29Z",
+    "P4": "2027-08-17T09:03:03Z"
+   }
+  },
+  {
+   "date": "2028-01-12",
+   "type": "partial",
+   "figureUrl": "https://eclipse.gsfc.nasa.gov/LEplot/LEplot2001/LE2028Jan12P.pdf",
+   "greatestEclipseTd": "2028-01-12T04:14:13",
+   "deltaTSeconds": 76,
+   "gamma": 0.9817,
+   "penumbralMagnitude": 1.0468,
+   "umbralMagnitude": 0.0662,
+   "durationsMinutes": {
+    "penumbral": 250.7,
+    "partial": 56.0,
+    "total": null
+   },
+   "contactsUt": {
+    "P1": "2028-01-12T02:07:37Z",
+    "U1": "2028-01-12T03:45:00Z",
+    "U4": "2028-01-12T04:41:00Z",
+    "P4": "2028-01-12T06:18:18Z"
+   }
+  },
+  {
+   "date": "2028-07-06",
+   "type": "partial",
+   "figureUrl": "https://eclipse.gsfc.nasa.gov/LEplot/LEplot2001/LE2028Jul06P.pdf",
+   "greatestEclipseTd": "2028-07-06T18:20:57",
+   "deltaTSeconds": 77,
+   "gamma": -0.7903,
+   "penumbralMagnitude": 1.4266,
+   "umbralMagnitude": 0.3892,
+   "durationsMinutes": {
+    "penumbral": 310.6,
+    "partial": 141.5,
+    "total": null
+   },
+   "contactsUt": {
+    "P1": "2028-07-06T15:44:21Z",
+    "U1": "2028-07-06T17:08:51Z",
+    "U4": "2028-07-06T19:30:21Z",
+    "P4": "2028-07-06T20:54:59Z"
+   }
+  },
+  {
+   "date": "2028-12-31",
+   "type": "total",
+   "figureUrl": "https://eclipse.gsfc.nasa.gov/LEplot/LEplot2001/LE2028Dec31T.pdf",
+   "greatestEclipseTd": "2028-12-31T16:53:15",
+   "deltaTSeconds": 77,
+   "gamma": 0.3258,
+   "penumbralMagnitude": 2.2742,
+   "umbralMagnitude": 1.2463,
+   "durationsMinutes": {
+    "penumbral": 336.2,
+    "partial": 208.8,
+    "total": 71.3
+   },
+   "contactsUt": {
+    "P1": "2028-12-31T14:03:49Z",
+    "U1": "2028-12-31T15:07:35Z",
+    "U2": "2028-12-31T16:16:19Z",
+    "U3": "2028-12-31T17:27:40Z",
+    "U4": "2028-12-31T18:36:24Z",
+    "P4": "2028-12-31T19:40:02Z"
+   }
+  },
+  {
+   "date": "2029-06-26",
+   "type": "total",
+   "figureUrl": "https://eclipse.gsfc.nasa.gov/LEplot/LEplot2001/LE2029Jun26T.pdf",
+   "greatestEclipseTd": "2029-06-26T03:23:22",
+   "deltaTSeconds": 77,
+   "gamma": 0.0124,
+   "penumbralMagnitude": 2.8266,
+   "umbralMagnitude": 1.8436,
+   "durationsMinutes": {
+    "penumbral": 335.1,
+    "partial": 219.5,
+    "total": 101.9
+   },
+   "contactsUt": {
+    "P1": "2029-06-26T00:34:34Z",
+    "U1": "2029-06-26T01:32:18Z",
+    "U2": "2029-06-26T02:31:08Z",
+    "U3": "2029-06-26T04:13:01Z",
+    "U4": "2029-06-26T05:11:50Z",
+    "P4": "2029-06-26T06:09:42Z"
+   }
+  },
+  {
+   "date": "2029-12-20",
+   "type": "total",
+   "figureUrl": "https://eclipse.gsfc.nasa.gov/LEplot/LEplot2001/LE2029Dec20T.pdf",
+   "greatestEclipseTd": "2029-12-20T22:43:12",
+   "deltaTSeconds": 78,
+   "gamma": -0.3811,
+   "penumbralMagnitude": 2.2008,
+   "umbralMagnitude": 1.1174,
+   "durationsMinutes": {
+    "penumbral": 358.0,
+    "partial": 213.3,
+    "total": 53.7
+   },
+   "contactsUt": {
+    "P1": "2029-12-20T19:42:53Z",
+    "U1": "2029-12-20T20:55:17Z",
+    "U2": "2029-12-20T22:15:05Z",
+    "U3": "2029-12-20T23:08:45Z",
+    "U4": "2029-12-21T00:28:34Z",
+    "P4": "2029-12-21T01:40:51Z"
+   }
+  },
+  {
+   "date": "2030-06-15",
+   "type": "partial",
+   "figureUrl": "https://eclipse.gsfc.nasa.gov/LEplot/LEplot2001/LE2030Jun15P.pdf",
+   "greatestEclipseTd": "2030-06-15T18:34:34",
+   "deltaTSeconds": 78,
+   "gamma": 0.7534,
+   "penumbralMagnitude": 1.448,
+   "umbralMagnitude": 0.5025,
+   "durationsMinutes": {
+    "penumbral": 278.2,
+    "partial": 144.4,
+    "total": null
+   },
+   "contactsUt": {
+    "P1": "2030-06-15T16:14:09Z",
+    "U1": "2030-06-15T17:21:03Z",
+    "U4": "2030-06-15T19:45:25Z",
+    "P4": "2030-06-15T20:52:23Z"
+   }
+  },
+  {
+   "date": "2030-12-09",
+   "type": "penumbral",
+   "figureUrl": "https://eclipse.gsfc.nasa.gov/LEplot/LEplot2001/LE2030Dec09N.pdf",
+   "greatestEclipseTd": "2030-12-09T22:28:51",
+   "deltaTSeconds": 78,
+   "gamma": -1.0731,
+   "penumbralMagnitude": 0.9416,
+   "umbralMagnitude": -0.1628,
+   "durationsMinutes": {
+    "penumbral": 279.2,
+    "partial": null,
+    "total": null
+   },
+   "contactsUt": {
+    "P1": "2030-12-09T20:07:56Z",
+    "P4": "2030-12-10T00:47:09Z"
+   }
+  }
+ ]
+}
