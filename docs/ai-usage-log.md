@@ -8,8 +8,8 @@ Central European Time (CET, UTC+1).
 
 | Tool | Role in this project |
 |---|---|
-| Anthropic Claude (Claude Code) | Writes and reviews code and documentation for the web application, the terrain pipeline, the repository and the delivery; researches official sources |
-| OpenAI Codex | Writes and tests the computational core and its validation against NASA/JPL Horizons |
+| Anthropic Claude (Claude Code) | Writes and reviews code and documentation for the web application, the computational core, the terrain pipeline, the repository and the delivery; researches official sources |
+| OpenAI Codex | Writes and tests parts of the computational core; reviews the rest of it independently, with reproductions and regression tests |
 
 Both tools work under the direction of the team, which chose the challenge, sets goals
 and priorities, decides what is built, and reviews the result.
@@ -19,7 +19,11 @@ and priorities, decides what is built, and reviews the result.
 - **Code and documentation:** every AI-assisted source file carries a header line naming
   the tool that helped write it, and the log below records what each tool did and when.
 - **Data:** no dataset in this repository is AI-generated. Every dataset comes from a
-  cited source or is computed by code in this repository from cited sources.
+  cited source or is computed by code in this repository from cited sources. One file
+  was transcribed with AI assistance: the contact times in
+  `data/eclipses/nasa-lunar-eclipses.json` are printed on NASA's eclipse figures, which
+  are images; Claude read them from the 14 figures and checked every one against the
+  phase durations of NASA's catalogue page (a test repeats that check).
 - **Images, video, audio:** none are AI-generated. If that ever changes, the item will
   carry a visible watermark and be listed here.
 - No NASA logos, insignia or other NASA branding are used anywhere.
@@ -57,3 +61,10 @@ official rules, guides and challenge page were re-read.
 | 14 Nov 13:50 | Claude | Reviewed and integrated those fixes; wrote the whole-map parallel-light sweep and its test against an independent ray march |
 | 14 Nov 14:45 | Claude | Rebuilt the interface around it: live map layers (visibility now, share of the mission), best spot within 5 km, true-scale close-ups of the Sun and the Earth, layered skylines, calendar rows for every scenario with the best landing days, ready-made comparisons |
 | 14 Nov 15:00 | Claude | Researched NASA and JPL statements on lighting and direct-to-Earth links, checked each quotation against the source text, added the check against JPL's reported Earth elevations for IM-1 and Chandrayaan-3; wrote the README and the methodology |
+| 14 Nov 18:35 | Codex | Measured the straight-edge approximation of the solar disc on all 25 polar sites (kept: at most 0.6 percentage points on a mission); exported the shared visibility predicates; made the skyline code accept any height field; added guards on time grids |
+| 14 Nov 19:00 | Claude | Wrote the interpolated table of Sun and Earth vectors that makes ten-minute sampling affordable, and the planning module (operating window, landing calendar, ranking of sites and dates), tested against a minute-by-minute simulation and the exact ephemeris |
+| 14 Nov 19:05 | Claude | Cut NASA's 120 m elevation model into 431 lossless tiles, verified every sample against the source, and measured what a point chosen on the map gains from them (100 random places against the complete model) |
+| 14 Nov 19:30 | Claude | Wrote the eclipse module (the Earth covering the Sun); read NASA's shadow conventions and the contact times of the 14 lunar eclipses of 2025-2030 from the NASA eclipse web site and tested the module against them; compared it with Firefly Aerospace's published times for the eclipse seen by Blue Ghost Mission 1 |
+| 15 Nov 00:05 | Claude | Wired eclipses into the sunlight margins and summaries; made the application sample every mission every ten minutes and load the 120 m tiles around a chosen point |
+| 15 Nov 00:20 | Codex | Independently reviewed the new modules: audited the whole-map sweep on 200 places and three dates, measured the sampled eclipse contacts on 240 cases, found a rounding defect in the eclipse visible fraction and two defects in the landing grid, and wrote the fixes with regression tests |
+| 15 Nov 00:40 | Claude | Reproduced and integrated the review's findings; added input guards to the sweep; updated README, methodology, references and the engine pages |

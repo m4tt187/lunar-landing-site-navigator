@@ -85,8 +85,9 @@ All fourteen lunar eclipses from 2025 to 2030 (six total, four partial, four pen
 | Instant of greatest eclipse, all 14 | within 5 s |
 | Difference between Dynamical and Universal Time (ΔT) used by NASA and by this engine | within 1 s |
 
-NASA's values are transcribed unmodified in `data/eclipses/nasa-lunar-eclipses.json`, each
-with the address of its figure. The contact times are printed on those figures, which are
+NASA's values — Eclipse Predictions by Fred Espenak and Jean Meeus (NASA's GSFC) —
+are transcribed unmodified in `data/eclipses/nasa-lunar-eclipses.json`, each with the
+address of its figure. The contact times are printed on those figures, which are
 images; the transcription was checked against the phase durations of the catalogue page
 (P4 − P1, U4 − U1 and U3 − U2 agree to the 0.1 minute printed there).
 

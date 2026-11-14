@@ -54,12 +54,23 @@ This tool draws that picture for any site and any date, instantly, in a browser.
   every scenario, with the best landing days marked.
 - **Sites to start from.** Apollo and robotic landing sites with cited coordinates,
   named south-pole features, the eight best-lit points of NASA's long-term illumination
-  map — or any coordinates, typed or clicked on the map.
+  map — or any coordinates, typed or clicked on the map. A clicked point gets NASA's
+  120 m terrain too: the application fetches the nine terrain tiles around it.
+- **Eclipses included.** When the Earth passes in front of the Sun — a lunar eclipse,
+  seen from the Earth — the sunlight is counted as lost for as long as the chosen rule
+  says. Seen from the south pole, the eclipse of 14 March 2025 covered the whole Sun for
+  2 h 48 min.
 - **Rules you can change.** What counts as "Sun up" (any part of the disc, half, or all
   of it) and as "Earth in view" (its centre on the skyline, or 2° or 5° above it, since
   links that graze the terrain fade).
 - **Ready-made comparisons** for a first look, and a **link** that reproduces any
   comparison exactly.
+- **A recommendation, not only a comparison.** The engine can search every site with a
+  real skyline and every landing date of a year for the mission you describe — so many
+  days of operations, a lander that survives so many hours of darkness — and rank the
+  site-and-date pairs: power for the whole mission first, then the most contact with the
+  Earth. Today from the command line (`npx tsx tools/planning/recommend.ts`, see
+  [docs/engine/planning.md](docs/engine/planning.md)).
 
 Plain-language sentences accompany the numbers, so the same screen serves a planner who
 wants degrees and hours and a student who wants to know why the pole is hard.
@@ -72,20 +83,28 @@ Everything is computed in the browser; there is no server.
    the open-source Astronomy Engine; the Moon's orientation follows the IAU rotation
    model. For a site this gives azimuth, elevation, apparent size and distance, with
    light-time, aberration and the observer's position on the surface taken into account.
+   The positions are computed exactly every two hours, once for all sites, and
+   interpolated in between, so that every mission can be sampled every ten minutes.
 2. **What the terrain hides.** From the site, rays are marched over NASA's LOLA elevation
    model in every direction (every 0.25°), out to 400 km on the curved Moon. The highest
-   elevation angle found along each ray is the skyline.
-3. **What it means.** The Sun counts as up when the chosen fraction of its disc is above
-   the skyline in its direction; the Earth when it clears the skyline by the chosen
-   margin. From samples through the mission come the shares of time, the windows, the
-   longest night and the longest link gap.
-4. **The whole map at once.** For a distant light the terrain is resampled into a frame
+   elevation angle found along each ray is the skyline. Marked sites use the complete
+   120 m model; a clicked point uses the same 120 m model for at least 30 km around it
+   and a 480 m reduction beyond.
+3. **What the Earth hides.** The Earth's disc, enlarged by 75 km of opaque air as in
+   NASA's eclipse predictions, is tested against the Sun's at every sample.
+4. **What it means.** The Sun counts as up when the chosen fraction of its disc is above
+   the skyline in its direction and not covered by the Earth; the Earth when it clears
+   the skyline by the chosen margin. From samples ten minutes apart through the mission
+   come the shares of time, the windows, the longest night and the longest link gap.
+5. **The whole map at once.** For a distant light the terrain is resampled into a frame
    aligned with the light's direction; one running maximum per row then tells every
    place at once whether it sees the light. A whole-map answer takes about a tenth of a
    second, so the map layers are computed live, in background workers.
 
 Full description, conventions and formulas: [docs/methodology.md](docs/methodology.md).
-The engine's contract: [docs/engine/contract.md](docs/engine/contract.md).
+The engine, module by module: [contract](docs/engine/contract.md),
+[ten-minute sampling](docs/engine/ephemeris.md), [eclipses](docs/engine/eclipses.md),
+[planning](docs/engine/planning.md), [terrain tiles](docs/engine/tiles.md).
 
 ## How far to trust it
 
@@ -94,27 +113,38 @@ The engine's contract: [docs/engine/contract.md](docs/engine/contract.md).
 | Sun and Earth directions against **NASA/JPL Horizons** (9,810 reference values: nine sites, five time windows, 2026–2035) | largest difference **0.004°** (the Sun's disc is 0.53° wide); the test fails above 0.01° |
 | Earth elevation at two **real landings** against a JPL report | IM-1: 15.4° on the landing day and 9.6° a week later (JPL: "15 deg at landing down to 10 deg during the last contact"); Chandrayaan-3: 13.0° above the horizontal at landing (JPL: "approximately 11°" above the local terrain) |
 | Share of time with sunlight and with the Earth in view against the **NASA LOLA-team illumination maps**, at 400 places south of 85.4° S over 18.6 years | correlation **0.98** for both; mean absolute difference 0.010 (Sun) and 0.012 (Earth); 96 % and 94 % of places within 0.05 |
+| Eclipses against **NASA's lunar eclipse predictions** (Goddard Space Flight Center), all 14 eclipses of 2025–2030 | 58 contact times within **8.3 s** (root mean square 3.5 s); the two contacts of the eclipse that only grazes the Moon (18 July 2027) within 52 s, which is 0.7″ |
+| The eclipse of 14 March 2025 at the **Blue Ghost Mission 1** landing site against the mission's own prediction (Firefly Aerospace, NASA CLPS) | first and last contact within half a minute; start of totality within 2.1 min; the three photographs the lander took fall in the phases computed for their times |
+| A clicked point (120 m tiles nearby, 480 m beyond) against the complete 120 m model, 100 random places south of 80° S | yearly sunlight within **0.11** percentage points, Earth visibility within 0.12 (the 480 m model alone: up to 17.5 and 15.3) |
+| Ten-minute sampling: interpolated Sun and Earth directions against the exact ones, 25,000 cases | largest difference 1.4 × 10⁻⁷ ° |
+| Planning (operating window, landing calendar) against a minute-by-minute simulation | same answer in 700 random cases |
 | Whole-map sweep against an independent ray march over the same model | same answer for 98.9 % (Sun) and 99.5 % (Earth) of 1,280 place-and-time pairs; above 99.3 % away from shadow edges |
-| Automated tests | 88 tests in 8 files, run with `npm test` |
+| Automated tests | 287 tests in 16 files, run with `npm test` |
 
 Reproduce: `npm test`, `python3 tools/horizons/fetch_fixtures.py`,
-`npx tsx tools/validation/illumination.ts` (details in [docs/methodology.md](docs/methodology.md)).
+`npx tsx tools/validation/illumination.ts`, `npx tsx tools/validation/tiles.ts`,
+`npx tsx tools/eclipses/list.ts` (details in [docs/methodology.md](docs/methodology.md)).
 
 ### Limits, stated plainly
 
-- **Geometry only.** Line of sight to the Sun and the Earth. Not modelled: lunar eclipses
-  (the Earth covering the Sun), the lander's own shadow and tilt, slopes, dust, heat,
-  radio link budgets, and which ground stations on Earth can see the Moon.
-- **Terrain resolution.** Marked sites use the 120 m LOLA model. Coordinates clicked on
-  the map, and the map layers, use the same model reduced to 480 m: small ridges near the
-  site are smoothed, and results can differ by ten percentage points or more from the
-  120 m result. The application says which model each result uses.
-- **Where terrain is modelled.** South of 80° S. Sites elsewhere (Apollo, mid-latitude
+- **Geometry only.** Line of sight to the Sun and the Earth. Not modelled: the lander's
+  own shadow and tilt, slopes, dust, heat, radio link budgets, and which ground stations
+  on Earth can see the Moon. During an eclipse the faint reddish light that the Earth's
+  atmosphere bends into the shadow is counted as none.
+- **Terrain resolution.** Marked sites use the complete 120 m LOLA model. A clicked point
+  uses the 120 m model for at least 30 km around it and a 480 m reduction beyond; if the
+  terrain tiles cannot be loaded it falls back to the 480 m model alone and says so
+  (results can then differ by ten percentage points and more). The map layers always use
+  the 480 m model and a faster, approximate method: about one cell in a hundred, on steep
+  slopes and at shadow edges, differs from the per-site answer. Numbers quoted for a site
+  never come from the map.
+- **Where terrain is modelled.** South of 80° S, from a model that ends at 75° S: terrain
+  farther north does not exist for the application. Sites elsewhere (Apollo, mid-latitude
   landers) are computed with the horizon of a smooth sphere, and say so.
 - **Dates.** Landings between February 2000 and August 2049.
-- **Sampling.** Windows are found from samples every 30 minutes (missions up to a month),
-  one hour (up to 100 days) or three hours (a year), with interpolated crossings. An
-  event much shorter than the sampling step can be missed.
+- **Sampling.** Every mission is sampled every ten minutes, and the ends of each window
+  are placed on a straight line between two samples. An event shorter than ten minutes
+  can be missed; the ends of a very brief total eclipse can be up to two minutes off.
 - **A planning aid, not a flight product.**
 
 ## NASA data and other sources
@@ -125,6 +155,8 @@ Reproduce: `npm test`, `python3 tools/horizons/fetch_fixtures.py`,
 | Terrain | NASA **LOLA** (Lunar Reconnaissance Orbiter) south-polar elevation model `LDEM_75S_120M`, NASA Planetary Data System |
 | Independent check, long-term averages, best-lit points, map layers | NASA LOLA-team **average illumination and Earth-visibility maps** (`AVGVISIB_85S_060M_201608`) |
 | Site coordinates | NASA **NSSDCA** lunar artifacts table; **LROC** (Lunar Reconnaissance Orbiter Camera) posts; IAU/USGS **Gazetteer of Planetary Nomenclature** |
+| Eclipse model and its check | NASA Goddard Space Flight Center **eclipse web site** (*Five Millennium Canon of Lunar Eclipses*): shadow conventions, catalogue and contact times of the lunar eclipses of 2025–2030. Eclipse Predictions by Fred Espenak and Jean Meeus (NASA's GSFC) |
+| Check against a lander | Firefly Aerospace's mission updates for **Blue Ghost Mission 1** (a NASA CLPS delivery) |
 
 Every source, with its exact location, licence or terms and where it is used, is listed
 in [docs/references.md](docs/references.md); data provenance and checksums are in
@@ -147,19 +179,20 @@ The terrain assets shipped in `web/public/data/` are rebuilt from the NASA files
 
 | Path | Contents |
 |---|---|
-| `engine/` | Computational core: Sun and Earth positions, skylines, windows, whole-map sweep |
-| `web/` | The application (Preact, TypeScript, Vite) |
+| `engine/` | Computational core: Sun and Earth positions, ten-minute sampling, skylines, eclipses, windows, planning, terrain tiles, whole-map sweep |
+| `web/` | The application (Preact, TypeScript, Vite); `web/public/data/` holds the terrain assets it loads |
 | `tests/` | Automated tests, including the comparisons with NASA/JPL data |
-| `tools/` | Scripts that fetch the Horizons reference tables, build the terrain assets, run the validation |
-| `data/` | Site catalogue with sources, Horizons reference tables, data provenance |
-| `docs/` | Methodology, references and attributions, AI usage log |
+| `tools/` | Scripts that fetch the Horizons reference tables, build the terrain assets and tiles, run the validations, list eclipses, recommend a site and date |
+| `data/` | Site catalogue with sources, Horizons reference tables, NASA eclipse predictions, data provenance |
+| `docs/` | Methodology, references and attributions, AI usage log, one page per engine module |
 
 ## Use of AI tools
 
 This project was built with substantial help from AI tools — Anthropic Claude (Claude
 Code) and OpenAI Codex — working under the direction of the team: they proposed design
 options, wrote and tested the code, researched and checked sources, and drafted the
-documentation. Every AI-assisted source file says so in its header, and
+documentation, and each reviewed the other's work independently. Every AI-assisted
+source file says so in its header, and
 [docs/ai-usage-log.md](docs/ai-usage-log.md) records what each tool did and when. No
 image, video, audio or dataset here is AI-generated: figures are screenshots of the
 application or renderings of NASA data made by code in this repository. No NASA logo or

@@ -9,16 +9,21 @@ when a resource is added, not reconstructed at the end.
 | Resource | Source | Terms | Used for |
 |---|---|---|---|
 | JPL Horizons System (ephemeris DE441, lunar frame MEAN_ME) | https://ssd.jpl.nasa.gov/horizons/ — API https://ssd-api.jpl.nasa.gov/doc/horizons.html | NASA/JPL public data service | Reference Sun and Earth azimuth/elevation for nine lunar sites and five time windows (`data/horizons/fixtures.json`, fetched by `tools/horizons/fetch_fixtures.py`); the engine is tested against these 9,810 reference values (nine sites, five time windows between 2026 and 2035) |
-| LOLA elevation model `LDEM_75S_120M` (Lunar Reconnaissance Orbiter, data set LRO-L-LOLA-4-GDR-V1.0) | NASA Planetary Data System Geosciences Node — https://pds-geosciences.wustl.edu/missions/lro/lola.htm ; exact file and checksum in `data/terrain/README.md` | NASA PDS public archive | Terrain skyline at every site, the 480 m model shipped with the app, the shaded-relief map |
+| LOLA elevation model `LDEM_75S_120M` (Lunar Reconnaissance Orbiter, data set LRO-L-LOLA-4-GDR-V1.0) | NASA Planetary Data System Geosciences Node — https://pds-geosciences.wustl.edu/missions/lro/lola.htm ; exact file and checksum in `data/terrain/README.md` | NASA PDS public archive | Terrain skyline at every site, the 480 m model and the 120 m tiles shipped with the app (`web/public/data/`), the shaded-relief map |
 | Lunar Artifacts and Impact Sites table | NASA Space Science Data Coordinated Archive — https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html | NASA public information | Apollo landing coordinates (`data/sites/catalog.json`) |
 | LROC featured-image posts (Lunar Reconnaissance Orbiter Camera, NASA/GSFC/Arizona State University) | https://www.lroc.asu.edu/images — exact post per site in `data/sites/catalog.json` | Public web pages; coordinates cited as facts | Measured coordinates of robotic landers |
 | LOLA-team average illumination maps `AVGVISIB_85S_060M_201608` (Sun) and `AVGVISIB_85S_060M_201608_EARTH` (Earth), 60 m, south of 85 S | NASA Planetary Data System Geosciences Node — https://pds-geosciences.wustl.edu/lro/lro-l-lola-3-rdr-v1/lrolol_1xxx/extras/illumination/ ; checksums in `data/terrain/README.md` | NASA PDS public archive (extras) | Independent check of this project's terrain and ephemeris chain (`tools/validation/illumination.ts`, `docs/validation-illumination.json`); long-term averages shown per site; the eight best-lit candidate points; map layers |
+| *Five Millennium Canon of Lunar Eclipses* on the NASA eclipse web site (F. Espenak and J. Meeus, NASA TP-2009-214172): catalogue of lunar eclipses 2001–2100, the figure of each eclipse from 2025 to 2030, and the pages on the enlargement of the Earth's shadow, on the figures and on ΔT | NASA Goddard Space Flight Center — https://eclipse.gsfc.nasa.gov/LEcat5/LE2001-2100.html ; figures under https://eclipse.gsfc.nasa.gov/LEplot/LEplot2001/ ; https://eclipse.gsfc.nasa.gov/LEcat5/shadow.html ; https://eclipse.gsfc.nasa.gov/LEcat5/figure.html ; https://eclipse.gsfc.nasa.gov/LEcat5/deltat.html | "Permission is freely granted to reproduce this data when accompanied by an acknowledgment": **Eclipse Predictions by Fred Espenak and Jean Meeus (NASA's GSFC)** | Constants of the eclipse model (75 km of opaque air, mean Earth radius factor 0.998340); contact times, dates and types of the 14 lunar eclipses of 2025–2030 (`data/eclipses/nasa-lunar-eclipses.json`), against which the eclipse module is tested (`tests/engine/eclipse.test.ts`) |
 
 ## Space Agency Partner data and resources
 
+None is used.
+
+## Other organisations
+
 | Resource | Source | Terms | Used for |
 |---|---|---|---|
-| *(entries are added as each resource is actually used)* | | | |
+| *Blue Ghost Mission 1: Live Updates*, Firefly Aerospace (the lander was a NASA Commercial Lunar Payload Services delivery) | https://fireflyspace.com/news/blue-ghost-mission-1-live-updates/ | Public web page; short quotations with attribution | The mission's predicted times of the eclipse of 14 March 2025 at its landing site and the times of three photographs, used as a check of the eclipse module (`tests/engine/eclipse.test.ts`, `docs/engine/eclipses.md`) |
 
 ## Software
 

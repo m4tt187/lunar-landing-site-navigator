@@ -28,8 +28,13 @@ and where its limits are. Code references are to this repository.
    east, north and up directions to give azimuth and elevation. The angular radius of
    each body follows from its radius (695,700 km and 6,378.137 km) and its distance.
 
-The Moon-fixed vectors of step 2 do not depend on the site. The application computes
-them once per time grid and reuses them for every scenario and for the map.
+The Moon-fixed vectors of step 2 do not depend on the site and change smoothly with
+time. They are computed exactly at knots two hours apart, once for all sites, and
+interpolated between the knots with a four-point (cubic) formula
+(`engine/src/ephemeris.ts`, [engine/ephemeris.md](engine/ephemeris.md)). Against the exact
+computation, at 25,000 pseudo-random sites and instants between 2026 and 2035, the largest
+difference in direction is 1.4 × 10⁻⁷ °. This is what makes a ten-minute sampling of a
+whole year affordable: 11 ms for a site.
 
 **Check.** `tools/horizons/fetch_fixtures.py` downloads from NASA/JPL Horizons the
 apparent azimuth and elevation of the Sun and of the Earth for observers at nine places on
@@ -73,11 +78,18 @@ the skyline found so far, when it reaches 400 km, or when it leaves the model. T
 destination of each step is computed with a Cartesian tangent basis, so the method is
 exact and continuous at the pole itself.
 
-For the marked sites the skylines are computed once, at 120 m, by the build script and
-shipped with the application, together with the skylines of the terrain nearer than 3 km
-and 30 km (drawn as separate layers so that a nearby ridge can be told from a far
-massif). For coordinates chosen on the map the same code runs in the browser on the model
-reduced to 480 m (mean of 4 × 4 cells).
+For the marked sites the skylines are computed once, from the complete 120 m model, by
+the build script and shipped with the application, together with the skylines of the
+terrain nearer than 3 km and 30 km (drawn as separate layers so that a nearby ridge can be
+told from a far massif).
+
+For coordinates chosen on the map the same code runs in the browser. The 120 m model is
+shipped as 431 lossless tiles of 256 × 256 samples (`tools/terrain/tiles.ts`,
+`engine/src/tiles.ts`, [engine/tiles.md](engine/tiles.md)); the application fetches the
+nine around the point, so that the 120 m terrain is known for at least 30.7 km in every
+direction, and uses the model reduced to 480 m (mean of 4 × 4 cells) beyond. The skyline
+is one march over the two. If the tiles cannot be loaded, the 480 m model is used alone
+and the result is labelled as an estimate.
 
 **Check.** NASA's LOLA team publishes maps of the average illumination and of the average
 Earth visibility of the polar regions (`AVGVISIB_85S_060M_201608` and `…_EARTH`, method of
@@ -96,10 +108,23 @@ places south of 85.4° S, and compares them with the NASA maps:
 All sample values are in `validation-illumination.json`. The remaining differences are
 expected: the NASA maps were made from a 60 m model and over a different span of years.
 
-This validates the 120 m chain. The 480 m model used for custom coordinates and for the
-map layers is coarser: at some ridge-top places its yearly sunlight differs by ten
-percentage points or more from the 120 m result. The application labels such results as
-estimates.
+This validates the chain built on the complete 120 m model.
+
+**Check of the tiles.** `tools/terrain/tiles.ts --verify` compares every sample of every
+tile with the source file (28,246,016 samples, identical). `tools/validation/tiles.ts`
+then compares, at 100 pseudo-random places south of 80° S, the skyline a chosen point
+gets (tiles nearby, 480 m beyond) with the skyline from the complete 120 m model, and
+the share of 2027 with sunlight and with the Earth in view computed from each
+(`validation-tiles.json`):
+
+| | Tiles + 480 m | 480 m alone |
+|---|---|---|
+| Skyline, mean / largest difference | 0.001° / 0.085° | 0.35° / 5.91° |
+| Sunlight share of the year, mean / largest difference | 0.006 / 0.11 points | 1.4 / 17.5 points |
+| Earth-in-view share, mean / largest difference | 0.009 / 0.12 points | 0.7 / 15.3 points |
+
+The 480 m model alone, still used by the map layers, is coarse: at some ridge-top places
+its yearly sunlight differs by ten percentage points or more.
 
 ## 4. From geometry to answers
 
@@ -120,19 +145,60 @@ azimuth by the chosen margin (0°, 2° or 5°). The Earth's disc is about 1.9° 
 no margin half of it can be hidden. A margin is offered because radio links that graze
 the terrain fade from multipath, as JPL measured on two missions.
 
-**Over a mission.** The scenario is sampled every 30 minutes (up to 31 days), every hour
-(up to 100 days) or every 3 hours (a year). Windows of sunlight, of Earth visibility and
-of both are the intervals where the corresponding margin is positive; the instant of each
-crossing is linearly interpolated between samples. From them: the share of the mission,
-the longest night, the longest link gap. The next rise or set after the moment on the
-time slider is read from the windows, or searched (hourly steps, then bisection to one
-second) up to 60 days beyond the mission.
+**Eclipses.** `engine/src/eclipse.ts`, [engine/eclipses.md](engine/eclipses.md). When the
+Earth passes in front of the Sun, the part of the solar disc inside the Earth's opaque
+disc is lost. That disc is the mean Earth at latitude 45° plus a layer of 75 km of air
+taken as opaque (Danjon's rule, the one of NASA's *Five Millennium Canon of Lunar
+Eclipses*). The visible fraction of the Sun is then the part of its disc that is above
+the skyline *and* outside the Earth's disc, and the rule is applied to that. The two
+obstructions are not judged one at a time: near the poles the Sun is often half-hidden by
+a ridge, and the Earth can cover exactly the part left showing.
+
+*Check against NASA.* For each of the 14 lunar eclipses of 2025–2030, NASA's Goddard
+Space Flight Center gives the instants at which the Moon's limb touches the penumbra and
+the umbra and at which the whole Moon is inside the umbra
+(`data/eclipses/nasa-lunar-eclipses.json`, values unmodified, with their sources). Seen
+from the Moon, those are the instants at which the first point of the limb starts to lose
+the Sun, the first one loses it entirely, and the last one does.
+`tests/engine/eclipse.test.ts` computes them at 360 points of the limb: 58 contact times
+of 13 eclipses agree within 8.3 s (root mean square 3.5 s). The fourteenth eclipse (18
+July 2027) only grazes the Moon — 0.14 % of its diameter enters the penumbra for 11.8
+minutes — and its two contacts differ by 43 s and 52 s, which is 0.7″ of depth. The
+instant of greatest eclipse agrees within 5 s for all 14.
+
+*Check against a lander.* Firefly Aerospace's Blue Ghost Mission 1 watched the eclipse of
+14 March 2025 from Mare Crisium. The mission's prediction for its site (start 05:00 UTC,
+totality from 06:18 for about 2 h 16 min, end 09:52) and this engine (04:59:28,
+06:15:57 for 2 h 20 min, 09:52:26) agree within half a minute at first and last contact
+and within 2.1 minutes at the start of totality, where the assumed depth of opaque
+atmosphere matters most. The three photographs the lander took (partial at 05:30, total
+at 07:30, "about to emerge from totality" at 08:30) fall in the phases computed for
+those times.
+
+**Over a mission.** The scenario is sampled every ten minutes. Windows of sunlight, of
+Earth visibility and of both are the intervals where the corresponding margin is
+positive; the instant of each crossing is linearly interpolated between samples. From
+them: the share of the mission, the longest night, the longest link gap, and the eclipses
+that fall inside it. The next rise or set after the moment on the time slider is read
+from the windows, or searched (hourly steps, then bisection to one second) up to 60 days
+beyond the mission. The paths of the Sun and the Earth drawn on the skyline use fewer
+points for long missions (every 30 minutes up to 100 days, every 3 hours for a year); the
+numbers always come from the ten-minute samples.
 
 **Landing calendar.** For each scenario, a year from the start of the month before the
 landing is sampled every 2 hours, plus 120 days of look-ahead. For each possible landing
 time the calendar shows the length of the unbroken stretch of sunlight, of Earth
 visibility and of both that would follow. The "best landing days" are the starts of the
 three longest stretches of power and link.
+
+**Planning.** `engine/src/planning.ts`, [engine/planning.md](engine/planning.md). From the
+windows of a site the engine computes the *operating window* of a landing — from
+touchdown to the first darkness longer than the lander can bridge — for every landing
+time of a year, and ranks sites and dates for a mission: power for the whole mission
+first, then the largest share of it with the Earth in view. It is checked against a
+minute-by-minute simulation (700 random cases) and its first recommendation against the
+exact ephemeris. `tools/planning/recommend.ts` runs it over the 25 sites that have a real
+skyline; the interface does not show it yet.
 
 ## 5. The whole map at once
 
@@ -166,7 +232,14 @@ largest count of both around the selected site.
 calculation — a ray marched from the place along the body's azimuth over the same 480 m
 model — at 160 random places and 8 dates: the two agree for 98.9 % (Sun) and 99.5 %
 (Earth) of the 1,280 cases, and for more than 99.3 % of those where the margin exceeds
-0.3°. The differences sit on shadow edges, where the two discretisations differ.
+0.3°. The differences sit on shadow edges and on steep slopes, where a place takes the
+answer of the sweep bin it falls in.
+
+**Limits of the map.** The sweep is the approximate method of the two, and it works on
+the 480 m model. It is used to draw the map and to suggest a better place nearby; the
+numbers of a site always come from its own skyline. Terrain outside the elevation model
+(north of 75° S, 150 km beyond the mapped area) does not exist for the sweep. The map
+layers do not take eclipses into account.
 
 ## 6. Reproducing everything
 
@@ -175,17 +248,25 @@ npm ci
 npm test                                         # all automated checks
 python3 tools/horizons/fetch_fixtures.py         # re-download the Horizons reference tables
 npx tsx tools/terrain/build.ts                   # rebuild terrain assets (needs the NASA files, see data/terrain/README.md)
+npx tsx tools/terrain/tiles.ts --verify          # every sample of the 120 m tiles against the NASA file
 npx tsx tools/validation/illumination.ts 400     # comparison with the NASA illumination maps
+npx tsx tools/validation/tiles.ts                # what a chosen point gets, against the complete 120 m model
+npx tsx tools/eclipses/list.ts --lat -90         # eclipses seen from a point, next to NASA's list
+npx tsx tools/planning/recommend.ts              # best sites and landing dates for a mission
 ```
 
 ## 7. What is not modelled
 
-- Lunar eclipses, during which the Earth covers the Sun for up to a few hours.
+- During an eclipse, the faint reddish light that the Earth's atmosphere bends into the
+  shadow (it is counted as none), and the gradual dimming at the shadow's edge (the
+  Earth's disc is taken as a circle with a sharp edge).
 - The lander itself: its shadow, tilt, the pointing and field of view of panels and
   antennas.
 - Slopes, surface roughness, dust, temperatures.
 - Radio link budgets, multipath, and the visibility of the Moon from ground stations on
   Earth. "Earth in view" is geometric line of sight to the Earth's centre.
-- Terrain north of 80° S (smooth-sphere horizon there), and terrain detail finer than
-  the grid in use.
-- Events shorter than the sampling step.
+- Terrain north of 80° S (smooth-sphere horizon there), terrain north of 75° S as an
+  obstacle for the polar sites, and terrain detail finer than the grid in use.
+- Events shorter than the ten-minute sampling step. The ends of each window are placed on
+  a straight line between two samples: good to seconds for sunrises and sunsets, up to
+  two minutes off for the ends of a very brief total eclipse.

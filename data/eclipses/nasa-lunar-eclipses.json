@@ -1,5 +1,6 @@
 {
  "source": "NASA Goddard Space Flight Center eclipse web site: Five Millennium Canon of Lunar Eclipses, -1999 to +3000 (F. Espenak and J. Meeus, NASA TP-2009-214172)",
+ "acknowledgment": "Eclipse Predictions by Fred Espenak and Jean Meeus (NASA's GSFC)",
  "catalogueUrl": "https://eclipse.gsfc.nasa.gov/LEcat5/LE2001-2100.html",
  "conventionsUrls": [
   "https://eclipse.gsfc.nasa.gov/LEcat5/shadow.html",
