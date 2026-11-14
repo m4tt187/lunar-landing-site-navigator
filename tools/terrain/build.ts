@@ -197,6 +197,8 @@ function distanceKm(lat1: number, lon1: number, lat2: number, lon2: number): num
   return (2 * R_M * Math.asin(Math.sqrt(a))) / 1000;
 }
 
+const SKYLINE_STEP_DEG = 0.25, RIDGE_STEP_DEG = 0.5, RIDGE_BANDS_KM = [3, 30];
+
 interface CatalogSite { id: string; name: string; group: string; latDeg: number; lonDeg: number; [key: string]: unknown }
 
 function main(): void {
@@ -239,23 +241,30 @@ function main(): void {
       id: `sunlit-${i + 1}`, name: `Sunlit peak ${String.fromCharCode(65 + i)} (near ${near})`, group: 'sunlit',
       agency: 'Found in the NASA LOLA-team average-sunlight map', latDeg: peak.latDeg, lonDeg: peak.lonDeg,
       kind: 'derived from NASA data', date: '',
-      note: `Among the best-lit places near the south pole: sunlit ${Math.round(peak.value * 100)}% of the time on average (3 x 3 cells of 60 m); ${Math.round(nearest.km)} km from the centre of ${near}`,
+      note: `One of the eight best-lit places in NASA's long-term sunlight map, ${Math.round(nearest.km)} km from the centre of ${near}`,
       source: { title: 'NASA LOLA team, average solar illumination map AVGVISIB_85S_060M_201608', url: 'https://pds-geosciences.wustl.edu/lro/lro-l-lola-3-rdr-v1/lrolol_1xxx/extras/illumination/' },
     };
   });
   const sites = [...catalog.sites, ...peaks].map((site) => {
     if (site.latDeg > MAP_MIN_LAT) return { ...site, terrain: null, nasaLongTerm: null };
+    const round = (values: Float32Array): number[] => Array.from(values, (v) => Math.round(v * 100) / 100);
     const profiles: Record<string, number[]> = {};
     let truncated = false, ground = 0;
     for (const mast of MAST_HEIGHTS_M) {
-      const t = computeTerrainHorizon(dem, site.latDeg, site.lonDeg, mast, { azStepDeg: 0.5, maxDistanceKm: 400 });
-      profiles[String(mast)] = Array.from(t.profile.elDeg, (v) => Math.round(v * 100) / 100);
+      const t = computeTerrainHorizon(dem, site.latDeg, site.lonDeg, mast, { azStepDeg: SKYLINE_STEP_DEG, maxDistanceKm: 400 });
+      profiles[String(mast)] = round(t.profile.elDeg);
       truncated ||= t.truncated; ground = t.groundHeightM;
     }
+    // Skylines of the terrain closer than 3 km and 30 km (2 m height): they tell a nearby ridge from a far massif.
+    const band = (km: number): number[] =>
+      round(computeTerrainHorizon(dem, site.latDeg, site.lonDeg, MAST_HEIGHTS_M[0]!, { azStepDeg: RIDGE_STEP_DEG, maxDistanceKm: km }).profile.elDeg);
     console.log(`${site.id}: ground ${ground.toFixed(0)} m${truncated ? ' (model edge reached)' : ''}`);
     return {
       ...site,
-      terrain: { groundHeightM: Math.round(ground), azStepDeg: 0.5, modelEdgeReached: truncated, profiles },
+      terrain: {
+        groundHeightM: Math.round(ground), azStepDeg: SKYLINE_STEP_DEG, modelEdgeReached: truncated, profiles,
+        ridges: { azStepDeg: RIDGE_STEP_DEG, bandsKm: RIDGE_BANDS_KM, near: band(RIDGE_BANDS_KM[0]!), mid: band(RIDGE_BANDS_KM[1]!) },
+      },
       nasaLongTerm: longTerm(site.latDeg, site.lonDeg),
     };
   });

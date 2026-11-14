@@ -4,3 +4,4 @@ export * from './types';
 export * from './geometry';
 export * from './analysis';
 export * from './terrain';
+export * from './sweep';

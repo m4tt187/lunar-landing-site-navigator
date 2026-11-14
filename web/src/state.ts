@@ -28,13 +28,32 @@ export const SUN_RULES = [
   { value: 1, label: 'the whole disc shows' },
 ];
 export const EARTH_RULES = [
-  { value: 0, label: 'just above the skyline' },
-  { value: 2, label: '2° above the skyline' },
-  { value: 5, label: '5° above the skyline' },
+  { value: 0, label: 'its centre clears the skyline' },
+  { value: 2, label: 'it is 2° above the skyline' },
+  { value: 5, label: 'it is 5° above the skyline' },
+];
+
+export type MapLayer = 'terrain' | 'now' | 'sun' | 'earth' | 'both' | 'nasa-sun' | 'nasa-earth';
+export const MAP_LAYERS: { id: MapLayer; label: string; title: string }[] = [
+  { id: 'terrain', label: 'Terrain', title: 'Shaded relief from NASA LOLA elevation data' },
+  { id: 'now', label: 'Now', title: 'Where the Sun and the Earth can be seen at the moment shown by the time slider' },
+  { id: 'both', label: 'Power + link', title: 'Share of the mission with sunlight and the Earth in view at the same time' },
+  { id: 'sun', label: 'Sunlight', title: 'Share of the mission with sunlight' },
+  { id: 'earth', label: 'Earth in view', title: 'Share of the mission with the Earth in view' },
+  { id: 'nasa-sun', label: 'NASA: sunlight', title: 'Long-term average sunlight, NASA LOLA team map (south of 85° S)' },
+  { id: 'nasa-earth', label: 'NASA: Earth', title: 'Long-term average Earth visibility, NASA LOLA team map (south of 85° S)' },
 ];
 
 export const HOUR = 3600000;
 export const DAY = 86400000;
+
+/**
+ * Landing dates the app accepts. The landing calendar starts up to a month
+ * before the landing and looks more than a year ahead of it, and all of that
+ * must stay inside the years the ephemeris covers (2000-2050).
+ */
+export const MIN_LANDING_MS = MIN_TIME_MS + 32 * DAY;
+export const MAX_LANDING_MS = MAX_TIME_MS - 490 * DAY;
 
 export const data = signal<AppData | null>(null);
 export const loadError = signal<string | null>(null);
@@ -46,17 +65,18 @@ export const cursorH = signal(0);
 export const sunRule = signal(0);
 export const earthRule = signal(0);
 export const playing = signal(false);
+export const mapLayer = signal<MapLayer>('terrain');
 
 let nextId = 1;
 export const newId = (): number => nextId++;
 
 export function clampTime(ms: number): number {
-  return Math.min(MAX_TIME_MS - 400 * DAY, Math.max(MIN_TIME_MS, ms));
+  return Math.min(MAX_LANDING_MS, Math.max(MIN_LANDING_MS, ms));
 }
 
 export function defaultStart(): number {
   const now = new Date();
-  return Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1);
+  return clampTime(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1));
 }
 
 export function updateScenario(id: number, patch: Partial<Scenario>): void {
@@ -73,6 +93,13 @@ export function removeScenario(id: number): void {
   scenarios.value = scenarios.value.filter((s) => s.id !== id);
   if (selectedId.value === id) selectedId.value = scenarios.value[0]!.id;
 }
+export function setScenarios(list: Omit<Scenario, 'id'>[]): void {
+  const next = list.slice(0, MAX_SCENARIOS).map((s) => ({ ...s, id: newId(), startMs: clampTime(s.startMs) }));
+  if (!next.length) return;
+  scenarios.value = next;
+  selectedId.value = next[0]!.id;
+  cursorH.value = 0;
+}
 
 /** Shareable state in the URL fragment. */
 export function encodeState(): string {
@@ -80,7 +107,7 @@ export function encodeState(): string {
     const site = s.siteId ?? `@${s.custom!.latDeg.toFixed(4)}_${s.custom!.lonDeg.toFixed(4)}`;
     return [site, s.mastM, new Date(s.startMs).toISOString().slice(0, 16)].join('~');
   });
-  return `v=1&s=${parts.join('|')}&d=${durationDays.value}&sun=${sunRule.value}&earth=${earthRule.value}`;
+  return `v=1&s=${parts.join('|')}&d=${durationDays.value}&sun=${sunRule.value}&earth=${earthRule.value}&map=${mapLayer.value}`;
 }
 
 export function decodeState(hash: string, app: AppData): boolean {
@@ -110,5 +137,7 @@ export function decodeState(hash: string, app: AppData): boolean {
   if (SUN_RULES.some((x) => x.value === sun)) sunRule.value = sun;
   const earth = Number(params.get('earth'));
   if (EARTH_RULES.some((x) => x.value === earth)) earthRule.value = earth;
+  const layer = params.get('map');
+  if (MAP_LAYERS.some((x) => x.id === layer)) mapLayer.value = layer as MapLayer;
   return true;
 }

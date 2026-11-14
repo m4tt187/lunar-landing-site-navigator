@@ -53,3 +53,6 @@ official rules, guides and challenge page were re-read.
 | 14 Nov 09:50 | Claude | Wrote the first version of the web application: south-pole map, scenario cards, skyline panorama, timeline, landing calendar, shareable links |
 | 14 Nov 09:45 | Claude | Validated the terrain and ephemeris chain against the NASA LOLA-team average illumination and Earth-visibility maps at 400 points (correlation 0.98) |
 | 14 Nov 09:50 | Claude | Added NASA long-term averages per site, the eight best-lit points found in the NASA illumination map, and map-layer assets built from those maps |
+| 14 Nov 13:32 | Codex | Independently reviewed the computational core and the terrain code; reproduced three defects (terrain rays collapsing at exactly 90 S, threshold equality, missing input validation) and wrote the fixes with 70 regression tests |
+| 14 Nov 13:50 | Claude | Reviewed and integrated those fixes; wrote the whole-map parallel-light sweep and its test against an independent ray march |
+| 14 Nov 14:45 | Claude | Rebuilt the interface around it: live map layers (visibility now, share of the mission), best spot within 5 km, true-scale close-ups of the Sun and the Earth, layered skylines, calendar rows for every scenario with the best landing days, ready-made comparisons |

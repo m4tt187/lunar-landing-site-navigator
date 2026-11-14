@@ -1,90 +1,194 @@
 // SPDX-License-Identifier: Apache-2.0
 // AI-assisted: written with Anthropic Claude under the direction of the team.
+import { useMemo } from 'preact/hooks';
 import { horizonElevationAt } from '@engine/index';
-import type { Interval } from '@engine/index';
-import type { Analysis, Calendar, Instant } from './compute';
-import { fmtDate } from './format';
+import type { HorizonProfile, Interval } from '@engine/index';
+import { earthUp, sunUp } from './compute';
+import type { Analysis, Calendar, Instant, LandingWindow } from './compute';
+import { compass, fmtDate, fmtSpan, pct } from './format';
 import { DAY, HOUR } from './state';
 
-const SUN = '#ffbf47', EARTH = '#58a6ff', BOTH = '#6fdc8c';
+export const SUN = '#ffbf47', EARTH = '#58a6ff', BOTH = '#6fdc8c';
+const DEG = Math.PI / 180;
 
-/** Azimuth shown from -180 (south) through 0 (north, centre) to +180 (south). */
-const wrap = (az: number): number => ((((az + 180) % 360) + 360) % 360) - 180;
+const wrap180 = (deg: number): number => ((((deg + 180) % 360) + 360) % 360) - 180;
 
-/** Panorama of the skyline with the paths of the Sun and the Earth. */
+/** Skyline of the nearer terrain, or the full skyline when the site has no ridge data. */
+function ridge(a: Analysis, which: 'near' | 'mid'): HorizonProfile | null {
+  const r = a.terrain.ridges;
+  return r ? { azStepDeg: r.azStepDeg, elDeg: r[which] } : null;
+}
+
+interface Frame { x: (az: number) => number; y: (el: number) => number; centre: number; lo: number; hi: number }
+
+/** Panorama of the skyline all around the site, with the paths of the Sun and the Earth over the mission. */
 export function SkyView({ a, instant }: { a: Analysis; instant: Instant }) {
-  const W = 480, H = 230, L = 30, R = 6, T = 8, B = 22;
-  const profile = a.terrain.profile;
-  const { series, margins } = a;
-  let lo = 0, hi = 0;
-  for (let i = 0; i < profile.elDeg.length; i++) { lo = Math.min(lo, profile.elDeg[i]!); hi = Math.max(hi, profile.elDeg[i]!); }
-  let bodyHi = -90, bodyLo = 90;
-  for (let i = 0; i < series.n; i++) {
-    bodyHi = Math.max(bodyHi, series.sunEl[i]!, series.earthEl[i]!);
-    bodyLo = Math.min(bodyLo, series.sunEl[i]!, series.earthEl[i]!);
-  }
-  hi = Math.max(hi, bodyHi, 1) + 1.5;
-  lo = Math.max(Math.min(lo, bodyLo, -1) - 1, hi - 100, -12);
-  const x = (az: number): number => L + ((wrap(az) + 180) / 360) * (W - L - R);
-  const y = (el: number): number => T + ((hi - el) / (hi - lo)) * (H - T - B);
-  const pxPerDegX = (W - L - R) / 360, pxPerDegY = (H - T - B) / (hi - lo);
-
-  let skyline = `M${L},${H - B}`;
-  for (let px = 0; px <= W - L - R; px += 1) {
-    const az = (px / (W - L - R)) * 360 - 180;
-    skyline += `L${(L + px).toFixed(1)},${y(horizonElevationAt(profile, az)).toFixed(1)}`;
-  }
-  skyline += `L${W - R},${H - B}Z`;
-
-  const path = (azs: Float64Array, els: Float64Array, margin: Float64Array, visible: boolean): string => {
-    let d = '', pen = false;
+  const W = 480, H = 232, L = 30, R = 6, T = 8, B = 22;
+  const stat = useMemo(() => {
+    const profile = a.terrain.profile;
+    const { series, margins } = a;
+    let lo = 0, hi = 0;
+    for (let i = 0; i < profile.elDeg.length; i++) { lo = Math.min(lo, profile.elDeg[i]!); hi = Math.max(hi, profile.elDeg[i]!); }
+    let bodyHi = -90, bodyLo = 90, sx = 0, sy = 0;
     for (let i = 0; i < series.n; i++) {
-      const on = margin[i]! > 0 === visible;
-      const jump = i > 0 && Math.abs(wrap(azs[i]!) - wrap(azs[i - 1]!)) > 180;
-      if (!on) { pen = false; continue; }
-      d += `${pen && !jump ? 'L' : 'M'}${x(azs[i]!).toFixed(1)},${y(els[i]!).toFixed(1)}`;
-      pen = true;
+      bodyHi = Math.max(bodyHi, series.sunEl[i]!, series.earthEl[i]!);
+      bodyLo = Math.min(bodyLo, series.sunEl[i]!, series.earthEl[i]!);
+      sx += Math.cos(series.earthAz[i]! * DEG); sy += Math.sin(series.earthAz[i]! * DEG);
     }
-    return d;
-  };
-  const span = hi - lo;
-  const tick = span > 60 ? 20 : span > 25 ? 10 : span > 12 ? 5 : span > 5 ? 2 : 1;
-  const ticks: number[] = [];
-  for (let v = Math.ceil(lo / tick) * tick; v <= hi; v += tick) ticks.push(v);
-  const disc = (az: number, el: number, radius: number, color: string, up: boolean) => (
+    hi = Math.max(hi, bodyHi, 1) + 1.5;
+    lo = Math.max(Math.min(lo, bodyLo, -1) - 1, hi - 100, -12);
+    // Centre the panorama on the compass point nearest to the Earth's mean direction.
+    const centre = (((Math.round(Math.atan2(sy, sx) / DEG / 90) * 90) % 360) + 360) % 360;
+    const frame: Frame = {
+      centre, lo, hi,
+      x: (az) => L + ((wrap180(az - centre) + 180) / 360) * (W - L - R),
+      y: (el) => T + ((hi - el) / (hi - lo)) * (H - T - B),
+    };
+    const outline = (p: HorizonProfile): string => {
+      let d = `M${L},${H - B}`;
+      for (let px = 0; px <= W - L - R; px++) {
+        const az = centre - 180 + (px / (W - L - R)) * 360;
+        d += `L${L + px},${frame.y(horizonElevationAt(p, az)).toFixed(1)}`;
+      }
+      return `${d}L${W - R},${H - B}Z`;
+    };
+    const track = (azs: Float64Array, els: Float64Array, visible: (i: number) => boolean, wanted: boolean): string => {
+      let d = '', pen = false;
+      for (let i = 0; i < series.n; i++) {
+        if (visible(i) !== wanted) { pen = false; continue; }
+        const jump = i > 0 && Math.abs(wrap180(azs[i]! - centre) - wrap180(azs[i - 1]! - centre)) > 180;
+        d += `${pen && !jump ? 'L' : 'M'}${frame.x(azs[i]!).toFixed(1)},${frame.y(els[i]!).toFixed(1)}`;
+        pen = true;
+      }
+      return d;
+    };
+    const sunVisible = (i: number): boolean => sunUp(margins.sun[i]!, a.thresholds);
+    const earthVisible = (i: number): boolean => earthUp(margins.earth[i]!);
+    const span = hi - lo;
+    const tick = span > 60 ? 20 : span > 25 ? 10 : span > 12 ? 5 : span > 5 ? 2 : 1;
+    const ticks: number[] = [];
+    for (let v = Math.ceil(lo / tick) * tick; v <= hi; v += tick) ticks.push(v);
+    const near = ridge(a, 'near'), mid = ridge(a, 'mid');
+    return {
+      frame, ticks,
+      far: outline(profile), mid: mid ? outline(mid) : null, near: near ? outline(near) : null,
+      sunHidden: track(series.sunAz, series.sunEl, sunVisible, false), sunSeen: track(series.sunAz, series.sunEl, sunVisible, true),
+      earthHidden: track(series.earthAz, series.earthEl, earthVisible, false), earthSeen: track(series.earthAz, series.earthEl, earthVisible, true),
+    };
+  }, [a]);
+  const { frame } = stat;
+  const marker = (az: number, el: number, color: string, up: boolean, label: string) => (
     <g>
-      <ellipse cx={x(az)} cy={y(el)} rx={Math.max(4, radius * pxPerDegX)} ry={Math.max(4, radius * pxPerDegY)}
-        fill={color} fill-opacity={up ? 1 : 0.25} stroke={color} stroke-width="1.5" />
-      <circle cx={x(az)} cy={y(el)} r="11" fill="none" stroke={color} stroke-opacity="0.5" stroke-dasharray="2 3" />
+      <circle cx={frame.x(az)} cy={frame.y(el)} r="5" fill={color} fill-opacity={up ? 1 : 0.3} stroke={color} stroke-width="1.5" />
+      <circle cx={frame.x(az)} cy={frame.y(el)} r="11" fill="none" stroke={color} stroke-opacity="0.55" stroke-dasharray="2 3" />
+      <text x={Math.min(W - R - 26, Math.max(L + 2, frame.x(az) + 14))} y={Math.max(T + 10, frame.y(el) - 8)} class="marker-label" fill={color}>{label}</text>
     </g>
   );
   const clip = `sky-${a.scenario.id}`;
   return (
     <svg class="sky" viewBox={`0 0 ${W} ${H}`} role="img"
-      aria-label={`Skyline panorama at ${a.name} with the paths of the Sun and the Earth`}>
-      <defs><clipPath id={clip}><rect x={L} y={T} width={W - L - R} height={H - T - B} /></clipPath></defs>
-      <rect x={L} y={T} width={W - L - R} height={H - T - B} class="sky-bg" />
-      {ticks.map((v) => (
+      aria-label={`Skyline all around ${a.name}, with the paths of the Sun and the Earth`}>
+      <defs>
+        <clipPath id={clip}><rect x={L} y={T} width={W - L - R} height={H - T - B} /></clipPath>
+        <linearGradient id={`${clip}-bg`} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#02030a" /><stop offset="1" stop-color="#0a0f1c" /></linearGradient>
+      </defs>
+      <rect x={L} y={T} width={W - L - R} height={H - T - B} fill={`url(#${clip}-bg)`} />
+      {stat.ticks.map((v) => (
         <g>
-          <line x1={L} x2={W - R} y1={y(v)} y2={y(v)} class={v === 0 ? 'grid zero' : 'grid'} />
-          <text x={L - 5} y={y(v) + 3.5} class="axis" text-anchor="end">{v}°</text>
+          <line x1={L} x2={W - R} y1={frame.y(v)} y2={frame.y(v)} class={v === 0 ? 'grid zero' : 'grid'} />
+          <text x={L - 5} y={frame.y(v) + 3.5} class="axis" text-anchor="end">{v}°</text>
         </g>
       ))}
-      {[-180, -90, 0, 90, 180].map((az, i) => (
-        <text x={x(az === 180 ? 179.999 : az)} y={H - 7} class="axis" text-anchor={i === 0 ? 'start' : i === 4 ? 'end' : 'middle'}>
-          {['S', 'W', 'N', 'E', 'S'][i]}
+      {[-180, -90, 0, 90, 180].map((offset, i) => (
+        <text x={L + ((offset + 180) / 360) * (W - L - R)} y={H - 7} class="axis" text-anchor={i === 0 ? 'start' : i === 4 ? 'end' : 'middle'}>
+          {compass(frame.centre + offset)}
         </text>
       ))}
       <g clip-path={`url(#${clip})`}>
-        <path d={path(series.sunAz, series.sunEl, margins.sun, false)} class="trace" stroke={SUN} stroke-opacity="0.28" />
-        <path d={path(series.earthAz, series.earthEl, margins.earth, false)} class="trace" stroke={EARTH} stroke-opacity="0.28" />
-        <path d={skyline} class="terrain" />
-        <path d={path(series.sunAz, series.sunEl, margins.sun, true)} class="trace" stroke={SUN} />
-        <path d={path(series.earthAz, series.earthEl, margins.earth, true)} class="trace" stroke={EARTH} />
-        {disc(instant.sample.earth.azDeg, instant.sample.earth.elDeg, instant.sample.earth.angularRadiusDeg, EARTH, instant.margins.earthDeg > 0)}
-        {disc(instant.sample.sun.azDeg, instant.sample.sun.elDeg, instant.sample.sun.angularRadiusDeg, SUN, instant.margins.sunDeg > 0)}
+        <path d={stat.sunHidden} class="trace" stroke={SUN} stroke-opacity="0.25" />
+        <path d={stat.earthHidden} class="trace" stroke={EARTH} stroke-opacity="0.25" />
+        <path d={stat.far} class="terrain far" />
+        {stat.mid ? <path d={stat.mid} class="terrain mid" /> : null}
+        {stat.near ? <path d={stat.near} class="terrain near" /> : null}
+        <path d={stat.sunSeen} class="trace" stroke={SUN} />
+        <path d={stat.earthSeen} class="trace" stroke={EARTH} />
+        {marker(instant.sample.earth.azDeg, instant.sample.earth.elDeg, EARTH, instant.earthUp, 'Earth')}
+        {marker(instant.sample.sun.azDeg, instant.sample.sun.elDeg, SUN, instant.sunUp, 'Sun')}
       </g>
     </svg>
+  );
+}
+
+/** Illuminated fraction of the Earth's disc seen from the Moon, and the screen angle of its bright limb. */
+function earthPhase(instant: Instant): { lit: number; angleDeg: number } {
+  const s = instant.sample.sun, e = instant.sample.earth;
+  const cosSep = Math.sin(s.elDeg * DEG) * Math.sin(e.elDeg * DEG) + Math.cos(s.elDeg * DEG) * Math.cos(e.elDeg * DEG) * Math.cos((s.azDeg - e.azDeg) * DEG);
+  // Initial bearing from the Earth to the Sun on the sky, measured from "up" towards increasing azimuth.
+  const dAz = (s.azDeg - e.azDeg) * DEG;
+  const bearing = Math.atan2(Math.sin(dAz) * Math.cos(s.elDeg * DEG),
+    Math.cos(e.elDeg * DEG) * Math.sin(s.elDeg * DEG) - Math.sin(e.elDeg * DEG) * Math.cos(s.elDeg * DEG) * Math.cos(dAz));
+  return { lit: (1 - Math.max(-1, Math.min(1, cosSep))) / 2, angleDeg: bearing / DEG - 90 };
+}
+
+/** The Sun or the Earth at true scale against the skyline around it. */
+export function CloseUp({ a, instant, body }: { a: Analysis; instant: Instant; body: 'sun' | 'earth' }) {
+  const S = 132, half = body === 'sun' ? 1.5 : 3.2;
+  const b = instant.sample[body];
+  const scale = S / (2 * half), across = Math.max(0.05, Math.cos(b.elDeg * DEG));
+  const y = (el: number): number => S / 2 - (el - b.elDeg) * scale;
+  const outline = (p: HorizonProfile): string => {
+    let d = `M0,${S}`;
+    for (let px = 0; px <= S; px += 2) {
+      const az = b.azDeg + (px - S / 2) / (across * scale);
+      d += `L${px},${Math.min(S, Math.max(0, y(horizonElevationAt(p, az)))).toFixed(1)}`;
+    }
+    return `${d}L${S},${S}Z`;
+  };
+  const far = outline(a.terrain.profile);
+  const mid = ridge(a, 'mid'), near = ridge(a, 'near');
+  const r = b.angularRadiusDeg * scale;
+  const id = `close-${body}-${a.scenario.id}`;
+  const up = body === 'sun' ? instant.sunUp : instant.earthUp;
+  const fraction = instant.margins.sunDiskFraction;
+  let caption: string;
+  let disc;
+  if (body === 'sun') {
+    caption = fraction >= 0.995 ? 'whole disc in view' : fraction <= 0.005 ? 'hidden by terrain' : `${pct(fraction)} of the disc in view`;
+    disc = (
+      <g>
+        <circle cx={S / 2} cy={S / 2} r={r * 2.6} fill={`url(#${id}-glow)`} />
+        <circle cx={S / 2} cy={S / 2} r={r} fill="#ffe08a" />
+      </g>
+    );
+  } else {
+    const phase = earthPhase(instant);
+    const rx = r * Math.abs(1 - 2 * phase.lit);
+    caption = `${up ? 'in view' : 'hidden by terrain'} · ${pct(phase.lit)} lit`;
+    disc = (
+      <g transform={`rotate(${phase.angleDeg.toFixed(1)} ${S / 2} ${S / 2}) translate(${S / 2} ${S / 2})`}>
+        <circle r={r} fill="#14263f" />
+        <path d={`M0,${-r}A${r},${r} 0 0 1 0,${r}A${rx.toFixed(2)},${r} 0 0 ${phase.lit > 0.5 ? 1 : 0} 0,${-r}Z`} fill="#7dbcff" />
+      </g>
+    );
+  }
+  const barDeg = body === 'sun' ? 0.5 : 1;
+  return (
+    <figure class="closeup">
+      <svg viewBox={`0 0 ${S} ${S}`} role="img" aria-label={`${body === 'sun' ? 'Sun' : 'Earth'} against the skyline: ${caption}`}>
+        <defs>
+          <radialGradient id={`${id}-glow`}><stop offset="0.3" stop-color="#ffd66b" stop-opacity="0.55" /><stop offset="1" stop-color="#ffd66b" stop-opacity="0" /></radialGradient>
+        </defs>
+        <rect width={S} height={S} fill="#03040b" />
+        {disc}
+        <path d={far} class="terrain far" />
+        {mid ? <path d={outline(mid)} class="terrain mid" /> : null}
+        {near ? <path d={outline(near)} class="terrain near" /> : null}
+        <circle cx={S / 2} cy={S / 2} r={r} fill="none" stroke={body === 'sun' ? SUN : EARTH} stroke-opacity="0.75" stroke-dasharray="3 3" />
+        <line x1="8" x2={8 + barDeg * scale * across} y1={S - 8} y2={S - 8} stroke="#fff" stroke-width="2" />
+        <text x="8" y={S - 13} class="axis strong">{barDeg}°</text>
+      </svg>
+      <figcaption><b style={{ color: body === 'sun' ? SUN : EARTH }}>{body === 'sun' ? 'Sun' : 'Earth'}</b> {caption}</figcaption>
+    </figure>
   );
 }
 
@@ -107,15 +211,15 @@ export function Timeline({ a, cursorH, onCursor }: { a: Analysis; cursorH: numbe
     </g>
   );
   const pick = (event: PointerEvent): void => {
-    const svg = event.currentTarget as SVGSVGElement;
-    const box = svg.getBoundingClientRect();
+    const box = (event.currentTarget as SVGSVGElement).getBoundingClientRect();
     const px = ((event.clientX - box.left) / box.width) * W;
     const f = Math.min(1, Math.max(0, (px - L) / (W - L - R)));
     onCursor((f * (endMs - startMs)) / HOUR);
   };
   const cx = x(startMs + cursorH * HOUR);
   return (
-    <svg class="timeline" viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Sunlight and Earth-visibility windows"
+    <svg class="timeline" viewBox={`0 0 ${W} ${H}`} role="img"
+      aria-label={`Windows of sunlight, Earth in view, and both, over ${fmtSpan(days * 24)} from landing`}
       onPointerDown={(e) => { (e.currentTarget as Element).setPointerCapture(e.pointerId); pick(e); }}
       onPointerMove={(e) => { if (e.buttons & 1) pick(e); }}>
       {row(a.summary.sunWindows, 0, SUN, 'Sun')}
@@ -124,7 +228,7 @@ export function Timeline({ a, cursorH, onCursor }: { a: Analysis; cursorH: numbe
       {ticks.map((d) => (
         <g>
           <line x1={x(startMs + d * DAY)} x2={x(startMs + d * DAY)} y1={top} y2={top + 3 * (rowH + 4) - 4} class="grid" />
-          <text x={x(startMs + d * DAY)} y={H - 4} class="axis" text-anchor="middle">{d === 0 ? 'landing' : `+${d} d`}</text>
+          <text x={x(startMs + d * DAY)} y={H - 4} class="axis" text-anchor={d === 0 ? 'start' : 'middle'}>{d === 0 ? 'landing' : `+${d} d`}</text>
         </g>
       ))}
       <line x1={cx} x2={cx} y1={0} y2={top + 3 * (rowH + 4)} class="cursor" />
@@ -132,40 +236,49 @@ export function Timeline({ a, cursorH, onCursor }: { a: Analysis; cursorH: numbe
   );
 }
 
-/** One year of possible landing dates: unbroken sunlight / Earth link that would follow each. */
-export function LandingCalendar({ calendar, currentMs, onPick }: { calendar: Calendar; currentMs: number; onPick: (ms: number) => void }) {
-  const W = 960, L = 46, R = 8, rowH = 20, top = 4, H = 104;
+export interface CalendarRow { label: string; color: string; values: Float32Array; title: string }
+
+/** One year of possible landing days: the unbroken sunlight / Earth link that would follow each. */
+export function LandingCalendar({ calendar, rows, currentMs, best, onPick }: {
+  calendar: Calendar; rows: CalendarRow[]; currentMs: number; best: LandingWindow[]; onPick: (ms: number) => void;
+}) {
+  const W = 960, L = 150, R = 8, rowH = 18, gap = 3, top = 16;
+  const H = top + rows.length * (rowH + gap) + 34;
   const perDay = DAY / calendar.stepMs;
   const daysTotal = Math.floor(calendar.sunRunH.length / perDay);
   const cellW = (W - L - R) / daysTotal;
-  const rows: [Float32Array, string, string][] = [[calendar.sunRunH, SUN, 'Sun'], [calendar.earthRunH, EARTH, 'Earth'], [calendar.bothRunH, BOTH, 'Both']];
   const months: { x: number; label: string }[] = [];
   for (let d = 0; d < daysTotal; d++) {
     const date = new Date(calendar.startMs + d * DAY);
-    if (date.getUTCDate() === 1) months.push({ x: L + d * cellW, label: date.toLocaleString('en', { month: 'short', timeZone: 'UTC' }) + (date.getUTCMonth() === 0 ? ` ${date.getUTCFullYear()}` : '') });
+    if (date.getUTCDate() === 1) months.push({ x: L + d * cellW, label: date.toLocaleString('en', { month: 'short', timeZone: 'UTC' }) + (date.getUTCMonth() === 0 || months.length === 0 ? ` ${date.getUTCFullYear()}` : '') });
   }
-  const currentX = L + ((currentMs - calendar.startMs) / DAY) * cellW;
+  const xOf = (ms: number): number => L + ((ms - calendar.startMs) / DAY) * cellW;
+  const currentX = xOf(currentMs);
+  const bottom = top + rows.length * (rowH + gap);
   return (
-    <svg class="calendar" viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Landing calendar"
+    <svg class="calendar" viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Landing calendar: unbroken sunlight and Earth link after each possible landing day"
       onClick={(event) => {
         const box = (event.currentTarget as SVGSVGElement).getBoundingClientRect();
         const px = ((event.clientX - box.left) / box.width) * W;
         const day = Math.floor((px - L) / cellW);
         if (day >= 0 && day < daysTotal) onPick(calendar.startMs + day * DAY);
       }}>
-      {rows.map(([values, color, label], r) => {
-        let max = 1;
-        for (let d = 0; d < daysTotal; d++) max = Math.max(max, values[Math.round(d * perDay)]!);
+      {best.map((w) => (
+        <text x={xOf(w.startMs)} y={top - 5} class="axis best" text-anchor="middle"><title>{`Best landing: ${fmtDate(w.startMs)}`}</title>▼</text>
+      ))}
+      {rows.map((row, r) => {
+        let max = 24;
+        for (let d = 0; d < daysTotal; d++) max = Math.max(max, row.values[Math.round(d * perDay)]!);
+        const y0 = top + r * (rowH + gap);
         return (
           <g>
-            <text x={L - 6} y={top + r * (rowH + 3) + rowH - 6} class="axis" text-anchor="end">{label}</text>
-            <rect x={L} y={top + r * (rowH + 3)} width={W - L - R} height={rowH} class="bar-bg" />
+            <text x={L - 6} y={y0 + rowH - 5} class="axis" text-anchor="end"><title>{row.title}</title>{row.label}</text>
+            <rect x={L} y={y0} width={W - L - R} height={rowH} class="bar-bg" />
             {Array.from({ length: daysTotal }, (_, d) => {
-              const v = values[Math.round(d * perDay)]!;
-              const capped = v >= calendar.lookaheadH - 1;
+              const v = row.values[Math.round(d * perDay)]!;
               return v > 0 ? (
-                <rect x={L + d * cellW} y={top + r * (rowH + 3)} width={cellW + 0.3} height={rowH} fill={color} fill-opacity={0.15 + 0.85 * (v / max)}>
-                  <title>{`Landing ${fmtDate(calendar.startMs + d * DAY)}: ${capped ? 'more than ' : ''}${(v / 24).toFixed(1)} days unbroken`}</title>
+                <rect x={L + d * cellW} y={y0} width={cellW + 0.3} height={rowH} fill={row.color} fill-opacity={0.15 + 0.85 * (v / max)}>
+                  <title>{`${row.title} — landing ${fmtDate(calendar.startMs + d * DAY)}: ${v >= calendar.lookaheadH - 1 ? 'more than ' : ''}${fmtSpan(v)} unbroken`}</title>
                 </rect>
               ) : null;
             })}
@@ -174,12 +287,15 @@ export function LandingCalendar({ calendar, currentMs, onPick }: { calendar: Cal
       })}
       {months.map((m) => (
         <g>
-          <line x1={m.x} x2={m.x} y1={top} y2={top + 3 * (rowH + 3)} class="grid" />
-          <text x={m.x + 2} y={H - 20} class="axis">{m.label}</text>
+          <line x1={m.x} x2={m.x} y1={top} y2={bottom} class="grid" />
+          <text x={m.x + 2} y={bottom + 12} class="axis">{m.label}</text>
         </g>
       ))}
       {currentX >= L && currentX <= W - R ? (
-        <g><line x1={currentX} x2={currentX} y1={0} y2={top + 3 * (rowH + 3)} class="cursor" /><text x={Math.min(W - 50, Math.max(L + 40, currentX))} y={H - 5} class="axis strong" text-anchor="middle">selected landing</text></g>
+        <g>
+          <line x1={currentX} x2={currentX} y1={top - 2} y2={bottom} class="cursor" />
+          <text x={Math.min(W - 50, Math.max(L + 40, currentX))} y={H - 4} class="axis strong" text-anchor="middle">selected landing</text>
+        </g>
       ) : null}
     </svg>
   );
