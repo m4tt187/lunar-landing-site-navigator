@@ -26,7 +26,7 @@ The public entry is `engine/src/index.ts` (UI alias `@engine`). Types are in
   output; it does not include eclipses, slopes, equipment, or dust.
 - `sunMinDiskFraction` lies in [0,1]. Zero means any nonzero visible disk;
   one means the full disk. Intermediate thresholds are inclusive. Earth
-  visibility uses the centre above skyline plus the requested elevation margin;
+  visibility uses the centre at or above skyline plus the requested elevation margin;
   it is a geometric line-of-sight proxy, not a guaranteed communications link.
 - Summary fractions and interval durations are time-weighted. Crossings use
   interpolation between samples and therefore have sampling uncertainty.
@@ -37,6 +37,27 @@ The public entry is `engine/src/index.ts` (UI alias `@engine`). Types are in
   forward for the next threshold crossing and returns UTC milliseconds or null
   when no crossing is found within the bounded search. A null result does not
   mean the event never occurs. Kinds: sunrise, sunset, earthrise, earthset.
+  Both ends must lie within the engine's time coverage. The optional coarse step
+  must advance time; at most 100000 coarse intervals are allowed. Detected
+  crossings are refined to a roughly one-second bracket. Events narrower than
+  the coarse scan can be missed; the bracket is not a physical accuracy claim.
+
+## Input and work limits
+
+Profiles must cover 360 degrees with finite elevations in [-90, 90]. Bulk
+analysis checks all samples once; individual horizon lookups validate the
+queried segment in constant time. Series arrays must match `n`, have finite
+values and positive angular radii, and include both endpoints with strictly
+increasing timestamps. Invalid inputs throw rather than produce apparent
+darkness, NaN fractions, or nonterminating loops.
+
+Terrain grids require at least 2 by 2 Int16 samples and positive finite scales.
+Observer heights above ground are 0–20000 m. Ray distance and first step must be
+finite and positive, and the first step cannot exceed the distance. Azimuth bins
+must divide 360 degrees, at most 36000 bins, subject to a preflight work limit of
+five million estimated terrain samples. Finite distance is at most a lunar
+semicircle. A returned `truncated` flag means a ray left the model before the
+remaining terrain could be bounded, and must be disclosed by consumers.
 
 Invalid or nonfinite inputs throw descriptive errors; there are no silent fake
 ephemerides or implicit network fallbacks. Use a Web Worker for long series;
