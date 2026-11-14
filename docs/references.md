@@ -8,7 +8,7 @@ when a resource is added, not reconstructed at the end.
 
 | Resource | Source | Terms | Used for |
 |---|---|---|---|
-| *(entries are added as each resource is actually used)* | | | |
+| JPL Horizons System (ephemeris DE441, lunar frame MEAN_ME) | https://ssd.jpl.nasa.gov/horizons/ — API https://ssd-api.jpl.nasa.gov/doc/horizons.html | NASA/JPL public data service | Reference Sun and Earth azimuth/elevation for nine lunar sites and five time windows (`data/horizons/fixtures.json`, fetched by `tools/horizons/fetch_fixtures.py`); every engine result is tested against it |
 
 ## Space Agency Partner data and resources
 
