@@ -304,17 +304,55 @@ function Card({ scenario, index, app }: { scenario: Scenario; index: number; app
   );
 }
 
+function ComparisonPanel() {
+  const rows = analyses.value.map((a, i) => ({ a, i })).filter((r): r is { a: Analysis; i: number } => r.a !== null);
+  if (rows.length < 2) return null;
+  const columns: { label: string; value: (a: Analysis) => number; text: (a: Analysis) => string; best: 'max' | 'min' }[] = [
+    { label: 'Sunlight', value: (a) => a.summary.sunlitFraction, text: (a) => pct(a.summary.sunlitFraction), best: 'max' },
+    { label: 'Longest night', value: (a) => a.summary.longestDarkH, text: (a) => fmtSpan(a.summary.longestDarkH), best: 'min' },
+    { label: 'Earth in view', value: (a) => a.summary.earthVisibleFraction, text: (a) => pct(a.summary.earthVisibleFraction), best: 'max' },
+    { label: 'Longest link gap', value: (a) => a.summary.longestCommGapH, text: (a) => fmtSpan(a.summary.longestCommGapH), best: 'min' },
+    { label: 'Power + link together', value: (a) => a.summary.bothFraction, text: (a) => pct(a.summary.bothFraction), best: 'max' },
+    { label: 'Highest Sun', value: (a) => a.summary.maxSunElDeg, text: (a) => deg(a.summary.maxSunElDeg), best: 'max' },
+  ];
+  const winners = columns.map((c) => {
+    const values = rows.map((r) => c.value(r.a));
+    const target = c.best === 'max' ? Math.max(...values) : Math.min(...values);
+    return values.every((v) => v === target) ? null : target;
+  });
+  return (
+    <section class="panel">
+      <h2>Side by side <span class="muted">— over {DURATIONS.find((d) => d.days === durationDays.value)?.label} from each landing</span></h2>
+      <div class="table-wrap">
+        <table class="compare">
+          <thead><tr><th>Scenario</th><th>Landing (UTC)</th>{columns.map((c) => <th>{c.label}</th>)}</tr></thead>
+          <tbody>
+            {rows.map(({ a, i }) => (
+              <tr onClick={() => { selectedId.value = a.scenario.id; }}>
+                <th><span class="badge small" style={{ background: SCENARIO_COLORS[i] }}>{i + 1}</span> {a.name}</th>
+                <td>{fmtUtc(a.scenario.startMs).replace(' UTC', '')}</td>
+                {columns.map((c, k) => <td class={winners[k] !== null && c.value(a) === winners[k] ? 'best' : ''}>{c.text(a)}</td>)}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p class="muted small">Green marks the better value in each column.</p>
+    </section>
+  );
+}
+
 function CalendarPanel() {
   const a = analyses.value.find((x) => x?.scenario.id === selectedId.value) ?? null;
   const index = scenarios.value.findIndex((s) => s.id === selectedId.value);
   if (!a) return null;
   const start = new Date(a.scenario.startMs);
   const from = Date.UTC(start.getUTCFullYear(), start.getUTCMonth() - 1, 1);
-  const calendar = landingCalendar(a, from, 365, durationDays.value);
+  const calendar = landingCalendar(a, from, 365);
   return (
     <section class="panel">
       <h2>When to land <span class="muted">— scenario {index + 1}, {a.name}</span></h2>
-      <p class="hint">Each day is a possible landing date. Brighter means a larger share of the following {DURATIONS.find((d) => d.days === durationDays.value)?.label} with sunlight, with the Earth in view, or with both. Click a day to move the landing there.</p>
+      <p class="hint">Each day is a possible landing date. Brighter means a longer unbroken stretch after touchdown of sunlight, of Earth in view, or of both at once; dark means landing into night or with no link. Hover for the numbers, click a day to move the landing there.</p>
       <LandingCalendar calendar={calendar} currentMs={a.scenario.startMs} onPick={(ms) => updateScenario(a.scenario.id, { startMs: clampTime(ms) })} />
     </section>
   );
@@ -331,6 +369,7 @@ export function App() {
         <p>Compare landing sites and dates on the Moon: where the Sun and the Earth sit against the real skyline, and what that means for solar power and a direct radio link to Earth.</p>
       </header>
       <Toolbar />
+      <ComparisonPanel />
       <div class="layout">
         <div class="side">
           <MapPanel app={app} />

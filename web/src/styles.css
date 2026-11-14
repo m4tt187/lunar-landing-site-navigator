@@ -45,7 +45,7 @@ button.ghost { background: none; border: none; font-size: 1.3rem; line-height: 1
 .scrub input[type='range'] { width: 100%; padding: 0; min-height: 22px; accent-color: var(--fg); }
 .scrub b { color: var(--fg); }
 
-.layout { display: grid; grid-template-columns: minmax(300px, 440px) 1fr; gap: 14px; align-items: start; }
+.layout { display: grid; grid-template-columns: minmax(280px, 400px) 1fr; gap: 14px; align-items: start; }
 .cards { display: grid; grid-template-columns: repeat(var(--columns, 2), minmax(0, 1fr)); gap: 14px; }
 @media (max-width: 1100px) { .layout { grid-template-columns: 1fr; } }
 @media (max-width: 760px) { .cards { grid-template-columns: 1fr; } }
@@ -102,3 +102,13 @@ svg.timeline, svg.calendar { cursor: pointer; }
 .card-actions button { font-size: 0.82rem; }
 
 footer { color: var(--muted); font-size: 0.82rem; max-width: 100ch; }
+
+.table-wrap { overflow-x: auto; }
+table.compare { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+table.compare th, table.compare td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+table.compare thead th { font-size: 0.78rem; color: var(--muted); font-weight: 500; }
+table.compare tbody th { font-weight: 600; }
+table.compare tbody tr { cursor: pointer; }
+table.compare tbody tr:hover { background: #161b25; }
+table.compare td.best { color: var(--both); font-weight: 700; }
+.badge.small { width: 20px; height: 20px; font-size: 0.8rem; vertical-align: middle; }

@@ -13,7 +13,7 @@ const wrap = (az: number): number => ((((az + 180) % 360) + 360) % 360) - 180;
 
 /** Panorama of the skyline with the paths of the Sun and the Earth. */
 export function SkyView({ a, instant }: { a: Analysis; instant: Instant }) {
-  const W = 720, H = 250, L = 34, R = 8, T = 10, B = 24;
+  const W = 480, H = 230, L = 30, R = 6, T = 8, B = 22;
   const profile = a.terrain.profile;
   const { series, margins } = a;
   let lo = 0, hi = 0;
@@ -90,11 +90,11 @@ export function SkyView({ a, instant }: { a: Analysis; instant: Instant }) {
 
 /** Sunlight, Earth-visibility and combined windows over the mission span. */
 export function Timeline({ a, cursorH, onCursor }: { a: Analysis; cursorH: number; onCursor: (hours: number) => void }) {
-  const W = 720, H = 86, L = 58, R = 8, rowH = 16, top = 6;
+  const W = 480, H = 84, L = 40, R = 6, rowH = 16, top = 4;
   const { startMs, endMs } = a.series;
   const x = (ms: number): number => L + ((ms - startMs) / (endMs - startMs)) * (W - L - R);
   const days = (endMs - startMs) / DAY;
-  const tickDays = days > 200 ? 30 : days > 60 ? 10 : days > 20 ? 5 : 2;
+  const tickDays = days > 200 ? 60 : days > 60 ? 15 : days > 20 ? 5 : 2;
   const ticks: number[] = [];
   for (let d = 0; d <= days + 1e-6; d += tickDays) ticks.push(d);
   const row = (windows: Interval[], index: number, color: string, label: string) => (
@@ -132,13 +132,13 @@ export function Timeline({ a, cursorH, onCursor }: { a: Analysis; cursorH: numbe
   );
 }
 
-/** One year of possible landing dates: how the mission span would fare for each. */
+/** One year of possible landing dates: unbroken sunlight / Earth link that would follow each. */
 export function LandingCalendar({ calendar, currentMs, onPick }: { calendar: Calendar; currentMs: number; onPick: (ms: number) => void }) {
-  const W = 720, L = 58, R = 8, rowH = 18, top = 4, H = 96;
+  const W = 960, L = 46, R = 8, rowH = 20, top = 4, H = 104;
   const perDay = DAY / calendar.stepMs;
-  const daysTotal = Math.floor(calendar.sun.length / perDay);
+  const daysTotal = Math.floor(calendar.sunRunH.length / perDay);
   const cellW = (W - L - R) / daysTotal;
-  const rows: [Float32Array, string, string][] = [[calendar.sun, SUN, 'Sun'], [calendar.earth, EARTH, 'Earth'], [calendar.both, BOTH, 'Both']];
+  const rows: [Float32Array, string, string][] = [[calendar.sunRunH, SUN, 'Sun'], [calendar.earthRunH, EARTH, 'Earth'], [calendar.bothRunH, BOTH, 'Both']];
   const months: { x: number; label: string }[] = [];
   for (let d = 0; d < daysTotal; d++) {
     const date = new Date(calendar.startMs + d * DAY);
@@ -153,24 +153,33 @@ export function LandingCalendar({ calendar, currentMs, onPick }: { calendar: Cal
         const day = Math.floor((px - L) / cellW);
         if (day >= 0 && day < daysTotal) onPick(calendar.startMs + day * DAY);
       }}>
-      {rows.map(([values, color, label], r) => (
-        <g>
-          <text x={L - 6} y={top + r * (rowH + 3) + rowH - 5} class="axis" text-anchor="end">{label}</text>
-          <rect x={L} y={top + r * (rowH + 3)} width={W - L - R} height={rowH} class="bar-bg" />
-          {Array.from({ length: daysTotal }, (_, d) => {
-            const v = values[Math.round(d * perDay)]!;
-            return v > 0.005 ? <rect x={L + d * cellW} y={top + r * (rowH + 3)} width={cellW + 0.3} height={rowH} fill={color} fill-opacity={0.12 + 0.88 * v}><title>{`${fmtDate(calendar.startMs + d * DAY)}: ${Math.round(v * 100)}%`}</title></rect> : null;
-          })}
-        </g>
-      ))}
+      {rows.map(([values, color, label], r) => {
+        let max = 1;
+        for (let d = 0; d < daysTotal; d++) max = Math.max(max, values[Math.round(d * perDay)]!);
+        return (
+          <g>
+            <text x={L - 6} y={top + r * (rowH + 3) + rowH - 6} class="axis" text-anchor="end">{label}</text>
+            <rect x={L} y={top + r * (rowH + 3)} width={W - L - R} height={rowH} class="bar-bg" />
+            {Array.from({ length: daysTotal }, (_, d) => {
+              const v = values[Math.round(d * perDay)]!;
+              const capped = v >= calendar.lookaheadH - 1;
+              return v > 0 ? (
+                <rect x={L + d * cellW} y={top + r * (rowH + 3)} width={cellW + 0.3} height={rowH} fill={color} fill-opacity={0.15 + 0.85 * (v / max)}>
+                  <title>{`Landing ${fmtDate(calendar.startMs + d * DAY)}: ${capped ? 'more than ' : ''}${(v / 24).toFixed(1)} days unbroken`}</title>
+                </rect>
+              ) : null;
+            })}
+          </g>
+        );
+      })}
       {months.map((m) => (
         <g>
           <line x1={m.x} x2={m.x} y1={top} y2={top + 3 * (rowH + 3)} class="grid" />
-          <text x={m.x + 2} y={H - 18} class="axis">{m.label}</text>
+          <text x={m.x + 2} y={H - 20} class="axis">{m.label}</text>
         </g>
       ))}
       {currentX >= L && currentX <= W - R ? (
-        <g><line x1={currentX} x2={currentX} y1={0} y2={top + 3 * (rowH + 3)} class="cursor" /><text x={currentX} y={H - 4} class="axis strong" text-anchor="middle">selected landing</text></g>
+        <g><line x1={currentX} x2={currentX} y1={0} y2={top + 3 * (rowH + 3)} class="cursor" /><text x={Math.min(W - 50, Math.max(L + 40, currentX))} y={H - 5} class="axis strong" text-anchor="middle">selected landing</text></g>
       ) : null}
     </svg>
   );

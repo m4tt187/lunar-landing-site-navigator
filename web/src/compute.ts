@@ -80,29 +80,29 @@ export function instantAt(a: Analysis, cursorHours: number): Instant {
 }
 export const SEARCH_LIMIT_DAYS = SEARCH_DAYS;
 
-/** Landing calendar: how each landing date over the coming year would fare. */
-export interface Calendar { startMs: number; stepMs: number; sun: Float32Array; earth: Float32Array; both: Float32Array }
+/** Landing calendar: for each possible landing date, the unbroken hours of sunlight / Earth view that follow. */
+export interface Calendar { startMs: number; stepMs: number; lookaheadH: number; sunRunH: Float32Array; earthRunH: Float32Array; bothRunH: Float32Array }
 
-export function landingCalendar(a: Analysis, fromMs: number, spanDays: number, missionDays: number): Calendar {
+const LOOKAHEAD_DAYS = 120;
+export function landingCalendar(a: Analysis, fromMs: number, spanDays: number): Calendar {
   const stepS = 7200;
-  const series = cachedSeries(a.site, fromMs, fromMs + (spanDays + missionDays) * DAY, stepS);
+  const series = cachedSeries(a.site, fromMs, fromMs + (spanDays + LOOKAHEAD_DAYS) * DAY, stepS);
   const m = seriesMargins(series, a.terrain.profile, a.thresholds);
   const n = series.n;
-  const prefix = (flag: (i: number) => boolean): Float64Array => {
-    const p = new Float64Array(n + 1);
-    for (let i = 0; i < n; i++) p[i + 1] = p[i]! + (flag(i) ? 1 : 0);
-    return p;
-  };
-  const pSun = prefix((i) => m.sun[i]! > 0), pEarth = prefix((i) => m.earth[i]! > 0);
-  const pBoth = prefix((i) => m.sun[i]! > 0 && m.earth[i]! > 0);
-  const window = Math.max(1, Math.round((missionDays * 86400) / stepS));
   const cells = Math.floor((spanDays * 86400) / stepS);
-  const out: Calendar = { startMs: fromMs, stepMs: stepS * 1000, sun: new Float32Array(cells), earth: new Float32Array(cells), both: new Float32Array(cells) };
-  for (let i = 0; i < cells; i++) {
-    const j = Math.min(n, i + window);
-    out.sun[i] = (pSun[j]! - pSun[i]!) / (j - i);
-    out.earth[i] = (pEarth[j]! - pEarth[i]!) / (j - i);
-    out.both[i] = (pBoth[j]! - pBoth[i]!) / (j - i);
-  }
-  return out;
+  const lookaheadH = LOOKAHEAD_DAYS * 24;
+  const run = (flag: (i: number) => boolean): Float32Array => {
+    const out = new Float32Array(cells);
+    let length = 0;
+    for (let i = n - 1; i >= 0; i--) {
+      length = flag(i) ? length + 1 : 0;
+      if (i < cells) out[i] = Math.min(lookaheadH, (length * stepS) / 3600);
+    }
+    return out;
+  };
+  return {
+    startMs: fromMs, stepMs: stepS * 1000, lookaheadH,
+    sunRunH: run((i) => m.sun[i]! > 0), earthRunH: run((i) => m.earth[i]! > 0),
+    bothRunH: run((i) => m.sun[i]! > 0 && m.earth[i]! > 0),
+  };
 }
