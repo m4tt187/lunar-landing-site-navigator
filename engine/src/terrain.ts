@@ -27,6 +27,29 @@ export interface PolarDem {
   maxHeightM: number;
 }
 
+/** A terrain sampler in the same lunar reference sphere as PolarDem. */
+export interface HeightField {
+  /** Metres above the 1737.4 km sphere; NaN where the field is unknown. */
+  heightAt(latDeg: number, lonDeg: number): number;
+  /** Guaranteed upper bound of every known terrain height, in metres. */
+  maxHeightM: number;
+  /** Finest pixel size in metres; defaults the first ray step to half a pixel. */
+  resolutionM: number;
+}
+
+function validateHeightBound(maxHeightM: number): void {
+  if (!Number.isFinite(maxHeightM) || R_M + maxHeightM <= 0)
+    throw new RangeError('Terrain maximum must be finite and above the lunar centre.');
+}
+
+/** Adapt a polar grid for composition with tile or global terrain samplers. */
+export function polarDemField(dem: PolarDem): HeightField {
+  validateGrid(dem.raw, dem.n, dem.scaleM, dem.heightScale);
+  validateHeightBound(dem.maxHeightM);
+  return { heightAt: (latDeg, lonDeg) => demHeightAt(dem, latDeg, lonDeg),
+    maxHeightM: dem.maxHeightM, resolutionM: dem.scaleM };
+}
+
 function validateGrid(raw: Int16Array, n: number, scaleM: number, heightScale: number): void {
   if (!(raw instanceof Int16Array) || !Number.isSafeInteger(n) || n < 2)
     throw new RangeError('Elevation grid must have at least two rows and columns of Int16 samples.');
@@ -99,11 +122,17 @@ export interface TerrainHorizon {
  * samples are rejected; increase the azimuth or distance step to reduce work.
  */
 export function computeTerrainHorizon(
-  dem: PolarDem, latDeg: number, lonDeg: number, observerHeightM: number, options: HorizonOptions = {},
+  source: PolarDem | HeightField, latDeg: number, lonDeg: number, observerHeightM: number, options: HorizonOptions = {},
 ): TerrainHorizon {
-  validateGrid(dem.raw, dem.n, dem.scaleM, dem.heightScale);
-  if (!Number.isFinite(dem.maxHeightM) || R_M + dem.maxHeightM <= 0)
-    throw new RangeError('Elevation grid maximum must be finite and above the lunar centre.');
+  const dem = 'raw' in source ? source : null;
+  const field = dem === null ? source as HeightField : null;
+  if (dem) validateGrid(dem.raw, dem.n, dem.scaleM, dem.heightScale);
+  if (field && (typeof field.heightAt !== 'function' || !Number.isFinite(field.resolutionM) || field.resolutionM <= 0))
+    throw new RangeError('Height field must provide a sampler and a positive finite resolution.');
+  validateHeightBound(source.maxHeightM);
+  const maxHeightTolerance = 1e-9 * Math.max(1, Math.abs(source.maxHeightM));
+  if (!Number.isFinite(latDeg) || Math.abs(latDeg) > 90 || !Number.isFinite(lonDeg) || Math.abs(lonDeg) > 180)
+    throw new RangeError('Latitude must be in [-90, 90] and longitude in [-180, 180] degrees.');
   if (!Number.isFinite(observerHeightM) || observerHeightM < 0 || observerHeightM > 20000)
     throw new RangeError('Observer height must be between 0 and 20000 metres above the ground.');
   const azStep = options.azStepDeg ?? 0.5;
@@ -111,7 +140,7 @@ export function computeTerrainHorizon(
   if (!Number.isFinite(azStep) || azStep <= 0 || bins < 1 || bins > MAX_AZIMUTH_BINS || Math.abs(bins * azStep - 360) > 1e-9)
     throw new RangeError('Azimuth step must divide 360 degrees into at most 36000 bins.');
   const maxDist = (options.maxDistanceKm ?? 400) * 1000;
-  const first = options.firstStepM ?? dem.scaleM / 2;
+  const first = options.firstStepM ?? (dem ? dem.scaleM : field!.resolutionM) / 2;
   if (!Number.isFinite(maxDist) || maxDist <= 0 || maxDist > Math.PI * R_M)
     throw new RangeError('Maximum distance must be positive, finite and no greater than a lunar semicircle.');
   if (!Number.isFinite(first) || first <= 0 || first > maxDist)
@@ -123,11 +152,12 @@ export function computeTerrainHorizon(
     Math.ceil(Math.max(0, Math.log(ratio * RAY_GROWTH)) / Math.log1p(RAY_GROWTH)) + 1;
   if (bins * raySamples > MAX_TERRAIN_SAMPLES)
     throw new RangeError('Requested horizon exceeds five million terrain samples; increase a sampling step.');
-  const ground = demHeightAt(dem, latDeg, lonDeg);
+  const ground = dem ? demHeightAt(dem, latDeg, lonDeg) : field!.heightAt(latDeg, lonDeg);
   if (!Number.isFinite(ground)) throw new RangeError('Site is outside the elevation model or has a non-finite height.');
   if (R_M + ground <= 0) throw new RangeError('Terrain height must be above the lunar centre.');
+  if (ground > source.maxHeightM + maxHeightTolerance) throw new RangeError('Terrain height exceeds the declared maximum.');
   const r0 = R_M + ground + observerHeightM;
-  const rMax = R_M + dem.maxHeightM;
+  const rMax = R_M + source.maxHeightM;
   const lat1 = latDeg * DEG, lon1 = lonDeg * DEG;
   const sinLat1 = Math.sin(lat1), cosLat1 = Math.cos(lat1);
   const sinLon1 = Math.sin(lon1), cosLon1 = Math.cos(lon1);
@@ -152,8 +182,11 @@ export function computeTerrainHorizon(
       const z = sinLat1 * cosG + rayZ * sinG;
       const lat2 = Math.atan2(z, Math.hypot(x, y));
       const lon2 = Math.atan2(y, x);
-      const h = demHeightAt(dem, lat2 / DEG, lon2 / DEG);
+      // Preserve the direct grid path; callbacks are used only for HeightField.
+      const h = dem ? demHeightAt(dem, lat2 / DEG, lon2 / DEG) : field!.heightAt(lat2 / DEG, lon2 / DEG);
       if (Number.isNaN(h)) { truncated = true; break; }
+      if (field && (!Number.isFinite(h) || R_M + h <= 0 || h > source.maxHeightM + maxHeightTolerance))
+        throw new RangeError('Height field samples must be finite, above the lunar centre, and at most the declared maximum.');
       const r1 = R_M + h;
       const e = Math.atan2(r1 * cosG - r0, r1 * sinG);
       if (e > best) { best = e; bestD = d; }

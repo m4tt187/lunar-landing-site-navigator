@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 // AI-assisted: written with OpenAI Codex under the direction of the team.
 import { describe, expect, it } from 'vitest';
-import { FLAT_HORIZON, summarize } from '../../engine/src/index.ts';
+import { FLAT_HORIZON, earthVisible, sunVisible, summarize } from '../../engine/src/index.ts';
 import type { Series, Thresholds } from '../../engine/src/index.ts';
 
 const HOUR = 3600000;
@@ -15,6 +15,17 @@ function series(timesH: number[], sun: number[], earth = sun.map(() => 1)): Seri
     sunRadius:new Float64Array(n).fill(0.25),earthRadius:new Float64Array(n).fill(1)};
 }
 describe('visibility threshold equality and time integration',()=>{
+  it('shares the exact boundary predicates with API consumers',()=>{
+    expect(sunVisible(0,{...thresholds,sunMinDiskFraction:0})).toBe(false);
+    expect(sunVisible(Number.EPSILON,{...thresholds,sunMinDiskFraction:0})).toBe(true);
+    for(const fraction of [0.25,0.5,1]) {
+      expect(sunVisible(0,{...thresholds,sunMinDiskFraction:fraction})).toBe(true);
+      expect(sunVisible(-Number.EPSILON,{...thresholds,sunMinDiskFraction:fraction})).toBe(false);
+    }
+    expect(earthVisible(0)).toBe(true); expect(earthVisible(-Number.EPSILON)).toBe(false);
+    expect(()=>sunVisible(NaN,thresholds)).toThrow(RangeError);
+    expect(()=>earthVisible(Infinity)).toThrow(RangeError);
+  });
   it('counts full disk tangency as fully visible, but a hidden disk remains dark',()=>{
     const full=summarize(series([0,1],[0.25,0.25]),FLAT_HORIZON,{...thresholds,sunMinDiskFraction:1});
     expect(full.meanSunDiskFraction).toBe(1); expect(full.sunlitFraction).toBe(1); expect(full.longestDarkH).toBe(0);

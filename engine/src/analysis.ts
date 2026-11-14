@@ -35,6 +35,19 @@ export function validateThresholds(t: Thresholds): void {
     throw new RangeError('Earth elevation margin must be between -90 and 90 degrees.');
 }
 
+/** Shared solar rule: any-disk is strict, positive required fractions inclusive. */
+export function sunVisible(marginDeg: number, thresholds: Thresholds): boolean {
+  validateThresholds(thresholds);
+  if (!Number.isFinite(marginDeg)) throw new RangeError('Visibility margin must be finite.');
+  return thresholds.sunMinDiskFraction > 0 ? marginDeg >= 0 : marginDeg > 0;
+}
+
+/** Shared Earth rule: the centre meets the requested margin at equality. */
+export function earthVisible(marginDeg: number): boolean {
+  if (!Number.isFinite(marginDeg)) throw new RangeError('Visibility margin must be finite.');
+  return marginDeg >= 0;
+}
+
 /** Skyline elevation (degrees) at an azimuth, by periodic linear interpolation. */
 export function horizonElevationAt(profile: HorizonProfile, azDeg: number): number {
   validateProfileShape(profile);
@@ -129,10 +142,9 @@ export function sampleMargins(sample: Sample, profile: HorizonProfile, threshold
 }
 
 /** Intervals where a sampled margin is positive; crossings are linearly interpolated. */
-function positiveIntervals(times: Float64Array, margin: Float64Array, inclusive = false): Interval[] {
+function positiveIntervals(times: Float64Array, margin: Float64Array, active: (margin: number) => boolean): Interval[] {
   const out: Interval[] = [];
   const n = times.length;
-  const active = (value: number): boolean => inclusive ? value >= 0 : value > 0;
   let start: number | null = active(margin[0]!) ? times[0]! : null;
   for (let i = 1; i < n; i++) {
     const a = margin[i - 1]!, b = margin[i]!;
@@ -206,8 +218,8 @@ export function summarize(series: Series, profile: HorizonProfile, thresholds: T
   const m = seriesMargins(series, profile, thresholds);
   const t = series.timesMs;
   const span = series.endMs - series.startMs;
-  const sunWindows = positiveIntervals(t, m.sun, thresholds.sunMinDiskFraction > 0);
-  const earthWindows = positiveIntervals(t, m.earth, true);
+  const sunWindows = positiveIntervals(t, m.sun, (margin) => sunVisible(margin, thresholds));
+  const earthWindows = positiveIntervals(t, m.earth, earthVisible);
   const bothWindows = intersect(sunWindows, earthWindows);
   let diskIntegral = 0, maxSunEl = -Infinity;
   for (let i = 0; i < series.n; i++) {
@@ -256,7 +268,7 @@ export function nextEvent(
     const m = marginsUnchecked(s.sun.azDeg, s.sun.elDeg, s.sun.angularRadiusDeg, s.earth.azDeg, s.earth.elDeg, profile, thresholds, offset);
     return sun ? m.sunDeg : m.earthDeg;
   };
-  const active = (margin: number): boolean => !sun || thresholds.sunMinDiskFraction > 0 ? margin >= 0 : margin > 0;
+  const active = (margin: number): boolean => sun ? sunVisible(margin, thresholds) : earthVisible(margin);
   let t0 = fromMs, m0 = marginAt(t0);
   let intervals = 0;
   while (t0 < endMs) {

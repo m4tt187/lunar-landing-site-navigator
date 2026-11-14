@@ -1,0 +1,3508 @@
+{
+  "spdxLicenseIdentifier": "Apache-2.0",
+  "aiAssistance": "Study code and derived report prepared with OpenAI Codex under team direction.",
+  "source": "web/public/data/sites.json, NASA LOLA-derived 120 m catalogue skylines; Astronomy Engine positions.",
+  "startUtc": "2027-01-01T00:00:00.000Z",
+  "days": 365,
+  "stepS": 3600,
+  "method": "Uniform midpoint time samples; 2 m observer; circular disk integrated in the local angular plane with azimuth width radius/cos(elevation); equal-x slices normalized by their full disk area; not a spherical solid-angle integration.",
+  "rules": [
+    0,
+    0.5,
+    1
+  ],
+  "durationsH": [
+    336,
+    708.72,
+    2160,
+    8760
+  ],
+  "analyticChecks": [
+    {
+      "slices": 64,
+      "maxAbsoluteError": 0.00033347350238510653
+    },
+    {
+      "slices": 256,
+      "maxAbsoluteError": 0.00001628799547792603
+    },
+    {
+      "slices": 1024,
+      "maxAbsoluteError": 0.00000210558819879747
+    }
+  ],
+  "results": [
+    {
+      "id": "sunlit-1",
+      "latDeg": -89.4749,
+      "lonDeg": -137.4431,
+      "slices": 64,
+      "samples": 8760,
+      "baselinePercent": [
+        88.94977168949772,
+        84.63470319634703,
+        78.58447488584476
+      ],
+      "integratedPercent": [
+        88.98401826484019,
+        84.65753424657534,
+        78.56164383561644
+      ],
+      "deltaPercentagePoints": [
+        0.03424657534246575,
+        0.0228310502283105,
+        -0.0228310502283105
+      ],
+      "meanFractionDelta": 0.000021130305633993458,
+      "maxInstantFractionDifference": 0.0589060462344837,
+      "rolling": [
+        {
+          "hours": 336,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0.5952380952380952,
+              "signedPp": 0.5952380952380952,
+              "windowStartUtc": "2027-04-06T10:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0.2976190476190476,
+              "signedPp": 0.2976190476190476,
+              "windowStartUtc": "2027-04-29T16:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0.2976190476190476,
+              "signedPp": -0.2976190476190476,
+              "windowStartUtc": "2027-03-14T22:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 708.72,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0.42329834067050454,
+              "signedPp": 0.42329834067050454,
+              "windowStartUtc": "2027-03-21T22:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0.14109944689016818,
+              "signedPp": 0.14109944689016818,
+              "windowStartUtc": "2027-04-14T04:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0.14109944689016818,
+              "signedPp": -0.14109944689016818,
+              "windowStartUtc": "2027-02-27T10:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 2160,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0.1388888888888889,
+              "signedPp": 0.1388888888888889,
+              "windowStartUtc": "2027-01-20T10:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0.09259259259259259,
+              "signedPp": 0.09259259259259259,
+              "windowStartUtc": "2027-03-17T08:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0.09259259259259259,
+              "signedPp": -0.09259259259259259,
+              "windowStartUtc": "2027-03-21T13:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 8760,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0.03424657534246575,
+              "signedPp": 0.03424657534246575,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0.0228310502283105,
+              "signedPp": 0.0228310502283105,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0.0228310502283105,
+              "signedPp": -0.0228310502283105,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sunlit-2",
+      "latDeg": -89.0102,
+      "lonDeg": -94.7589,
+      "slices": 64,
+      "samples": 8760,
+      "baselinePercent": [
+        81.96347031963471,
+        76.78082191780823,
+        72.18036529680366
+      ],
+      "integratedPercent": [
+        81.99771689497717,
+        76.76940639269407,
+        72.1689497716895
+      ],
+      "deltaPercentagePoints": [
+        0.03424657534246575,
+        -0.01141552511415525,
+        -0.01141552511415525
+      ],
+      "meanFractionDelta": 0.0000023627412875284124,
+      "maxInstantFractionDifference": 0.034960092781995245,
+      "rolling": [
+        {
+          "hours": 336,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0.5952380952380952,
+              "signedPp": 0.5952380952380952,
+              "windowStartUtc": "2027-04-30T18:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0.5952380952380952,
+              "signedPp": -0.5952380952380952,
+              "windowStartUtc": "2027-06-08T06:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0.2976190476190476,
+              "signedPp": -0.2976190476190476,
+              "windowStartUtc": "2027-06-06T07:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 708.72,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0.28219889378033636,
+              "signedPp": 0.28219889378033636,
+              "windowStartUtc": "2027-04-07T23:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0.28219889378033636,
+              "signedPp": -0.28219889378033636,
+              "windowStartUtc": "2027-06-06T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0.14109944689016818,
+              "signedPp": -0.14109944689016818,
+              "windowStartUtc": "2027-05-21T19:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 2160,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0.1388888888888889,
+              "signedPp": 0.1388888888888889,
+              "windowStartUtc": "2027-02-13T18:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0.09259259259259259,
+              "signedPp": -0.09259259259259259,
+              "windowStartUtc": "2027-03-24T06:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0.046296296296296294,
+              "signedPp": -0.046296296296296294,
+              "windowStartUtc": "2027-03-22T07:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 8760,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0.03424657534246575,
+              "signedPp": 0.03424657534246575,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0.01141552511415525,
+              "signedPp": -0.01141552511415525,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0.01141552511415525,
+              "signedPp": -0.01141552511415525,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sunlit-3",
+      "latDeg": -85.444,
+      "lonDeg": 32.1965,
+      "slices": 64,
+      "samples": 8760,
+      "baselinePercent": [
+        78.93835616438356,
+        74.62328767123287,
+        68.78995433789954
+      ],
+      "integratedPercent": [
+        78.96118721461187,
+        74.63470319634703,
+        68.74429223744292
+      ],
+      "deltaPercentagePoints": [
+        0.0228310502283105,
+        0.01141552511415525,
+        -0.045662100456621
+      ],
+      "meanFractionDelta": -0.000012207117686258456,
+      "maxInstantFractionDifference": 0.03600890395298406,
+      "rolling": [
+        {
+          "hours": 336,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0.2976190476190476,
+              "signedPp": 0.2976190476190476,
+              "windowStartUtc": "2027-05-23T21:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0.2976190476190476,
+              "signedPp": 0.2976190476190476,
+              "windowStartUtc": "2027-01-22T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0.5952380952380952,
+              "signedPp": -0.5952380952380952,
+              "windowStartUtc": "2027-01-29T07:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 708.72,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0.14109944689016818,
+              "signedPp": 0.14109944689016818,
+              "windowStartUtc": "2027-05-08T09:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0.14109944689016818,
+              "signedPp": 0.14109944689016818,
+              "windowStartUtc": "2027-01-06T12:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0.28219889378033636,
+              "signedPp": -0.28219889378033636,
+              "windowStartUtc": "2027-01-13T19:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 2160,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0.09259259259259259,
+              "signedPp": 0.09259259259259259,
+              "windowStartUtc": "2027-04-27T13:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0.046296296296296294,
+              "signedPp": 0.046296296296296294,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0.09259259259259259,
+              "signedPp": -0.09259259259259259,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 8760,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0.0228310502283105,
+              "signedPp": 0.0228310502283105,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0.01141552511415525,
+              "signedPp": 0.01141552511415525,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0.045662100456621,
+              "signedPp": -0.045662100456621,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sunlit-4",
+      "latDeg": -89.7861,
+      "lonDeg": -155.6877,
+      "slices": 64,
+      "samples": 8760,
+      "baselinePercent": [
+        79.01826484018265,
+        74.68036529680366,
+        69.46347031963471
+      ],
+      "integratedPercent": [
+        79.05251141552512,
+        74.6689497716895,
+        69.42922374429224
+      ],
+      "deltaPercentagePoints": [
+        0.03424657534246575,
+        -0.01141552511415525,
+        -0.03424657534246575
+      ],
+      "meanFractionDelta": 0.000013624984201453624,
+      "maxInstantFractionDifference": 0.030821995164384386,
+      "rolling": [
+        {
+          "hours": 336,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0.5952380952380952,
+              "signedPp": 0.5952380952380952,
+              "windowStartUtc": "2027-06-13T06:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0.2976190476190476,
+              "signedPp": 0.2976190476190476,
+              "windowStartUtc": "2027-04-11T17:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0.2976190476190476,
+              "signedPp": -0.2976190476190476,
+              "windowStartUtc": "2027-02-07T12:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 708.72,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0.28219889378033636,
+              "signedPp": 0.28219889378033636,
+              "windowStartUtc": "2027-05-28T18:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0.28219889378033636,
+              "signedPp": 0.28219889378033636,
+              "windowStartUtc": "2027-04-12T15:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0.14109944689016818,
+              "signedPp": -0.14109944689016818,
+              "windowStartUtc": "2027-01-23T00:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 2160,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0.09259259259259259,
+              "signedPp": 0.09259259259259259,
+              "windowStartUtc": "2027-03-29T06:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0.09259259259259259,
+              "signedPp": 0.09259259259259259,
+              "windowStartUtc": "2027-02-11T03:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0.046296296296296294,
+              "signedPp": -0.046296296296296294,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 8760,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0.03424657534246575,
+              "signedPp": 0.03424657534246575,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0.01141552511415525,
+              "signedPp": -0.01141552511415525,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0.03424657534246575,
+              "signedPp": -0.03424657534246575,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sunlit-7",
+      "latDeg": -85.9531,
+      "lonDeg": -3.4043,
+      "slices": 64,
+      "samples": 8760,
+      "baselinePercent": [
+        83.162100456621,
+        80.13698630136986,
+        76.80365296803653
+      ],
+      "integratedPercent": [
+        83.18493150684931,
+        80.13698630136986,
+        76.80365296803653
+      ],
+      "deltaPercentagePoints": [
+        0.0228310502283105,
+        0,
+        0
+      ],
+      "meanFractionDelta": 0.000001808011649355653,
+      "maxInstantFractionDifference": 0.054776492758071504,
+      "rolling": [
+        {
+          "hours": 336,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0.5952380952380952,
+              "signedPp": 0.5952380952380952,
+              "windowStartUtc": "2027-01-27T23:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0.2976190476190476,
+              "signedPp": -0.2976190476190476,
+              "windowStartUtc": "2027-01-22T17:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 708.72,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0.28219889378033636,
+              "signedPp": 0.28219889378033636,
+              "windowStartUtc": "2027-01-12T11:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0.14109944689016818,
+              "signedPp": -0.14109944689016818,
+              "windowStartUtc": "2027-01-07T05:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 2160,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0.09259259259259259,
+              "signedPp": 0.09259259259259259,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0.046296296296296294,
+              "signedPp": -0.046296296296296294,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 8760,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0.0228310502283105,
+              "signedPp": 0.0228310502283105,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "feature-16338",
+      "latDeg": -85.98,
+      "lonDeg": -1.67,
+      "slices": 64,
+      "samples": 8760,
+      "baselinePercent": [
+        43.89269406392694,
+        41.906392694063925,
+        40.23972602739726
+      ],
+      "integratedPercent": [
+        43.91552511415525,
+        41.89497716894977,
+        40.194063926940636
+      ],
+      "deltaPercentagePoints": [
+        0.0228310502283105,
+        -0.01141552511415525,
+        -0.045662100456621
+      ],
+      "meanFractionDelta": 9.020534456250813e-7,
+      "maxInstantFractionDifference": 0.020175871116126343,
+      "rolling": [
+        {
+          "hours": 336,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0.2976190476190476,
+              "signedPp": 0.2976190476190476,
+              "windowStartUtc": "2027-08-23T21:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0.2976190476190476,
+              "signedPp": -0.2976190476190476,
+              "windowStartUtc": "2027-01-28T22:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0.2976190476190476,
+              "signedPp": -0.2976190476190476,
+              "windowStartUtc": "2027-06-09T22:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 708.72,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0.14109944689016818,
+              "signedPp": 0.14109944689016818,
+              "windowStartUtc": "2027-08-08T09:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0.14109944689016818,
+              "signedPp": -0.14109944689016818,
+              "windowStartUtc": "2027-01-13T10:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0.28219889378033636,
+              "signedPp": -0.28219889378033636,
+              "windowStartUtc": "2027-07-09T09:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 2160,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0.09259259259259259,
+              "signedPp": 0.09259259259259259,
+              "windowStartUtc": "2027-09-05T18:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0.046296296296296294,
+              "signedPp": -0.046296296296296294,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0.18518518518518517,
+              "signedPp": -0.18518518518518517,
+              "windowStartUtc": "2027-06-08T15:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 8760,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0.0228310502283105,
+              "signedPp": 0.0228310502283105,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0.01141552511415525,
+              "signedPp": -0.01141552511415525,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0.045662100456621,
+              "signedPp": -0.045662100456621,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "feature-4321",
+      "latDeg": -85.28,
+      "lonDeg": 53.27,
+      "slices": 64,
+      "samples": 8760,
+      "baselinePercent": [
+        35.55936073059361,
+        34.54337899543379,
+        33.401826484018265
+      ],
+      "integratedPercent": [
+        35.582191780821915,
+        34.554794520547944,
+        33.401826484018265
+      ],
+      "deltaPercentagePoints": [
+        0.0228310502283105,
+        0.01141552511415525,
+        0
+      ],
+      "meanFractionDelta": 9.7274321189375e-7,
+      "maxInstantFractionDifference": 0.030039142484496795,
+      "rolling": [
+        {
+          "hours": 336,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0.2976190476190476,
+              "signedPp": 0.2976190476190476,
+              "windowStartUtc": "2027-05-03T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0.2976190476190476,
+              "signedPp": 0.2976190476190476,
+              "windowStartUtc": "2027-02-03T21:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 708.72,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0.14109944689016818,
+              "signedPp": 0.14109944689016818,
+              "windowStartUtc": "2027-04-17T12:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0.14109944689016818,
+              "signedPp": 0.14109944689016818,
+              "windowStartUtc": "2027-01-19T09:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 2160,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0.046296296296296294,
+              "signedPp": 0.046296296296296294,
+              "windowStartUtc": "2027-02-16T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0.046296296296296294,
+              "signedPp": 0.046296296296296294,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 8760,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0.0228310502283105,
+              "signedPp": 0.0228310502283105,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0.01141552511415525,
+              "signedPp": 0.01141552511415525,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "feature-16070",
+      "latDeg": -84.6,
+      "lonDeg": 31,
+      "slices": 64,
+      "samples": 8760,
+      "baselinePercent": [
+        32.65981735159817,
+        29.840182648401825,
+        26.735159817351597
+      ],
+      "integratedPercent": [
+        32.65981735159817,
+        29.828767123287673,
+        26.735159817351597
+      ],
+      "deltaPercentagePoints": [
+        0,
+        -0.01141552511415525,
+        0
+      ],
+      "meanFractionDelta": -0.000012937696917394853,
+      "maxInstantFractionDifference": 0.010264529810438017,
+      "rolling": [
+        {
+          "hours": 336,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0.2976190476190476,
+              "signedPp": -0.2976190476190476,
+              "windowStartUtc": "2027-06-03T08:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 708.72,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0.14109944689016818,
+              "signedPp": -0.14109944689016818,
+              "windowStartUtc": "2027-05-18T20:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 2160,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0.046296296296296294,
+              "signedPp": -0.046296296296296294,
+              "windowStartUtc": "2027-03-19T08:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 8760,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0.01141552511415525,
+              "signedPp": -0.01141552511415525,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "feature-247",
+      "latDeg": -84.44,
+      "lonDeg": 83.07,
+      "slices": 64,
+      "samples": 8760,
+      "baselinePercent": [
+        15.23972602739726,
+        13.116438356164384,
+        11.746575342465754
+      ],
+      "integratedPercent": [
+        15.273972602739725,
+        13.116438356164384,
+        11.723744292237443
+      ],
+      "deltaPercentagePoints": [
+        0.03424657534246575,
+        0,
+        -0.0228310502283105
+      ],
+      "meanFractionDelta": 0.00000749490531123615,
+      "maxInstantFractionDifference": 0.02699932600027205,
+      "rolling": [
+        {
+          "hours": 336,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0.2976190476190476,
+              "signedPp": 0.2976190476190476,
+              "windowStartUtc": "2027-03-27T08:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0.2976190476190476,
+              "signedPp": -0.2976190476190476,
+              "windowStartUtc": "2027-01-31T04:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 708.72,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0.14109944689016818,
+              "signedPp": 0.14109944689016818,
+              "windowStartUtc": "2027-03-11T20:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0.14109944689016818,
+              "signedPp": -0.14109944689016818,
+              "windowStartUtc": "2027-01-15T16:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 2160,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0.046296296296296294,
+              "signedPp": 0.046296296296296294,
+              "windowStartUtc": "2027-01-10T08:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0.046296296296296294,
+              "signedPp": -0.046296296296296294,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 8760,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0.03424657534246575,
+              "signedPp": 0.03424657534246575,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0.0228310502283105,
+              "signedPp": -0.0228310502283105,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sunlit-5",
+      "latDeg": -88.8073,
+      "lonDeg": 123.7032,
+      "slices": 64,
+      "samples": 8760,
+      "baselinePercent": [
+        87.69406392694064,
+        83.64155251141553,
+        80.28538812785388
+      ],
+      "integratedPercent": [
+        87.72831050228311,
+        83.63013698630137,
+        80.27397260273973
+      ],
+      "deltaPercentagePoints": [
+        0.03424657534246575,
+        -0.01141552511415525,
+        -0.01141552511415525
+      ],
+      "meanFractionDelta": 0.000023197540150295235,
+      "maxInstantFractionDifference": 0.02551222139288095,
+      "rolling": [
+        {
+          "hours": 336,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0.2976190476190476,
+              "signedPp": 0.2976190476190476,
+              "windowStartUtc": "2027-01-14T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0.2976190476190476,
+              "signedPp": -0.2976190476190476,
+              "windowStartUtc": "2027-07-02T17:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0.2976190476190476,
+              "signedPp": -0.2976190476190476,
+              "windowStartUtc": "2027-02-07T20:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 708.72,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0.28219889378033636,
+              "signedPp": 0.28219889378033636,
+              "windowStartUtc": "2027-05-02T01:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0.14109944689016818,
+              "signedPp": -0.14109944689016818,
+              "windowStartUtc": "2027-06-17T05:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0.14109944689016818,
+              "signedPp": -0.14109944689016818,
+              "windowStartUtc": "2027-01-23T08:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 2160,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0.09259259259259259,
+              "signedPp": 0.09259259259259259,
+              "windowStartUtc": "2027-03-02T13:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0.046296296296296294,
+              "signedPp": -0.046296296296296294,
+              "windowStartUtc": "2027-04-17T17:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0.046296296296296294,
+              "signedPp": -0.046296296296296294,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 8760,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0.03424657534246575,
+              "signedPp": 0.03424657534246575,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0.01141552511415525,
+              "signedPp": -0.01141552511415525,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0.01141552511415525,
+              "signedPp": -0.01141552511415525,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sunlit-6",
+      "latDeg": -85.7302,
+      "lonDeg": -116.6541,
+      "slices": 64,
+      "samples": 8760,
+      "baselinePercent": [
+        78.27625570776256,
+        74.52054794520548,
+        68.74429223744292
+      ],
+      "integratedPercent": [
+        78.27625570776256,
+        74.54337899543378,
+        68.74429223744292
+      ],
+      "deltaPercentagePoints": [
+        0,
+        0.0228310502283105,
+        0
+      ],
+      "meanFractionDelta": -0.00001898926058356457,
+      "maxInstantFractionDifference": 0.03654479813788791,
+      "rolling": [
+        {
+          "hours": 336,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0.2976190476190476,
+              "signedPp": 0.2976190476190476,
+              "windowStartUtc": "2027-09-25T10:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 708.72,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0.14109944689016818,
+              "signedPp": 0.14109944689016818,
+              "windowStartUtc": "2027-09-09T22:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 2160,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0.09259259259259259,
+              "signedPp": 0.09259259259259259,
+              "windowStartUtc": "2027-08-12T06:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 8760,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0.0228310502283105,
+              "signedPp": 0.0228310502283105,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sunlit-8",
+      "latDeg": -88.6665,
+      "lonDeg": -68.3643,
+      "slices": 64,
+      "samples": 8760,
+      "baselinePercent": [
+        83.81278538812785,
+        80.57077625570776,
+        77.13470319634703
+      ],
+      "integratedPercent": [
+        83.81278538812785,
+        80.57077625570776,
+        77.11187214611873
+      ],
+      "deltaPercentagePoints": [
+        0,
+        0,
+        -0.0228310502283105
+      ],
+      "meanFractionDelta": -0.0000035528994030174298,
+      "maxInstantFractionDifference": 0.04460199378984653,
+      "rolling": [
+        {
+          "hours": 336,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0.2976190476190476,
+              "signedPp": -0.2976190476190476,
+              "windowStartUtc": "2027-07-01T06:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0.2976190476190476,
+              "signedPp": -0.2976190476190476,
+              "windowStartUtc": "2027-06-03T00:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 708.72,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0.14109944689016818,
+              "signedPp": -0.14109944689016818,
+              "windowStartUtc": "2027-06-15T18:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0.14109944689016818,
+              "signedPp": -0.14109944689016818,
+              "windowStartUtc": "2027-05-18T12:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 2160,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0.046296296296296294,
+              "signedPp": -0.046296296296296294,
+              "windowStartUtc": "2027-04-16T06:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0.09259259259259259,
+              "signedPp": -0.09259259259259259,
+              "windowStartUtc": "2027-06-06T21:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 8760,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0.0228310502283105,
+              "signedPp": -0.0228310502283105,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "im-2-athena",
+      "latDeg": -84.7906,
+      "lonDeg": 29.1957,
+      "slices": 64,
+      "samples": 8760,
+      "baselinePercent": [
+        45.5365296803653,
+        43.710045662100455,
+        42.454337899543376
+      ],
+      "integratedPercent": [
+        45.5365296803653,
+        43.710045662100455,
+        42.454337899543376
+      ],
+      "deltaPercentagePoints": [
+        0,
+        0,
+        0
+      ],
+      "meanFractionDelta": 0.000002063034431354259,
+      "maxInstantFractionDifference": 0.015243242168151205,
+      "rolling": [
+        {
+          "hours": 336,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 708.72,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 2160,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 8760,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "im-1-odysseus",
+      "latDeg": -80.13,
+      "lonDeg": 1.44,
+      "slices": 64,
+      "samples": 8760,
+      "baselinePercent": [
+        38.84703196347032,
+        38.25342465753425,
+        37.602739726027394
+      ],
+      "integratedPercent": [
+        38.84703196347032,
+        38.25342465753425,
+        37.602739726027394
+      ],
+      "deltaPercentagePoints": [
+        0,
+        0,
+        0
+      ],
+      "meanFractionDelta": -0.000002592823258838262,
+      "maxInstantFractionDifference": 0.01078501558389,
+      "rolling": [
+        {
+          "hours": 336,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 708.72,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 2160,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 8760,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "feature-5450",
+      "latDeg": -89.67,
+      "lonDeg": 129.78,
+      "slices": 64,
+      "samples": 8760,
+      "baselinePercent": [
+        0,
+        0,
+        0
+      ],
+      "integratedPercent": [
+        0,
+        0,
+        0
+      ],
+      "deltaPercentagePoints": [
+        0,
+        0,
+        0
+      ],
+      "meanFractionDelta": 0,
+      "maxInstantFractionDifference": 0,
+      "rolling": [
+        {
+          "hours": 336,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 708.72,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 2160,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 8760,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "feature-16007",
+      "latDeg": -89.51,
+      "lonDeg": -84.61,
+      "slices": 64,
+      "samples": 8760,
+      "baselinePercent": [
+        0,
+        0,
+        0
+      ],
+      "integratedPercent": [
+        0,
+        0,
+        0
+      ],
+      "deltaPercentagePoints": [
+        0,
+        0,
+        0
+      ],
+      "meanFractionDelta": 0,
+      "maxInstantFractionDifference": 0,
+      "rolling": [
+        {
+          "hours": 336,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 708.72,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 2160,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 8760,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "feature-16008",
+      "latDeg": -89.13,
+      "lonDeg": -87.78,
+      "slices": 64,
+      "samples": 8760,
+      "baselinePercent": [
+        0,
+        0,
+        0
+      ],
+      "integratedPercent": [
+        0,
+        0,
+        0
+      ],
+      "deltaPercentagePoints": [
+        0,
+        0,
+        0
+      ],
+      "meanFractionDelta": 0,
+      "maxInstantFractionDifference": 0,
+      "rolling": [
+        {
+          "hours": 336,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 708.72,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 2160,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 8760,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "feature-1439",
+      "latDeg": -88.48,
+      "lonDeg": -88.34,
+      "slices": 64,
+      "samples": 8760,
+      "baselinePercent": [
+        0,
+        0,
+        0
+      ],
+      "integratedPercent": [
+        0,
+        0,
+        0
+      ],
+      "deltaPercentagePoints": [
+        0,
+        0,
+        0
+      ],
+      "meanFractionDelta": 0,
+      "maxInstantFractionDifference": 0,
+      "rolling": [
+        {
+          "hours": 336,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 708.72,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 2160,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 8760,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "feature-16004",
+      "latDeg": -88.57,
+      "lonDeg": -130.63,
+      "slices": 64,
+      "samples": 8760,
+      "baselinePercent": [
+        1.7009132420091324,
+        0.6735159817351598,
+        0.05707762557077625
+      ],
+      "integratedPercent": [
+        1.7009132420091324,
+        0.6735159817351598,
+        0.05707762557077625
+      ],
+      "deltaPercentagePoints": [
+        0,
+        0,
+        0
+      ],
+      "meanFractionDelta": 0.0000029384752272361735,
+      "maxInstantFractionDifference": 0.011081181644751026,
+      "rolling": [
+        {
+          "hours": 336,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 708.72,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 2160,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 8760,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "feature-5782",
+      "latDeg": -88.32,
+      "lonDeg": -153.39,
+      "slices": 64,
+      "samples": 8760,
+      "baselinePercent": [
+        0,
+        0,
+        0
+      ],
+      "integratedPercent": [
+        0,
+        0,
+        0
+      ],
+      "deltaPercentagePoints": [
+        0,
+        0,
+        0
+      ],
+      "meanFractionDelta": 0,
+      "maxInstantFractionDifference": 0,
+      "rolling": [
+        {
+          "hours": 336,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 708.72,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 2160,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 8760,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "feature-5494",
+      "latDeg": -88.14,
+      "lonDeg": 45.91,
+      "slices": 64,
+      "samples": 8760,
+      "baselinePercent": [
+        0,
+        0,
+        0
+      ],
+      "integratedPercent": [
+        0,
+        0,
+        0
+      ],
+      "deltaPercentagePoints": [
+        0,
+        0,
+        0
+      ],
+      "meanFractionDelta": 0,
+      "maxInstantFractionDifference": 0,
+      "rolling": [
+        {
+          "hours": 336,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 708.72,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 2160,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 8760,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "feature-15325",
+      "latDeg": -88.08,
+      "lonDeg": 111.29,
+      "slices": 64,
+      "samples": 8760,
+      "baselinePercent": [
+        0,
+        0,
+        0
+      ],
+      "integratedPercent": [
+        0,
+        0,
+        0
+      ],
+      "deltaPercentagePoints": [
+        0,
+        0,
+        0
+      ],
+      "meanFractionDelta": 0,
+      "maxInstantFractionDifference": 0,
+      "rolling": [
+        {
+          "hours": 336,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 708.72,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 2160,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 8760,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "feature-14502",
+      "latDeg": -87.45,
+      "lonDeg": -5.17,
+      "slices": 64,
+      "samples": 8760,
+      "baselinePercent": [
+        0,
+        0,
+        0
+      ],
+      "integratedPercent": [
+        0,
+        0,
+        0
+      ],
+      "deltaPercentagePoints": [
+        0,
+        0,
+        0
+      ],
+      "meanFractionDelta": 0,
+      "maxInstantFractionDifference": 0,
+      "rolling": [
+        {
+          "hours": 336,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 708.72,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 2160,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 8760,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "feature-1919",
+      "latDeg": -87.18,
+      "lonDeg": 84.31,
+      "slices": 64,
+      "samples": 8760,
+      "baselinePercent": [
+        0,
+        0,
+        0
+      ],
+      "integratedPercent": [
+        0,
+        0,
+        0
+      ],
+      "deltaPercentagePoints": [
+        0,
+        0,
+        0
+      ],
+      "meanFractionDelta": 0,
+      "maxInstantFractionDifference": 0,
+      "rolling": [
+        {
+          "hours": 336,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 708.72,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 2160,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 8760,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "feature-953",
+      "latDeg": -85.33,
+      "lonDeg": -42.13,
+      "slices": 64,
+      "samples": 8760,
+      "baselinePercent": [
+        0,
+        0,
+        0
+      ],
+      "integratedPercent": [
+        0,
+        0,
+        0
+      ],
+      "deltaPercentagePoints": [
+        0,
+        0,
+        0
+      ],
+      "meanFractionDelta": 0,
+      "maxInstantFractionDifference": 0,
+      "rolling": [
+        {
+          "hours": 336,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 708.72,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 2160,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 8760,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0,
+              "signedPp": 0,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "convergence": [
+    {
+      "id": "sunlit-1",
+      "latDeg": -89.4749,
+      "lonDeg": -137.4431,
+      "slices": 256,
+      "samples": 8760,
+      "baselinePercent": [
+        88.94977168949772,
+        84.63470319634703,
+        78.58447488584476
+      ],
+      "integratedPercent": [
+        88.98401826484019,
+        84.65753424657534,
+        78.56164383561644
+      ],
+      "deltaPercentagePoints": [
+        0.03424657534246575,
+        0.0228310502283105,
+        -0.0228310502283105
+      ],
+      "meanFractionDelta": 0.000019907638339920024,
+      "maxInstantFractionDifference": 0.05884073760762143,
+      "rolling": [
+        {
+          "hours": 336,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0.5952380952380952,
+              "signedPp": 0.5952380952380952,
+              "windowStartUtc": "2027-04-06T10:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0.2976190476190476,
+              "signedPp": 0.2976190476190476,
+              "windowStartUtc": "2027-04-29T16:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0.2976190476190476,
+              "signedPp": -0.2976190476190476,
+              "windowStartUtc": "2027-03-14T22:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 708.72,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0.42329834067050454,
+              "signedPp": 0.42329834067050454,
+              "windowStartUtc": "2027-03-21T22:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0.14109944689016818,
+              "signedPp": 0.14109944689016818,
+              "windowStartUtc": "2027-04-14T04:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0.14109944689016818,
+              "signedPp": -0.14109944689016818,
+              "windowStartUtc": "2027-02-27T10:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 2160,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0.1388888888888889,
+              "signedPp": 0.1388888888888889,
+              "windowStartUtc": "2027-01-20T10:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0.09259259259259259,
+              "signedPp": 0.09259259259259259,
+              "windowStartUtc": "2027-03-17T08:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0.09259259259259259,
+              "signedPp": -0.09259259259259259,
+              "windowStartUtc": "2027-03-21T13:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 8760,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0.03424657534246575,
+              "signedPp": 0.03424657534246575,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0.0228310502283105,
+              "signedPp": 0.0228310502283105,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0.0228310502283105,
+              "signedPp": -0.0228310502283105,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sunlit-2",
+      "latDeg": -89.0102,
+      "lonDeg": -94.7589,
+      "slices": 256,
+      "samples": 8760,
+      "baselinePercent": [
+        81.96347031963471,
+        76.78082191780823,
+        72.18036529680366
+      ],
+      "integratedPercent": [
+        81.99771689497717,
+        76.76940639269407,
+        72.1689497716895
+      ],
+      "deltaPercentagePoints": [
+        0.03424657534246575,
+        -0.01141552511415525,
+        -0.01141552511415525
+      ],
+      "meanFractionDelta": 0.000002795821916093767,
+      "maxInstantFractionDifference": 0.03477469634648672,
+      "rolling": [
+        {
+          "hours": 336,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0.5952380952380952,
+              "signedPp": 0.5952380952380952,
+              "windowStartUtc": "2027-04-30T18:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0.5952380952380952,
+              "signedPp": -0.5952380952380952,
+              "windowStartUtc": "2027-06-08T06:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0.2976190476190476,
+              "signedPp": -0.2976190476190476,
+              "windowStartUtc": "2027-06-06T07:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 708.72,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0.28219889378033636,
+              "signedPp": 0.28219889378033636,
+              "windowStartUtc": "2027-04-07T23:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0.28219889378033636,
+              "signedPp": -0.28219889378033636,
+              "windowStartUtc": "2027-06-06T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0.14109944689016818,
+              "signedPp": -0.14109944689016818,
+              "windowStartUtc": "2027-05-21T19:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 2160,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0.1388888888888889,
+              "signedPp": 0.1388888888888889,
+              "windowStartUtc": "2027-02-13T18:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0.09259259259259259,
+              "signedPp": -0.09259259259259259,
+              "windowStartUtc": "2027-03-24T06:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0.046296296296296294,
+              "signedPp": -0.046296296296296294,
+              "windowStartUtc": "2027-03-22T07:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 8760,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0.03424657534246575,
+              "signedPp": 0.03424657534246575,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0.01141552511415525,
+              "signedPp": -0.01141552511415525,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0.01141552511415525,
+              "signedPp": -0.01141552511415525,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sunlit-3",
+      "latDeg": -85.444,
+      "lonDeg": 32.1965,
+      "slices": 256,
+      "samples": 8760,
+      "baselinePercent": [
+        78.93835616438356,
+        74.62328767123287,
+        68.78995433789954
+      ],
+      "integratedPercent": [
+        78.96118721461187,
+        74.63470319634703,
+        68.74429223744292
+      ],
+      "deltaPercentagePoints": [
+        0.0228310502283105,
+        0.01141552511415525,
+        -0.045662100456621
+      ],
+      "meanFractionDelta": -0.00001349441354551391,
+      "maxInstantFractionDifference": 0.035987655335850854,
+      "rolling": [
+        {
+          "hours": 336,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0.2976190476190476,
+              "signedPp": 0.2976190476190476,
+              "windowStartUtc": "2027-05-23T21:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0.2976190476190476,
+              "signedPp": 0.2976190476190476,
+              "windowStartUtc": "2027-01-22T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0.5952380952380952,
+              "signedPp": -0.5952380952380952,
+              "windowStartUtc": "2027-01-29T07:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 708.72,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0.14109944689016818,
+              "signedPp": 0.14109944689016818,
+              "windowStartUtc": "2027-05-08T09:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0.14109944689016818,
+              "signedPp": 0.14109944689016818,
+              "windowStartUtc": "2027-01-06T12:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0.28219889378033636,
+              "signedPp": -0.28219889378033636,
+              "windowStartUtc": "2027-01-13T19:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 2160,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0.09259259259259259,
+              "signedPp": 0.09259259259259259,
+              "windowStartUtc": "2027-04-27T13:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0.046296296296296294,
+              "signedPp": 0.046296296296296294,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0.09259259259259259,
+              "signedPp": -0.09259259259259259,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "hours": 8760,
+          "rules": [
+            {
+              "threshold": 0,
+              "maxAbsolutePp": 0.0228310502283105,
+              "signedPp": 0.0228310502283105,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 0.5,
+              "maxAbsolutePp": 0.01141552511415525,
+              "signedPp": 0.01141552511415525,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            },
+            {
+              "threshold": 1,
+              "maxAbsolutePp": 0.045662100456621,
+              "signedPp": -0.045662100456621,
+              "windowStartUtc": "2027-01-01T00:00:00.000Z"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "limitations": "Selected catalogue sites and year only; coarse time sampling can miss short events. Instantaneous disk errors may be larger than annual/mission time-fraction errors. Terrain profile discretization is unchanged.",
+  "refinedWindows": [
+    {
+      "startUtc": "2027-04-06T10:00:00.000Z",
+      "days": 14,
+      "stepS": 300,
+      "result": {
+        "id": "sunlit-1",
+        "latDeg": -89.4749,
+        "lonDeg": -137.4431,
+        "slices": 256,
+        "samples": 4032,
+        "baselinePercent": [
+          79.36507936507937,
+          64.16170634920636,
+          45.907738095238095
+        ],
+        "integratedPercent": [
+          79.46428571428571,
+          64.13690476190476,
+          45.833333333333336
+        ],
+        "deltaPercentagePoints": [
+          0.0992063492063492,
+          -0.0248015873015873,
+          -0.0744047619047619
+        ],
+        "meanFractionDelta": 1.2653606191067397e-7,
+        "maxInstantFractionDifference": 0.02959532306116036,
+        "rolling": [
+          {
+            "hours": 336,
+            "rules": [
+              {
+                "threshold": 0,
+                "maxAbsolutePp": 0.0992063492063492,
+                "signedPp": 0.0992063492063492,
+                "windowStartUtc": "2027-04-06T10:00:00.000Z"
+              },
+              {
+                "threshold": 0.5,
+                "maxAbsolutePp": 0.0248015873015873,
+                "signedPp": -0.0248015873015873,
+                "windowStartUtc": "2027-04-06T10:00:00.000Z"
+              },
+              {
+                "threshold": 1,
+                "maxAbsolutePp": 0.0744047619047619,
+                "signedPp": -0.0744047619047619,
+                "windowStartUtc": "2027-04-06T10:00:00.000Z"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "startUtc": "2027-06-08T06:00:00.000Z",
+      "days": 14,
+      "stepS": 300,
+      "result": {
+        "id": "sunlit-2",
+        "latDeg": -89.0102,
+        "lonDeg": -94.7589,
+        "slices": 256,
+        "samples": 4032,
+        "baselinePercent": [
+          35.39186507936508,
+          24.404761904761905,
+          7.093253968253968
+        ],
+        "integratedPercent": [
+          35.56547619047619,
+          24.18154761904762,
+          7.0188492063492065
+        ],
+        "deltaPercentagePoints": [
+          0.1736111111111111,
+          -0.22321428571428573,
+          -0.0744047619047619
+        ],
+        "meanFractionDelta": -0.000015701937555300832,
+        "maxInstantFractionDifference": 0.02748786788813007,
+        "rolling": [
+          {
+            "hours": 336,
+            "rules": [
+              {
+                "threshold": 0,
+                "maxAbsolutePp": 0.1736111111111111,
+                "signedPp": 0.1736111111111111,
+                "windowStartUtc": "2027-06-08T06:00:00.000Z"
+              },
+              {
+                "threshold": 0.5,
+                "maxAbsolutePp": 0.22321428571428573,
+                "signedPp": -0.22321428571428573,
+                "windowStartUtc": "2027-06-08T06:00:00.000Z"
+              },
+              {
+                "threshold": 1,
+                "maxAbsolutePp": 0.0744047619047619,
+                "signedPp": -0.0744047619047619,
+                "windowStartUtc": "2027-06-08T06:00:00.000Z"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "startUtc": "2027-01-29T07:00:00.000Z",
+      "days": 14,
+      "stepS": 300,
+      "result": {
+        "id": "sunlit-3",
+        "latDeg": -85.444,
+        "lonDeg": 32.1965,
+        "slices": 256,
+        "samples": 4032,
+        "baselinePercent": [
+          100,
+          96.20535714285714,
+          70.68452380952381
+        ],
+        "integratedPercent": [
+          100,
+          96.40376984126983,
+          70.53571428571429
+        ],
+        "deltaPercentagePoints": [
+          0,
+          0.1984126984126984,
+          -0.1488095238095238
+        ],
+        "meanFractionDelta": -0.00007963740644379233,
+        "maxInstantFractionDifference": 0.025779888429444453,
+        "rolling": [
+          {
+            "hours": 336,
+            "rules": [
+              {
+                "threshold": 0,
+                "maxAbsolutePp": 0,
+                "signedPp": 0,
+                "windowStartUtc": "2027-01-29T07:00:00.000Z"
+              },
+              {
+                "threshold": 0.5,
+                "maxAbsolutePp": 0.1984126984126984,
+                "signedPp": 0.1984126984126984,
+                "windowStartUtc": "2027-01-29T07:00:00.000Z"
+              },
+              {
+                "threshold": 1,
+                "maxAbsolutePp": 0.1488095238095238,
+                "signedPp": -0.1488095238095238,
+                "windowStartUtc": "2027-01-29T07:00:00.000Z"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "catalogSha256": "69445bab1680c6aa733518b40a8b7ed4f9a63087faad4c7e7f96cafe7c8181c2"
+}

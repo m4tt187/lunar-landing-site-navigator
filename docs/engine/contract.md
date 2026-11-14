@@ -28,6 +28,10 @@ The public entry is `engine/src/index.ts` (UI alias `@engine`). Types are in
   one means the full disk. Intermediate thresholds are inclusive. Earth
   visibility uses the centre at or above skyline plus the requested elevation margin;
   it is a geometric line-of-sight proxy, not a guaranteed communications link.
+- `sunVisible(marginDeg, thresholds)` and `earthVisible(marginDeg)` expose these
+  exact predicates for consumers. Summaries and next-event searches use the same
+  exports. Margins must be finite; a zero solar margin is visible only for a
+  positive required disk fraction, while a zero Earth margin meets the rule.
 - Summary fractions and interval durations are time-weighted. Crossings use
   interpolation between samples and therefore have sampling uncertainty.
   Longest night and longest communications gap are clipped to the selected
@@ -58,6 +62,12 @@ must divide 360 degrees, at most 36000 bins, subject to a preflight work limit o
 five million estimated terrain samples. Finite distance is at most a lunar
 semicircle. A returned `truncated` flag means a ray left the model before the
 remaining terrain could be bounded, and must be disclosed by consumers.
+
+`computeTerrainHorizon` also accepts `HeightField`; `polarDemField` adapts an
+existing grid. The synchronous provider supplies heights in the same lunar
+reference sphere, a conservative global maximum, and its finest resolution.
+Unknown coverage is NaN. See [height-field.md](height-field.md) for composition,
+validation requirements and the unchanged direct-grid path.
 
 Invalid or nonfinite inputs throw descriptive errors; there are no silent fake
 ephemerides or implicit network fallbacks. Use a Web Worker for long series;
