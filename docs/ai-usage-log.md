@@ -42,5 +42,6 @@ official rules, guides and challenge page were re-read.
 | 14 Nov 09:00 | Claude | Created the public repository at the team's instruction, after the official start |
 | 14 Nov 09:04 | Claude | Re-read the official challenge page, Project Submission Guide, Judging & Awards Guide, Participant FAQs and Terms & Conditions |
 | 14 Nov 09:04 | Codex | Independently re-read the same official pages and reported two wording corrections to the team's checklist |
-| 14 Nov 09:10 | Claude | Started source research (NASA LOLA topography products, landing-site coordinates, mission-planning conventions) with independent verification of every cited fact |
-| 14 Nov 09:20 | Claude | Wrote the repository skeleton: licence, README, tooling configuration, placeholder page |
+| 14 Nov 09:08 | Claude | Started source research (NASA LOLA topography products, landing-site coordinates, mission-planning conventions) with independent verification of every cited fact |
+| 14 Nov 09:11 | Claude | Wrote the repository skeleton: licence, README, tooling configuration, placeholder page |
+| 14 Nov 09:10 | Codex | Started the computational core (TypeScript, runs in the browser) and the NASA/JPL Horizons reference client |

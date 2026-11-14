@@ -24,6 +24,7 @@ when a resource is added, not reconstructed at the end.
 | Vite | https://vite.dev/ | MIT | Development server and production build |
 | TypeScript | https://www.typescriptlang.org/ | Apache-2.0 | Type checking |
 | Vitest | https://vitest.dev/ | MIT | Automated tests |
+| Astronomy Engine 2.1.19 (Don Cross) | https://github.com/cosinekitty/astronomy | MIT | Geocentric Sun and Moon vectors inside the computational core; validated against NASA/JPL Horizons |
 
 ## Documents
 
