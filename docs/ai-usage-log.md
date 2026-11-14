@@ -50,3 +50,4 @@ official rules, guides and challenge page were re-read.
 | 14 Nov 09:23 | Claude | Wrote the analysis functions (skyline interpolation, visible solar-disk fraction, sunlight/Earth windows, next rise/set) and their tests |
 | 14 Nov 09:28 | Claude | Wrote the terrain-skyline code for the NASA LOLA polar elevation model and checked it on known features (Shackleton floor, Mons Malapert) |
 | 14 Nov 09:33 | Claude | Compiled the site catalogue from cited NASA, LROC and USGS sources; wrote the terrain build (480 m model, shaded-relief map, per-site skylines) |
+| 14 Nov 09:50 | Claude | Wrote the first version of the web application: south-pole map, scenario cards, skyline panorama, timeline, landing calendar, shareable links |

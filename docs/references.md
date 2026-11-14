@@ -26,6 +26,7 @@ when a resource is added, not reconstructed at the end.
 | Node.js | https://nodejs.org/ | MIT and others (see upstream) | Build and test runtime |
 | Vite | https://vite.dev/ | MIT | Development server and production build |
 | TypeScript | https://www.typescriptlang.org/ | Apache-2.0 | Type checking |
+| Preact 11 and @preact/signals | https://preactjs.com/ | MIT | User interface |
 | tsx | https://tsx.is/ | MIT | Runs the build scripts |
 | Vitest | https://vitest.dev/ | MIT | Automated tests |
 | Astronomy Engine 2.1.19 (Don Cross) | https://github.com/cosinekitty/astronomy | MIT | Geocentric Sun and Moon vectors inside the computational core; validated against NASA/JPL Horizons |

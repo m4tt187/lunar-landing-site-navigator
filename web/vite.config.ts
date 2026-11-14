@@ -10,6 +10,7 @@ export default defineConfig({
   // Relative base: the same build works under any path (GitHub Pages project
   // site, a sub-folder of another site, or a local file server).
   base: './',
+  oxc: { jsx: { runtime: 'automatic', importSource: 'preact' } },
   resolve: {
     alias: {
       '@engine': here('../engine/src'),

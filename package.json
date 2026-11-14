@@ -23,6 +23,8 @@
     "vitest": "5.1.0"
   },
   "dependencies": {
-    "astronomy-engine": "2.1.19"
+    "@preact/signals": "2.11.4",
+    "astronomy-engine": "2.1.19",
+    "preact": "11.2.0"
   }
 }
