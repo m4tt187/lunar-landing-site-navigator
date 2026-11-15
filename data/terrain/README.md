@@ -26,7 +26,7 @@ npx tsx tools/terrain/build.ts
 The build checks the checksum and writes, in `web/public/data/`:
 
 - `ldem_75s_480m.i16` — the same model reduced to 480 m by 4 x 4 block mean, used in the
-  browser for skylines at custom coordinates;
+  browser for the map layers and, beyond the 120 m tiles, for skylines at custom coordinates;
 - `south-pole-relief.jpg` (PNG where the macOS `sips` tool is not available) — shaded relief,
   1.5 times wider than tall: the square of everything south of 80 S in the middle, and the
   model's terrain out towards 75 S on either side. Rendered by `tools/terrain/build.ts`

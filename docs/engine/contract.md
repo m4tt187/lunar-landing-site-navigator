@@ -27,11 +27,11 @@ The public entry is `engine/src/index.ts` (UI alias `@engine`). Types are in
   step 360 is a constant horizon. A zero profile represents a smooth tangent
   horizon, without terrain or height-dependent curvature dip.
 - `horizonElevationAt` uses periodic linear interpolation, including 359→0.
-- Solar visibility is the fraction of a circular solar disk that is above the
+- Solar visibility is the fraction of a circular solar disc that is above the
   local skyline (straight-edge approximation) and not covered by the Earth (an
   eclipse; see [eclipses.md](eclipses.md)). It is geometric visibility, not power
   output; it does not include slopes, equipment, or dust.
-- `Margins.sunDeg` is positive while at least the required fraction of the disk
+- `Margins.sunDeg` is positive while at least the required fraction of the disc
   is above the skyline and uncovered by the Earth; `Margins.sunDiskFraction` is
   that visible fraction; `Margins.eclipseFraction` is the fraction covered by the
   Earth (0 outside an eclipse). `sampleMargins`, `seriesMargins`, `summarize` and
@@ -42,14 +42,14 @@ The public entry is `engine/src/index.ts` (UI alias `@engine`). Types are in
   contact, the deepest moment, totality), from the samples; their darkness is
   already part of the sunlight windows. They are listed whether or not the
   skyline lets the site see the Sun.
-- `sunMinDiskFraction` lies in [0,1]. Zero means any nonzero visible disk;
-  one means the full disk. Intermediate thresholds are inclusive. Earth
+- `sunMinDiskFraction` lies in [0,1]. Zero means any nonzero visible disc;
+  one means the full disc. Intermediate thresholds are inclusive. Earth
   visibility uses the centre at or above skyline plus the requested elevation margin;
   it is a geometric line-of-sight proxy, not a guaranteed communications link.
 - `sunVisible(marginDeg, thresholds)` and `earthVisible(marginDeg)` expose these
   exact predicates for consumers. Summaries and next-event searches use the same
   exports. Margins must be finite; a zero solar margin is visible only for a
-  positive required disk fraction, while a zero Earth margin meets the rule.
+  positive required disc fraction, while a zero Earth margin meets the rule.
 - Summary fractions and interval durations are time-weighted. Crossings use
   interpolation between samples and therefore have sampling uncertainty.
   Longest night and longest communications gap are clipped to the selected

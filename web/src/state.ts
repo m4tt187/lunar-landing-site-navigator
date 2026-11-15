@@ -102,13 +102,18 @@ export function setScenarios(list: Omit<Scenario, 'id'>[]): void {
   cursorH.value = 0;
 }
 
-/** Shareable state in the URL fragment. */
-export function encodeState(): string {
+/**
+ * Shareable state in the URL fragment. The moment shown by the time slider is added only
+ * to a copied link (`withTime`), so that playing does not rewrite the address many times a second.
+ */
+export function encodeState(withTime = false): string {
   const parts = scenarios.value.map((s) => {
     const site = s.siteId ?? `@${s.custom!.latDeg.toFixed(4)}_${s.custom!.lonDeg.toFixed(4)}`;
     return [site, s.mastM, new Date(s.startMs).toISOString().slice(0, 16)].join('~');
   });
-  return `v=1&s=${parts.join('|')}&d=${durationDays.value}&sun=${sunRule.value}&earth=${earthRule.value}&map=${mapLayer.value}`;
+  const sel = Math.max(0, scenarios.value.findIndex((s) => s.id === selectedId.value)) + 1;
+  const time = withTime ? `&t=${Math.round(cursorH.value * 100) / 100}` : '';
+  return `v=1&s=${parts.join('|')}&d=${durationDays.value}&sun=${sunRule.value}&earth=${earthRule.value}&map=${mapLayer.value}&sel=${sel}${time}`;
 }
 
 export function decodeState(hash: string, app: AppData): boolean {
@@ -140,5 +145,9 @@ export function decodeState(hash: string, app: AppData): boolean {
   if (EARTH_RULES.some((x) => x.value === earth)) earthRule.value = earth;
   const layer = params.get('map');
   if (MAP_LAYERS.some((x) => x.id === layer)) mapLayer.value = layer as MapLayer;
+  const sel = Number(params.get('sel'));
+  if (Number.isInteger(sel) && sel >= 1 && sel <= list.length) selectedId.value = list[sel - 1]!.id;
+  const t = Number(params.get('t'));
+  if (params.has('t') && Number.isFinite(t)) cursorH.value = Math.min(durationDays.value * 24, Math.max(0, t));
   return true;
 }

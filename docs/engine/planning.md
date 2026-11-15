@@ -16,8 +16,8 @@ questions a planner actually asks.
 
 All of them work on **intervals** — the windows that `summarize()` returns — not on
 samples, and none calls the ephemeris. So the answers do not depend on how the windows
-were sampled, and they are fast: a year of hourly landing dates for 25 sites takes well
-under a second, most of it spent computing the windows.
+were sampled, and they are fast: a year of hourly landing dates for 25 sites takes about
+a second on the development machine, most of it spent computing the windows.
 
 ## Definitions
 

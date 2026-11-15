@@ -47,7 +47,7 @@ mid-latitudes; heights from −2,000 m to 5,000 m). Reproduce with
 | 30 min | 1.4 × 10⁻⁷ ° | 3.0 × 10⁻⁸ ° | 1.9 × 10⁻¹⁰ |
 | 1 h | 1.4 × 10⁻⁷ ° | 3.0 × 10⁻⁸ ° | 2.0 × 10⁻¹⁰ |
 | **2 h (default)** | **1.4 × 10⁻⁷ °** | **7.0 × 10⁻⁸ °** | **2.4 × 10⁻⁹** |
-| 6 h | 3.8 × 10⁻⁷ ° | 4.8 × 10⁻⁶ ° | 1.9 × 10⁻⁷ |
+| 6 h | 3.8 × 10⁻⁷ ° | 4.7 × 10⁻⁶ ° | 1.9 × 10⁻⁷ |
 | 12 h | 5.4 × 10⁻⁶ ° | 7.6 × 10⁻⁵ ° | 3.0 × 10⁻⁶ |
 
 Below two-hour knots the error stops falling: what is left is the numerical noise of the

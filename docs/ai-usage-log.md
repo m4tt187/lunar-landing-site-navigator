@@ -53,15 +53,15 @@ official rules, guides and challenge page were re-read.
 | 14 Nov 09:04 | Claude | Re-read the official challenge page, Project Submission Guide, Judging & Awards Guide, Participant FAQs and Terms & Conditions |
 | 14 Nov 09:04 | Codex | Independently re-read the same official pages and reported two wording corrections to the team's checklist |
 | 14 Nov 09:08 | Claude | Started source research (NASA LOLA topography products, landing-site coordinates, mission-planning conventions) with independent verification of every cited fact |
-| 14 Nov 09:11 | Claude | Wrote the repository skeleton: licence, README, tooling configuration, placeholder page |
 | 14 Nov 09:10 | Codex | Started the computational core (TypeScript, runs in the browser) and the NASA/JPL Horizons reference client |
+| 14 Nov 09:11 | Claude | Wrote the repository skeleton: licence, README, tooling configuration, placeholder page |
 | 14 Nov 09:14 | Codex | Wrote the first version of the Sun/Earth geometry (`engine/src/geometry.ts`, `types.ts`) and the engine contract, then stopped (usage limit reached); Claude took over the core |
 | 14 Nov 09:20 | Claude | Wrote the Horizons reference client, fetched 90 reference tables, and the test that compares the engine with them (max error 0.004 degrees over 9,810 samples) |
-| 14 Nov 09:23 | Claude | Wrote the analysis functions (skyline interpolation, visible solar-disk fraction, sunlight/Earth windows, next rise/set) and their tests |
+| 14 Nov 09:23 | Claude | Wrote the analysis functions (skyline interpolation, visible solar-disc fraction, sunlight/Earth windows, next rise/set) and their tests |
 | 14 Nov 09:28 | Claude | Wrote the terrain-skyline code for the NASA LOLA polar elevation model and checked it on known features (Shackleton floor, Mons Malapert) |
 | 14 Nov 09:33 | Claude | Compiled the site catalogue from cited NASA, LROC and USGS sources; wrote the terrain build (480 m model, shaded-relief map, per-site skylines) |
-| 14 Nov 09:50 | Claude | Wrote the first version of the web application: south-pole map, scenario cards, skyline panorama, timeline, landing calendar, shareable links |
 | 14 Nov 09:45 | Claude | Validated the terrain and ephemeris chain against the NASA LOLA-team average illumination and Earth-visibility maps at 400 points (correlation 0.98) |
+| 14 Nov 09:50 | Claude | Wrote the first version of the web application: south-pole map, scenario cards, skyline panorama, timeline, landing calendar, shareable links |
 | 14 Nov 09:50 | Claude | Added NASA long-term averages per site, the eight best-lit points found in the NASA illumination map, and map-layer assets built from those maps |
 | 14 Nov 13:32 | Codex | Independently reviewed the computational core and the terrain code; reproduced three defects (terrain rays collapsing at exactly 90 S, threshold equality, missing input validation) and wrote the fixes with 70 regression tests |
 | 14 Nov 13:50 | Claude | Reviewed and integrated those fixes; wrote the whole-map parallel-light sweep and its test against an independent ray march |
@@ -82,5 +82,7 @@ official rules, guides and challenge page were re-read.
 | 15 Nov 08:40 | Claude | Integrated that test and the contract; made the search for the skyline level start from the lowest uncovered point of the disc, which removes the rounding edge, with tests |
 | 15 Nov 08:50 | Claude | Checked the repository against the official rules: third-party notices kept in the published application, quotations and references, the `aiAssisted` field of the two data files compiled with AI assistance |
 | 15 Nov 14:10 | Claude | Wrote the project demo (`docs/demo/deck.html`, published as `demo.pdf`) from screenshots of the application, and the text of the Space Apps project page (`docs/project-page.md`) |
-| 15 Nov 16:40 | Claude | Rebuilt the interface to the team's brief (clean, compact, an everyday working tool): the "Best Site and Date" panel on the page, a wide map that can be zoomed and dragged with NASA terrain out to 76° S around the computed area, Title Case labels, a light and a dark theme; rendered the wider relief map from the LOLA model |
+| 15 Nov 16:40 | Claude | Rebuilt the interface to the team's brief (clean, compact, an everyday working tool): the "Best Site and Date" panel on the page, a wide map that can be zoomed and dragged with NASA terrain out towards 75° S around the computed area, Title Case labels, a light and a dark theme; rendered the wider relief map from the LOLA model |
 | 15 Nov 19:30 | Claude | Took new screenshots, rebuilt the demo (seven slides) and brought README, methodology pages and project page in line with the interface |
+| 15 Nov 19:45 | Claude | Final checks of repository, site and demo against the rules and the code: map labels kept apart, wheel zoom with Ctrl/⌘ (or a plain wheel once zoomed in), phone layout without side scrolling, clickable links in the demo, stale lines in the methodology pages corrected |
+| 15 Nov 20:10 | Claude | Second round of final checks: the map keeps one finger's drag on phones, can be moved and zoomed from the keyboard and keeps its symbols readable on narrow screens; a copied link also keeps the selected scenario and the moment shown; documentation figures and wording aligned with the code |

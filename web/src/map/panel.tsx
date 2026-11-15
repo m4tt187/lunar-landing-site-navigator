@@ -250,6 +250,11 @@ function CustomCoordinates() {
 /** Zoom and pan of the map: scale `k`, and the offset of the drawing as fractions of the frame. */
 const MAX_ZOOM = 6;
 const view = signal({ k: 1, x: 0, y: 0 });
+/**
+ * How much symbols and labels are enlarged on a narrow map (1 from 800 px up), so that they
+ * stay readable and easy to tap on a phone.
+ */
+const enlarge = signal(1);
 /** True while (and just after) the map is dragged, so that the drag is not taken for a click. */
 let dragged = false;
 
@@ -274,38 +279,71 @@ function MapFrame({ aspect, children }: { aspect: number; children: ComponentChi
       // The page keeps scrolling over the whole map: the wheel zooms only with Ctrl or ⌘
       // (a trackpad pinch sends Ctrl), or once the map is already zoomed in.
       const k = view.value.k;
-      if (!(event.ctrlKey || event.metaKey || k > 1)) return;
+      const ctrl = event.ctrlKey || event.metaKey;
+      if (!(ctrl || k > 1)) return;
       const factor = Math.exp(-event.deltaY * 0.0018);
       const next = Math.min(MAX_ZOOM, Math.max(1, k * factor));
+      // With Ctrl or ⌘ the browser would zoom the whole page: the map keeps the gesture.
+      if (ctrl) event.preventDefault();
       if (next === k) return;
       event.preventDefault();
       const box = el.getBoundingClientRect();
       zoomAt((event.clientX - box.left) / box.width, (event.clientY - box.top) / box.height, factor);
     };
     el.addEventListener('wheel', wheel, { passive: false });
-    return () => el.removeEventListener('wheel', wheel);
+    const resize = new ResizeObserver(() => {
+      enlarge.value = Math.min(2.2, Math.max(1, 800 / Math.max(1, el.clientWidth)));
+    });
+    resize.observe(el);
+    return () => { el.removeEventListener('wheel', wheel); resize.disconnect(); };
   }, []);
+  /** Arrow keys move the zoomed map, + and − zoom on its centre. */
+  const key = (event: KeyboardEvent): void => {
+    const { k, x, y } = view.value, step = 0.1;
+    const moves: Record<string, [number, number]> = { ArrowLeft: [step, 0], ArrowRight: [-step, 0], ArrowUp: [0, step], ArrowDown: [0, -step] };
+    if (moves[event.key] && k > 1) {
+      const [dx, dy] = moves[event.key]!;
+      view.value = clampView(k, x + dx, y + dy);
+    } else if (event.key === '+' || event.key === '=') zoomAt(0.5, 0.5, 1.6);
+    else if (event.key === '-' || event.key === '_') zoomAt(0.5, 0.5, 1 / 1.6);
+    else return;
+    event.preventDefault();
+  };
+  const active = useRef<number | null>(null);
   const down = (event: PointerEvent): void => {
-    if (event.button !== 0 || view.value.k === 1) return;
+    // One pointer drags; a second finger on a phone is ignored rather than fighting the first.
+    if (event.button !== 0 || view.value.k === 1 || active.current !== null) return;
+    const pointer = event.pointerId;
+    active.current = pointer;
     const el = ref.current!, box = el.getBoundingClientRect(), start = { cx: event.clientX, cy: event.clientY, ...view.value };
     let moved = false;
     const move = (e: PointerEvent): void => {
+      if (e.pointerId !== pointer) return;
       const dx = e.clientX - start.cx, dy = e.clientY - start.cy;
       if (!moved && Math.hypot(dx, dy) < 4) return;
       moved = true; dragged = true; el.classList.add('dragging');
       view.value = clampView(start.k, start.x + dx / box.width, start.y + dy / box.height);
     };
-    const up = (): void => {
+    const up = (e: PointerEvent): void => {
+      if (e.pointerId !== pointer) return;
+      active.current = null;
       window.removeEventListener('pointermove', move);
       window.removeEventListener('pointerup', up);
+      window.removeEventListener('pointercancel', up);
       el.classList.remove('dragging');
       // The click that ends a drag arrives right after this: let it pass first.
       setTimeout(() => { dragged = false; }, 0);
     };
     window.addEventListener('pointermove', move);
     window.addEventListener('pointerup', up);
+    window.addEventListener('pointercancel', up);
   };
-  return <div ref={ref} class={`map ${view.value.k > 1 ? 'zoomed' : ''}`} style={{ aspectRatio: String(aspect) }} onPointerDown={down}>{children}</div>;
+  return (
+    <div ref={ref} class={`map ${view.value.k > 1 ? 'zoomed' : ''}`} style={{ aspectRatio: String(aspect) }} onPointerDown={down}
+      tabIndex={0} role="group" aria-label="Map of the lunar south pole. Plus and minus zoom; arrow keys move the zoomed map." onKeyDown={key}>
+      {children}
+    </div>
+  );
 }
 
 interface Box { x0: number; y0: number; x1: number; y1: number }
@@ -361,7 +399,7 @@ function ScenarioList() {
       <ul>
         {scenariosOf(list).map(({ a, i, id }) => (
           <li class={id === selectedId.value ? 'selected' : ''}>
-            <button type="button" onClick={() => { selectedId.value = id; }}>
+            <button type="button" aria-pressed={id === selectedId.value} onClick={() => { selectedId.value = id; }}>
               <span class="badge small" style={{ background: SCENARIO_COLORS[i] }}>{i + 1}</span>
               <span class="name">{a?.name ?? '…'}</span>
               {a ? (
@@ -391,6 +429,8 @@ export function MapPanel({ app }: { app: AppData }) {
   const at = hover.value;
   const aspect = aspectOf(meta), left = -500 * (aspect - 1), right = 1000 - left;
   const { k, x: tx, y: ty } = view.value;
+  // Scale of symbols and labels in drawing units: smaller as the map zooms in, larger on a narrow map.
+  const z = k / enlarge.value;
   // Pointer position as a fraction of the central square (0..1 from its left and top edges).
   // The box is that of the zoomed drawing, so the answer holds at any zoom.
   const fraction = (event: MouseEvent): { x: number; y: number } => {
@@ -400,7 +440,7 @@ export function MapPanel({ app }: { app: AppData }) {
   const ring = (lat: number): number => project(meta, lat, 90).x * 1000 - 500;
   // Symbols and labels keep their size on screen while the terrain is enlarged.
   const at1 = (px: number, py: number, children: ComponentChildren) =>
-    <g transform={`translate(${px} ${py}) scale(${1 / k})`}>{children}</g>;
+    <g transform={`translate(${px} ${py}) scale(${1 / z})`}>{children}</g>;
   // Labels that would overlap at this zoom are moved to the other side of their mark, or left out
   // (the name stays in the mark's tooltip, and appears as soon as zooming in makes room for it).
   const pins = analyses.value.flatMap((a) => (a && a.site.latDeg <= meta.map.minLatDeg ? [project(meta, a.site.latDeg, a.site.lonDeg)] : []));
@@ -409,7 +449,7 @@ export function MapPanel({ app }: { app: AppData }) {
     s, p: project(meta, s.latDeg, s.lonDeg), place: null as { anchor: 'start' | 'end'; dy: number } | null,
     label: s.group === 'sunlit' ? s.name.split(' (')[0]!.replace('Sunlit Peak ', '') : s.name.replace(' Crater (Centre)', ''),
   }));
-  const labels = layoutLabels(k, left, right, pins, sites, ORDER, [-88, -86, -84, -82].map((lat) => ({ x: 503, y: project(meta, lat, 0).y * 1000 - 3, text: `${-lat}°S` }))
+  const labels = layoutLabels(z, left, right, pins, sites, ORDER, [-88, -86, -84, -82].map((lat) => ({ x: 503, y: project(meta, lat, 0).y * 1000 - 3, text: `${-lat}°S` }))
     .concat([-80, -78, -76].map((lat) => ({ x: 500 + ring(lat) + 4, y: 490, text: `${-lat}°S` }))));
   return (
     <section class="panel map-panel">
@@ -488,7 +528,7 @@ export function MapPanel({ app }: { app: AppData }) {
         <ScenarioList />
         <div class="readout" aria-live="off">
           <span class="field-label">Under the Pointer</span>
-          <p>{at ? readout(app, layer, at.x, at.y) : <>Click the map to move <b style={{ color: SCENARIO_COLORS[index] }}>scenario {index + 1}</b> there, or pick a marked site. ◆ marks the best-lit points in NASA's map.</>}</p>
+          <p>{at ? readout(app, layer, at.x, at.y) : <>Click the map to move <b class="scenario-ref" style={{ '--c': SCENARIO_COLORS[index] }}>scenario {index + 1}</b> there, or pick a marked site. ◆ marks the best-lit points in NASA's map.</>}</p>
         </div>
         <div>
           <span class="field-label">Legend</span>

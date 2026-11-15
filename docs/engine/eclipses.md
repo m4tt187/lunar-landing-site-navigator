@@ -118,7 +118,7 @@ the top of the disc (12 January 2028, when the Earth passes above the Sun).
 The level is computed once per instant, as seen from the pole, and used for the whole
 map. Measured against the level each place would compute from its own sky (300 places
 south of 80° S, the eleven eclipses of 2025–2030, every two minutes): the difference is
-below 0.04° for 95 % of place-and-instant pairs and below 0.08° for 99 %; the largest,
+below 0.04° for 95 % of place-and-instant pairs and below 0.081° for 99 %; the largest,
 0.21°, falls in the minutes around a contact, when the pole has already lost the Sun and
 a place at the edge of the map has not. It is one more approximation of the map, on top
 of the sweep's own; the comparison below measures what the two cost together.

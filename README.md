@@ -49,7 +49,7 @@ This tool draws that picture for any site and any date, instantly, in a browser.
   time plays — and the share of the chosen mission with sunlight, with the Earth in
   view, and with both. It then names the best place for power and link within 5 km of
   the selected site. The map can be zoomed and dragged; around the computed area it shows
-  NASA's terrain out to 76° S, so that the pole is seen in its setting.
+  NASA's terrain out towards 75° S, so that the pole is seen in its setting.
 - **A calendar that answers "when?".** For every possible landing day of the coming year:
   how long sunlight, the Earth link, or both would last unbroken after touchdown, for
   every scenario, with the best landing days marked.
@@ -157,7 +157,7 @@ Reproduce: `npm test`, `python3 tools/horizons/fetch_fixtures.py`,
   eclipse. An event shorter than ten minutes can be missed.
 - **Eclipses on the map.** Every cell is tested against the Earth's disc as seen from
   that cell, but the part of the Sun the Earth leaves uncovered is taken as seen from the
-  pole: within 0.08° of each cell's own for 99 % of cells and instants.
+  pole: within 0.081° of each cell's own for 99 % of cells and instants.
 - **A planning aid, not a flight product.**
 
 ## NASA data and other sources

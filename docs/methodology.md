@@ -252,7 +252,7 @@ no difference. While the Earth covers part of the Sun, the terrain is tested aga
 what is left of the disc: the direction tested is the highest skyline under which enough
 of the uncovered part still shows, so that a Sun whose uncovered part lies behind a ridge
 is not counted. That level is computed as seen from the pole and used for the whole map;
-for 99 % of places and instants it is within 0.08° of the level the place itself would
+for 99 % of places and instants it is within 0.081° of the level the place itself would
 compute (largest difference 0.21°, in the minutes around a contact). Details and checks:
 [engine/eclipses.md](engine/eclipses.md), "On the map".
 

@@ -118,7 +118,7 @@ export function FinderPanel({ app }: { app: AppData }) {
           </div>
           <p class="muted small">
             {found.sites} sites with a real skyline, every hour of {found.request.searchDays} days from {fmtUtc(found.request.fromMs).slice(0, 10)}, panels {found.request.mastM} m above the ground,
-            for a mission of {found.request.missionDays} days. Ranked by power for the whole mission first, then by contact with the Earth. "Power lasts" is the unbroken stretch from touchdown
+            for a mission of {found.request.missionDays} days. Ranked by power for the whole mission first, then by contact with the Earth. "Power Lasts" is the unbroken stretch from touchdown
             {found.request.toleranceH > 0 ? `, bridging darkness of up to ${fmtSpan(found.request.toleranceH)}` : ''}; it runs to the end of the {Math.round((searchEndMs(found.request) - found.request.fromMs) / DAY)} days examined at most.
           </p>
         </>

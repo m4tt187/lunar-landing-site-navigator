@@ -79,6 +79,13 @@ a { color: var(--accent); text-underline-offset: 2px; }
 .small { font-size: 0.8rem; }
 .hint { color: var(--muted); margin: 0 0 10px; font-size: 0.86rem; max-width: 130ch; text-wrap: pretty; }
 .error { color: #c0392b; }
+:root[data-theme='dark'] .error { color: #ff8f80; }
+/* Text in a scenario's or a body's colour stays readable on the dark surfaces. */
+.body-name.sun { color: var(--sun); }
+.body-name.earth { color: var(--earth); }
+:root[data-theme='dark'] .marker-label.earth { fill: var(--earth); }
+.scenario-ref { color: var(--c); }
+:root[data-theme='dark'] .scenario-ref, :root[data-theme='dark'] .card a { color: color-mix(in srgb, var(--c, var(--accent)) 45%, #fff); }
 .grow { flex: 1; min-width: 0; }
 
 /* Top bar */
@@ -172,7 +179,7 @@ input[type='range']::-moz-range-thumb { width: 11px; height: 11px; border-radius
 .scenario-list ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 3px; }
 .scenario-list li button { width: 100%; justify-content: flex-start; background: none; border: 1px solid transparent; padding: 4px 6px; min-height: 30px; font-weight: 500; text-align: left; }
 .scenario-list li button:hover { background: var(--subtle) !important; }
-.scenario-list li.selected button { background: var(--accent-tint); border-color: color-mix(in srgb, var(--accent) 30%, transparent); }
+.scenario-list li.selected button { color: var(--fg); background: var(--accent-tint); border-color: color-mix(in srgb, var(--accent) 30%, transparent); }
 .scenario-list .badge.small { margin-right: 2px; }
 .scenario-list .name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 .scenario-list .figures, .figures-key { display: inline-grid; grid-template-columns: repeat(3, 38px); text-align: right; font-family: var(--mono); font-size: 0.74rem; font-weight: 600; }
@@ -247,6 +254,11 @@ input[type='range']::-moz-range-thumb { width: 11px; height: 11px; border-radius
 /* Drawings */
 svg.sky, svg.timeline, svg.calendar { width: 100%; height: auto; display: block; touch-action: none; user-select: none; }
 svg.timeline, svg.calendar { cursor: pointer; }
+/* The calendar only takes clicks, so a finger may scroll it; on a narrow screen it keeps a readable width. */
+svg.calendar { touch-action: pan-x pan-y; }
+.calendar-scroll { overflow-x: auto; }
+.nw { white-space: nowrap; }
+.scrub-meta b { white-space: nowrap; }
 .sky-bg { fill: var(--sky); stroke: var(--line); }
 .terrain { stroke-width: 1; stroke: var(--terrain-line); }
 .terrain.far { fill: var(--terrain-far); stroke-opacity: 0.6; }
@@ -316,5 +328,6 @@ footer b { color: var(--fg); }
   .appbar-actions label.inline { flex: 1 1 100%; min-width: 0; }
   .appbar-actions select { max-width: none; width: 100%; min-width: 0; }
   .map-tools, .segmented { max-width: 100%; }
+  .calendar-scroll svg.calendar { min-width: 1000px; }
 }
 @media (max-width: 520px) { .closeups { grid-template-columns: 1fr 1fr; } .now { grid-column: 1 / -1; } .card-controls { grid-template-columns: 1fr; } .coords { grid-template-columns: 1fr 1fr; } .coords button { grid-column: 1 / -1; } }

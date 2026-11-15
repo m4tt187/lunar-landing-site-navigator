@@ -84,7 +84,7 @@ export function SkyView({ a, instant }: { a: Analysis; instant: Instant }) {
       <g>
         {up ? <circle cx={cx} cy={cy} r="11" fill={color} fill-opacity="0.12" stroke={color} stroke-opacity="0.45" /> : <circle cx={cx} cy={cy} r="11" fill="none" stroke={color} stroke-opacity="0.5" stroke-dasharray="2 3" />}
         <circle cx={cx} cy={cy} r="6" fill={`url(#${id}-${body})`} fill-opacity={up ? 1 : 0.35} stroke="#fff" stroke-width="1.5" />
-        <text x={Math.min(W - R - 30, Math.max(L + 2, cx + 15))} y={Math.max(T + 11, cy - 9)} class="marker-label" fill={color}>{label}</text>
+        <text x={Math.min(W - R - 30, Math.max(L + 2, cx + 15))} y={Math.max(T + 11, cy - 9)} class={`marker-label ${body}`} fill={color}>{label}</text>
       </g>
     );
   };
@@ -201,7 +201,7 @@ export function CloseUp({ a, instant, body }: { a: Analysis; instant: Instant; b
         <line x1="8" x2={8 + barDeg * scale * across} y1={S - 8} y2={S - 8} class="scale-bar" />
         <text x="8" y={S - 13} class="axis strong">{barDeg}°</text>
       </svg>
-      <figcaption><b style={{ color: body === 'sun' ? SUN : EARTH }}>{body === 'sun' ? 'Sun' : 'Earth'}</b> {caption}</figcaption>
+      <figcaption><b class={`body-name ${body}`}>{body === 'sun' ? 'Sun' : 'Earth'}</b> {caption}</figcaption>
     </figure>
   );
 }

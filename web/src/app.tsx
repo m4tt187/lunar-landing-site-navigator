@@ -6,14 +6,14 @@ import { SEARCH_LIMIT_DAYS, bestWindows, fromLanding, instantAt, landingCalendar
 import type { Analysis } from './compute';
 import type { AppData, CatalogSite } from './data';
 import { FinderPanel } from './finder';
-import { compass, deg, fmtDate, fmtLatLon, fmtSpan, fmtUtc, fromInputValue, pct, toInputValue } from './format';
+import { compass, deg, fmtDate, fmtLatLon, fmtSpan, fmtUtc, fromInputValue, pct, titleCase, toInputValue } from './format';
 import { MapPanel } from './map/panel';
 import { PRESETS } from './presets';
 import type { Preset } from './presets';
 import { analyses, demError, selectedAnalysis, selectedIndex } from './session';
 import {
   DAY, DURATIONS, EARTH_RULES, HOUR, MAX_LANDING_MS, MAX_SCENARIOS, MIN_LANDING_MS, SCENARIO_COLORS, SUN_RULES,
-  addScenario, clampTime, cursorH, data, defaultStart, durationDays, earthRule, loadError, mapLayer, playing,
+  addScenario, clampTime, cursorH, data, defaultStart, durationDays, earthRule, encodeState, loadError, mapLayer, playing,
   removeScenario, scenarios, selectedId, setScenarios, sunRule, updateScenario,
 } from './state';
 import type { Scenario } from './state';
@@ -117,10 +117,10 @@ function Toolbar() {
           </button>
           <div class="grow scrub-track">
             <div class="scrub-meta">
-              <span>Time since landing <b>{fmtSpan(cursorH.value)}</b></span>
+              <span>Time Since Landing <b>{fmtSpan(cursorH.value)}</b></span>
               {first ? <span class="muted">{fmtUtc(first.startMs + cursorH.value * HOUR)} · Scenario 1</span> : null}
             </div>
-            <input type="range" min="0" max={span} step={span / 2000} value={cursorH.value} aria-label="Time since landing"
+            <input type="range" min="0" max={span} step={span / 2000} value={cursorH.value} aria-label="Time Since Landing"
               style={{ '--fill': `${(cursorH.value / span) * 100}%` }}
               onInput={(e) => { cursorH.value = Number((e.currentTarget as HTMLInputElement).value); }} />
           </div>
@@ -217,7 +217,7 @@ function Card({ scenario, index, app }: { scenario: Scenario; index: number; app
       <span class="badge" style={{ background: color }}>{index + 1}</span>
       <div class="grow">
         <h3>{a?.name ?? scenario.custom?.name ?? '…'}</h3>
-        {a ? <div class="muted">{fmtLatLon(a.site.latDeg, a.site.lonDeg)}{a.catalog ? ` · ${a.catalog.agency}` : ''}</div> : null}
+        {a ? <div class="muted">{fmtLatLon(a.site.latDeg, a.site.lonDeg)}{a.catalog ? ` · ${titleCase(a.catalog.agency).replace(/-([a-z])/g, (_, c: string) => `-${c.toUpperCase()}`)}` : ''}</div> : null}
       </div>
       {scenarios.value.length > 1 ? <button type="button" class="ghost" aria-label={`Remove scenario ${index + 1}`} onClick={(e) => { e.stopPropagation(); removeScenario(scenario.id); }}>×</button> : null}
     </header>
@@ -270,9 +270,9 @@ function Card({ scenario, index, app }: { scenario: Scenario; index: number; app
     <article class={`card ${selected ? 'selected' : ''}`} style={{ '--accent': color }}>
       {header}{controls}
       <div class="verdict">
-        <div class="metric sun"><span>{ICONS.sun}Sunlight</span><b>{pct(s.sunlitFraction)}</b><small>Longest Night {fmtSpan(s.longestDarkH)}</small></div>
-        <div class="metric earth"><span>{ICONS.earth}Earth in View</span><b>{pct(s.earthVisibleFraction)}</b><small>Longest Gap {fmtSpan(s.longestCommGapH)}</small></div>
-        <div class="metric both"><span>{ICONS.both}Power + Link Together</span><b>{pct(s.bothFraction)}</b><small>Highest Sun {deg(s.maxSunElDeg)}</small></div>
+        <div class="metric sun"><span>{ICONS.sun}Sunlight</span><b>{pct(s.sunlitFraction)}</b><small>Longest Night <span class="nw">{fmtSpan(s.longestDarkH)}</span></small></div>
+        <div class="metric earth"><span>{ICONS.earth}Earth in View</span><b>{pct(s.earthVisibleFraction)}</b><small>Longest Gap <span class="nw">{fmtSpan(s.longestCommGapH)}</span></small></div>
+        <div class="metric both"><span>{ICONS.both}Power + Link Together</span><b>{pct(s.bothFraction)}</b><small>Highest Sun <span class="nw">{deg(s.maxSunElDeg)}</span></small></div>
       </div>
       <p class="explain">{explain(a)}</p>
       <SkyView a={a} instant={instant} />
@@ -282,13 +282,13 @@ function Card({ scenario, index, app }: { scenario: Scenario; index: number; app
         <div class="now">
           <div><span class="dot sun" /><b>Sun {instant.sunUp ? 'Up' : 'Down'}</b> · {change(instant.sunUp ? 'sunset' : 'sunrise', nextSun)}<br />
             <span class="muted">{deg(instant.sample.sun.elDeg, 2)} elevation, towards {compass(instant.sample.sun.azDeg)} ({deg(instant.sample.sun.azDeg, 0)})</span></div>
-          <div><span class="dot earth" /><b>Earth {instant.earthUp ? 'in View' : 'Hidden'}</b> ·{change(instant.earthUp ? 'earthset' : 'earthrise', nextEarth)}<br />
+          <div><span class="dot earth" /><b>Earth {instant.earthUp ? 'in View' : 'Hidden'}</b> · {change(instant.earthUp ? 'earthset' : 'earthrise', nextEarth)}<br />
             <span class="muted">{deg(instant.sample.earth.elDeg, 2)} elevation, towards {compass(instant.sample.earth.azDeg)} ({deg(instant.sample.earth.azDeg, 0)})</span></div>
           <div class="muted">{fmtUtc(instant.tMs)} · {fmtSpan(cursorH.value)} after landing</div>
         </div>
       </div>
       <Timeline a={a} cursorH={cursorH.value} onCursor={(h) => { cursorH.value = h; }} />
-      <p class="muted small">{terrainNote}{a.terrain.modelEdgeReached ? ' The terrain model ends before the far horizon in some directions.' : ''}{a.terrain.kind !== 'none' ? ` Ground ${a.terrain.groundHeightM} m above the reference sphere.` : ''}
+      <p class="muted small">{terrainNote}{a.terrain.modelEdgeReached ? ' The terrain model ends before the far horizon in some directions.' : ''}{a.terrain.kind !== 'none' ? ` Ground ${Math.abs(a.terrain.groundHeightM)} m ${a.terrain.groundHeightM < 0 ? 'below' : 'above'} the reference sphere.` : ''}
         {a.catalog?.nasaLongTerm ? ` NASA's long-term average for this spot, at ground level: ${pct(a.catalog.nasaLongTerm.sunlight)} sunlight, ${pct(a.catalog.nasaLongTerm.earth)} Earth in view.` : ''}
         {a.catalog ? <> Coordinates: <a href={a.catalog.source.url} target="_blank" rel="noreferrer">{a.catalog.source.title}</a>.</> : null}
         {a.catalog?.note ? ` ${a.catalog.note}.` : ''}</p>
@@ -327,8 +327,10 @@ function CalendarPanel() {
           <p class="sub">One year of possible landing days</p>
         </div>
       </header>
-      <p class="hint">Each column is a landing day. Brighter means a longer unbroken stretch after touchdown; dark means landing into night, or with no link. Rows show scenario {index + 1} ({own.name}){rows.length > 3 ? ' and the power + link row of the other sites' : ''}. Hover for the numbers, click a day to move the landing of scenario {index + 1} there.</p>
-      <LandingCalendar calendar={calendar} rows={rows} currentMs={own.scenario.startMs} best={best} onPick={(ms) => updateScenario(own.scenario.id, { startMs: clampTime(ms) })} />
+      <p class="hint">Each column is a landing day. Brighter means a longer unbroken stretch after touchdown; dark means landing into night, or with no link. Rows show scenario {index + 1} ({own.name}){rows.length > 3 ? ' and the power + link row of the other sites' : ''}. Hover for the numbers, click or tap a day to move the landing of scenario {index + 1} there; on a narrow screen the calendar scrolls sideways.</p>
+      <div class="calendar-scroll">
+        <LandingCalendar calendar={calendar} rows={rows} currentMs={own.scenario.startMs} best={best} onPick={(ms) => updateScenario(own.scenario.id, { startMs: clampTime(ms) })} />
+      </div>
       {best.length ? (
         <p class="advice">▼ Longest unbroken power + link at {own.name}:{' '}
           {best.map((w) => (
@@ -380,7 +382,7 @@ export function App() {
           <div class="appbar-actions">
             <Presets />
             <button type="button" onClick={() => {
-              void navigator.clipboard?.writeText(location.href).then(() => { copied.value = true; setTimeout(() => { copied.value = false; }, 1500); });
+              void navigator.clipboard?.writeText(`${location.origin}${location.pathname}#${encodeState(true)}`).then(() => { copied.value = true; setTimeout(() => { copied.value = false; }, 1500); });
             }}>{copied.value ? 'Link Copied' : 'Copy Link to This Comparison'}</button>
             <ThemeSwitch />
           </div>
