@@ -143,13 +143,15 @@ Open source under the Apache License 2.0.
 
 Yes. Two AI tools were used throughout: Anthropic Claude (Claude Code) and OpenAI Codex.
 
-How they were used. The solution concept and its design were proposed by the AI tools at
-the team's request. The tools then wrote and tested the code (the computational core, the
-terrain pipeline, the web application), researched official sources and checked every
-cited fact against them, and drafted the documentation. Each tool reviewed the other's
-work independently, with reproductions and regression tests. The team chose the
-challenge, set the goals and priorities, accepted or rejected what was proposed, and
-directed the work.
+How they were used. The idea of the solution is the team's: one screen on which landing
+sites and dates are compared side by side and the answer — power or not, contact with
+the Earth or not — is read at a glance. The team chose the challenge, set the goals and
+priorities, decided what was built and reviewed the results. The AI tools were used to
+carry it out, under the team's direction: they worked out the details of the design,
+wrote and tested the code (the computational core, the terrain pipeline, the web
+application), researched official sources and checked every cited fact against them, and
+drafted the documentation. Each tool reviewed the other's work independently, with
+reproductions and regression tests.
 
 How it is marked. Every AI-assisted source file carries a header line naming the tool
 that helped write it. The file `docs/ai-usage-log.md` in the repository records what each
