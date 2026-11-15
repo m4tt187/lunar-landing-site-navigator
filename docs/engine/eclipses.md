@@ -119,8 +119,8 @@ map. Measured against the level each place would compute from its own sky (300 p
 south of 80° S, the eleven eclipses of 2025–2030, every two minutes): the difference is
 below 0.04° for 95 % of place-and-instant pairs and below 0.08° for 99 %; the largest,
 0.21°, falls in the minutes around a contact, when the pole has already lost the Sun and
-a place at the edge of the map has not. This is finer than the sweep itself, which
-answers for a cell from bins 480 m wide.
+a place at the edge of the map has not. It is one more approximation of the map, on top
+of the sweep's own; the comparison below measures what the two cost together.
 
 **Checked against each place's own answer.** `web/src/map/visibility.test.ts` runs the
 map's computation (`web/src/map/visibility.ts`, the code the background workers run) and
@@ -137,10 +137,11 @@ Sun on 12 January 2028:
 Tested one obstruction at a time, all of those cells would be lit. The same file holds a
 real case found on the shipped terrain in the independent review (81.107° S, 92.189° W,
 12 January 2028 03:12:37 UTC: the terrain leaves 20 % of the Sun, the Earth 22 %, the two
-together nothing; the map shows it dark) and two constructed cases on a smooth sphere. In
-a browser, on the built application, 3,000 random cells per rule against the engine's
-complete per-site computation (`computeTerrainHorizon` and `sampleMargins`) agreed at
-99.3 % and 99.1 %.
+together nothing; the map shows it dark) and two constructed cases on a smooth sphere.
+`web/src/map/worker-eclipse-regression.test.ts`, written in the independent review, sends
+the same cases through the background worker's own message handler. In a browser, on the
+built application, 3,000 random cells per rule against the engine's complete per-site
+computation (`computeTerrainHorizon` and `sampleMargins`) agreed at 99.3 % and 99.1 %.
 
 ## Checked against NASA's predictions
 

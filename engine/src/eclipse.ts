@@ -440,44 +440,66 @@ export function sunMarginWithEarth(
 
 /**
  * The highest straight skyline, in degrees above the Sun's centre, under which
- * the Sun still counts as up while the Earth covers part of it: at least
- * minVisibleFraction of the solar disc is above the skyline and outside the
- * Earth's opaque disc exactly when the skyline is lower than this level.
- * Without the Earth it is the top of the disc for "any part shows" (+radius),
- * its centre for "half" (0) and its bottom for "the whole disc" (-radius).
- * Null when no skyline is low enough: the Earth alone hides that much of the Sun.
+ * the Sun still counts as up while the Earth covers part of it, that is, under
+ * which the required part of the solar disc is both above the skyline and
+ * outside the Earth's opaque disc. Without the Earth it is the top of the disc
+ * for "any part shows" (+radius), its centre for "half" (0) and its bottom for
+ * "the whole disc" (-radius). Null when no skyline is low enough: the Earth
+ * alone hides that much of the Sun.
  *
  * - "Any part shows" (0): exact. The level is the highest point of the disc that
  *   the Earth leaves uncovered: the top of the disc when the Earth does not reach
- *   it, otherwise the higher of the two points where the limbs cross.
- * - "The whole disc shows" (1): exact. The bottom of the disc, and only while the
- *   Earth does not touch the Sun.
+ *   it, otherwise the higher of the two points where the limbs cross. The Sun
+ *   counts as up for a skyline strictly below the level (at the level nothing
+ *   with an area is left).
+ * - "The whole disc shows" (1): exact. The bottom of the disc, while the Earth
+ *   covers nothing of the Sun; the two discs may touch.
  * - A fraction in between: the level at which the visible fraction, which only
- *   falls as the skyline rises, equals the required one (bisection).
+ *   falls as the skyline rises, equals the required one. The Sun counts as up
+ *   for a skyline at or below the level. The level is searched between the
+ *   lowest and the highest uncovered points of the disc, because below the
+ *   lowest one a lower skyline uncovers nothing more: when the Earth leaves
+ *   exactly the required fraction, the level is that lowest point.
  * No input checks.
  */
 export function skylineLimitInEclipse(sunRadiusDeg: number, state: EclipseState, minVisibleFraction: number): number | null {
   const a = sunRadiusDeg, b = state.earthDiscDeg, d = state.separationDeg;
   if (minVisibleFraction >= 1) return d >= a + b ? -a : null;
-  if (d >= a + b) return minVisibleFraction <= 0 ? a : skylineForFraction(a, minVisibleFraction, 0, 0, 0);
+  if (d >= a + b) return minVisibleFraction <= 0 ? a : skylineForFraction(a, minVisibleFraction, 0, 0, 0, -a, a);
   if (b >= a && d <= b - a) return null;
-  if (minVisibleFraction <= 0) {
-    // Top of the disc, at (0, a), unless the Earth covers it.
-    if (Math.hypot(state.acrossDeg, a - state.upDeg) >= b) return a;
-    if (!(d > 0)) return null;
-    // The limbs cross on the line at distance m from the Sun's centre towards the Earth's, half a chord k either side.
-    const m = (d * d + a * a - b * b) / (2 * d);
-    const k = Math.sqrt(Math.max(0, a * a - m * m));
-    return (m * state.upDeg + k * Math.abs(state.acrossDeg)) / d;
-  }
+  const highest = uncoveredExtreme(a, b, state, 1);
+  if (minVisibleFraction <= 0 || highest === null) return highest;
   if (1 - state.coveredFraction < minVisibleFraction) return null;
-  return skylineForFraction(a, minVisibleFraction, state.acrossDeg, state.upDeg, b);
+  const lowest = uncoveredExtreme(a, b, state, -1);
+  if (lowest === null) return null;
+  return skylineForFraction(a, minVisibleFraction, state.acrossDeg, state.upDeg, b, lowest, highest);
 }
 
-/** Skyline level above the Sun's centre at which exactly `fraction` of the disc shows (b = 0: no Earth). */
-function skylineForFraction(a: number, fraction: number, across: number, up: number, b: number): number {
+/**
+ * The highest (side = 1) or lowest (side = -1) point of the solar disc that the
+ * Earth leaves uncovered, in degrees above the Sun's centre: the top or bottom
+ * of the disc when the Earth does not reach it, otherwise one of the two points
+ * where the limbs cross. Null when the discs are concentric and that point is
+ * covered, which means the whole disc is.
+ */
+function uncoveredExtreme(a: number, b: number, state: EclipseState, side: 1 | -1): number | null {
+  if (Math.hypot(state.acrossDeg, side * a - state.upDeg) >= b) return side * a;
+  const d = state.separationDeg;
+  if (!(d > 0)) return null;
+  // The limbs cross on the line at distance m from the Sun's centre towards the Earth's, half a chord k either side.
+  const m = (d * d + a * a - b * b) / (2 * d);
+  const k = Math.sqrt(Math.max(0, a * a - m * m));
+  return (m * state.upDeg + side * k * Math.abs(state.acrossDeg)) / d;
+}
+
+/**
+ * Skyline level above the Sun's centre at which exactly `fraction` of the disc
+ * shows (b = 0: no Earth), searched between a level at which at least that much
+ * shows and one at which less does.
+ */
+function skylineForFraction(a: number, fraction: number, across: number, up: number, b: number, lowest: number, highest: number): number {
   const visible = (h: number): number => (b > 0 ? visibleFractionUnchecked(0, a, h, across, up, b) : fractionAboveSkyline(0, a, h));
-  let lit = -a, dark = a;
+  let lit = lowest, dark = Math.max(lowest, highest);
   for (let i = 0; i < 60 && dark - lit > 1e-12 * a; i++) {
     const mid = (lit + dark) / 2;
     if (visible(mid) >= fraction) lit = mid; else dark = mid;

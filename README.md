@@ -121,7 +121,7 @@ The engine, module by module: [contract](docs/engine/contract.md),
 | Planning (operating window, landing calendar) against a minute-by-minute simulation | same answer in 700 random cases |
 | Whole-map sweep against an independent ray march over the same 480 m model, at places south of 84° S | same answer for 98.9 % (Sun) and 99.5 % (Earth) of 1,280 place-and-time pairs; above 99.3 % away from shadow edges |
 | The map during an eclipse against each place's own answer (its own sky, its skyline on the same 480 m model, the Earth's disc), 2,500 random cells while the Earth covers part of the Sun | same answer at 99.1 % ("any part of the Sun") and 99.0 % ("half the disc") of the cells; where the Earth alone hides the Sun, 393,300 comparisons without a difference |
-| Automated tests | 312 tests in 18 files, run with `npm test` (one compares the terrain tiles with the 116 MB NASA source file and is skipped when that file has not been downloaded) |
+| Automated tests | 317 tests in 19 files, run with `npm test` (one compares the terrain tiles with the 116 MB NASA source file and is skipped when that file has not been downloaded) |
 
 Reproduce: `npm test`, `python3 tools/horizons/fetch_fixtures.py`,
 `npx tsx tools/validation/illumination.ts`, `npx tsx tools/validation/tiles.ts`,

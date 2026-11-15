@@ -18,7 +18,9 @@
 //    instant, as seen from the pole. Measured over the eclipses of 2025-2030, it
 //    is within 0.08 degrees of the level a cell would compute from its own sky
 //    for 99 % of cells and instants (largest difference 0.21 degrees, in the
-//    minutes around a contact): finer than the sweep itself.
+//    minutes around a contact). It is one more approximation of the map; what it
+//    costs is measured by comparing the map with each cell's own answer
+//    (visibility.test.ts, docs/engine/eclipses.md).
 import {
   MOON_RADIUS_KM, directionFromPole, eclipseOverArea, eclipseState, hideEclipsedPlaces, raiseDirection, sampleFromVectors,
   skylineLimitInEclipse,

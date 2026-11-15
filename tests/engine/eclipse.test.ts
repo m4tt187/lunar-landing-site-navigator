@@ -433,6 +433,18 @@ describe('the highest skyline under which the Sun still counts as up during an e
     return { acrossDeg: across, upDeg: up, separationDeg: separation, earthDiscDeg: b, coveredFraction: sunFractionCoveredByEarth(separation, a, EARTH_R) };
   };
 
+  /** Lowest and highest points of the Sun's limb that the Earth does not cover, by sampling the limb (the extremes of the uncovered part are always on it). */
+  const uncoveredRange = (a: number, across: number, up: number, earthDisc: number): [number, number] => {
+    let lowest = Infinity, highest = -Infinity;
+    for (let i = 0; i < 20000; i++) {
+      const angle = (2 * Math.PI * i) / 20000;
+      const x = a * Math.cos(angle), y = a * Math.sin(angle);
+      if (Math.hypot(x - across, y - up) < earthDisc) continue;
+      lowest = Math.min(lowest, y); highest = Math.max(highest, y);
+    }
+    return [lowest, highest];
+  };
+
   it('is the top, the centre or the bottom of the disc while the Earth does not touch the Sun', () => {
     const away = stateAt(SUN_R, 1.4, 0.6);
     expect(away.coveredFraction).toBe(0);
@@ -480,6 +492,10 @@ describe('the highest skyline under which the Sun still counts as up during an e
           // A level at the very bottom of the disc means the uncovered part is exactly the required fraction or more.
           if (limit > -a + 1e-9) { worstFraction = Math.max(worstFraction, error); expect(error).toBeLessThan(2e-5); }
           else expect(uncovered).toBeGreaterThan(rule - 2e-5);
+          // Never below the lowest uncovered point of the disc (a lower skyline would uncover nothing more), nor above the highest.
+          const [lowest, highest] = uncoveredRange(a, across, up, b);
+          expect(limit).toBeGreaterThan(lowest - 2e-4);
+          expect(limit).toBeLessThan(highest + 2e-4);
         }
       });
     }
@@ -498,6 +514,35 @@ describe('the highest skyline under which the Sun still counts as up during an e
         if (limit !== null) expect(limit).toBeLessThanOrEqual(clear + 1e-9);
       }
     }
+  });
+
+  it('is the lowest uncovered point of the disc when the Earth leaves exactly the required fraction', () => {
+    // Found in the independent review: the Earth below the Sun, at the separation at which it covers exactly half of it.
+    // Every skyline below the points where the limbs cross leaves that same half showing, so the level is at those points,
+    // not at the bottom of the disc.
+    const a = 0.25, earthDisc = enlargedEarthRadiusDeg(1);
+    const separation = -eclipseMarginDeg(0, a, 1, 0.5);
+    const crossing = -(separation * separation + a * a - earthDisc * earthDisc) / (2 * separation);
+    expect(crossing).toBeCloseTo(-0.02082, 5);
+    for (const nudge of [0, -1e-15, 1e-15, -1e-12, 1e-12, 1e-9]) {
+      const d = separation * (1 + nudge);
+      const state: EclipseState = { acrossDeg: 0, upDeg: -d, separationDeg: d, earthDiscDeg: earthDisc, coveredFraction: sunFractionCoveredByEarth(d, a, 1) };
+      const remaining = 1 - state.coveredFraction;
+      expect(Math.abs(remaining - 0.5)).toBeLessThan(1e-8);
+      const limit = skylineLimitInEclipse(a, state, 0.5);
+      // Either the Earth alone is judged to hide too much, or the level is where the limbs cross: never lower.
+      if (limit === null) expect(remaining).toBeLessThan(0.5);
+      else {
+        expect(remaining).toBeGreaterThanOrEqual(0.5);
+        // The uncovered part ends in two thin horns, so a billionth more of it moves the level by a hundred-thousandth of a degree.
+        expect(Math.abs(limit - crossing)).toBeLessThan(5e-5);
+        expect(sunDiskFractionVisibleWithEarth(0, a, limit + 0.001, 0, -d, 1)).toBeLessThan(0.5);
+      }
+    }
+    // At the separation itself the Earth leaves exactly one half, and the level is where the limbs cross.
+    const exact: EclipseState = { acrossDeg: 0, upDeg: -separation, separationDeg: separation, earthDiscDeg: earthDisc, coveredFraction: sunFractionCoveredByEarth(separation, a, 1) };
+    expect(1 - exact.coveredFraction).toBe(0.5);
+    expect(Math.abs(skylineLimitInEclipse(a, exact, 0.5)! - crossing)).toBeLessThan(1e-9);
   });
 
   it('answers the case in which each obstruction alone leaves some Sun and the two together leave none', () => {
