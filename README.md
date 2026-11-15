@@ -195,7 +195,7 @@ The terrain assets shipped in `web/public/data/` are rebuilt from the NASA files
 | `tests/` | Automated tests, including the comparisons with NASA/JPL data |
 | `tools/` | Scripts that fetch the Horizons reference tables, build the terrain assets and tiles, run the validations, list eclipses, recommend a site and date, write the third-party notices |
 | `data/` | Site catalogue with sources, Horizons reference tables, NASA eclipse predictions, data provenance |
-| `docs/` | Methodology, references and attributions, AI usage log, one page per engine module, the text of the Space Apps project page |
+| `docs/` | Methodology, references and attributions, AI usage log, one page per engine module, the text of the Space Apps project page, the project demo (`docs/demo/`) |
 
 ## Use of AI tools
 
