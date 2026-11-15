@@ -137,6 +137,13 @@ fixed grid, kept between calls — and its ten-minute sampling.
 | `calendarOf(analysis, request)` | what every landing date of a search would give at the scenario's site, and the best landing of each stretch of power |
 | `findBest(app, request, options)` | the best site-and-date pairs among the catalogue sites with a real skyline; one site at a time, so that the page stays responsive; it reports its progress and can be abandoned |
 
+The "Best Site and Date" panel of the page (`web/src/finder.tsx`) calls `findBest`: it
+takes the mission length, the darkness the lander survives and whether the Earth must be
+in view at touchdown, uses the panel height of the selected scenario, searches a year from
+the first day of its landing month (shortened to stay within the dates the ephemeris
+covers), and shows the five best pairs, each of which can be set as a scenario or added to
+the comparison.
+
 Measured on the development machine: a year of hourly landing dates for the 25 sites takes
 0.8 to 1.0 s the first time and 0.6 s once the knots are computed; the calendar of one
 site for a year, 27 ms.

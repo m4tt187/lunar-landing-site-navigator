@@ -6,7 +6,7 @@ A web tool that puts the Sun and the Earth against the **real skyline** of the M
 south pole, and lets mission planners, educators and anyone curious compare landing
 sites and dates side by side in seconds.
 
-**▶ Live application: https://m4tt187.github.io/lunar-landing-site-navigator/** · [Demo, seven slides](https://m4tt187.github.io/lunar-landing-site-navigator/demo.pdf)
+**▶ Live application: https://m4tt187.github.io/lunar-landing-site-navigator/** · [Demo, eight slides](https://m4tt187.github.io/lunar-landing-site-navigator/demo.pdf)
 
 Built by team **Eallweald, Inc.** for the
 [2026 NASA Space Apps Challenge](https://www.spaceappschallenge.org/2026/), challenge
@@ -48,7 +48,8 @@ This tool draws that picture for any site and any date, instantly, in a browser.
   where the Sun and the Earth are in view *at this moment* — with shadows that move as
   time plays — and the share of the chosen mission with sunlight, with the Earth in
   view, and with both. It then names the best place for power and link within 5 km of
-  the selected site.
+  the selected site. The map can be zoomed and dragged; around the computed area it shows
+  NASA's terrain out to 76° S, so that the pole is seen in its setting.
 - **A calendar that answers "when?".** For every possible landing day of the coming year:
   how long sunlight, the Earth link, or both would last unbroken after touchdown, for
   every scenario, with the best landing days marked.
@@ -63,14 +64,15 @@ This tool draws that picture for any site and any date, instantly, in a browser.
 - **Rules you can change.** What counts as "Sun up" (any part of the disc, half, or all
   of it) and as "Earth in view" (its centre on the skyline, or 2° or 5° above it, since
   links that graze the terrain fade).
-- **Ready-made comparisons** for a first look, and a **link** that reproduces any
-  comparison exactly.
-- **A recommendation, not only a comparison.** The engine can search every site with a
-  real skyline and every landing date of a year for the mission you describe — so many
-  days of operations, a lander that survives so many hours of darkness — and rank the
-  site-and-date pairs: power for the whole mission first, then the most contact with the
-  Earth. Today from the command line (`npx tsx tools/planning/recommend.ts`, see
-  [docs/engine/planning.md](docs/engine/planning.md)).
+- **A recommendation, not only a comparison.** Describe the mission — so many days of
+  operations, a lander that survives so many hours of darkness, the Earth in view at
+  touchdown or not — and the application searches every site with a real skyline and
+  every landing hour of a year, and ranks the site-and-date pairs: power for the whole
+  mission first, then the most contact with the Earth. One click puts an answer into the
+  comparison. The same search runs from the command line
+  (`npx tsx tools/planning/recommend.ts`, see [docs/engine/planning.md](docs/engine/planning.md)).
+- **Ready-made comparisons** for a first look, a **link** that reproduces any comparison
+  exactly, and a light and a dark theme.
 
 Plain-language sentences accompany the numbers, so the same screen serves a planner who
 wants degrees and hours and a student who wants to know why the pole is hard.

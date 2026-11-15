@@ -23,7 +23,8 @@ the Sun and the Earth against the real skyline of each site, computed from NASA'
 elevation model, and compares up to four sites and landing dates side by side: sunlight,
 longest night, windows of contact with the Earth, longest link gap, eclipses included. A
 live map shows where sunlight and the Earth are in view at any moment; a calendar shows
-what every landing day of the coming year would give.
+what every landing day of the coming year would give; and for a mission described in a
+few words it ranks the best sites and landing dates.
 
 It runs entirely in the browser, on public NASA data, and its results are checked against
 NASA's own: JPL Horizons, the LOLA illumination maps, NASA's eclipse predictions and real
@@ -35,7 +36,7 @@ Try it: https://m4tt187.github.io/lunar-landing-site-navigator/
 
 https://m4tt187.github.io/lunar-landing-site-navigator/demo.pdf
 
-Seven slides. The source is `docs/demo/deck.html`; the images are screenshots of the
+Eight slides. The source is `docs/demo/deck.html`; the images are screenshots of the
 application.
 
 ## Link to Final Project
@@ -58,10 +59,16 @@ https://github.com/m4tt187/lunar-landing-site-navigator
 - **A map that answers "where?".** For everything south of 80° S: where the Sun and the
   Earth are in view at this moment, with shadows that move as time plays, and the share
   of the mission with sunlight, with the Earth in view, and with both. It names the best
-  place for power and link within 5 km of the selected site.
+  place for power and link within 5 km of the selected site, and can be zoomed and
+  dragged.
 - **A calendar that answers "when?".** For every landing day of the coming year: how long
   sunlight, the Earth link, or both would last unbroken after touchdown, with the best
   landing days marked.
+- **A recommendation that answers "which?".** Describe the mission (so many days of
+  operations, a lander that survives so many hours of darkness, the Earth in view at
+  touchdown or not) and get the best sites and landing dates of a year, ranked by power
+  for the whole mission first and by contact with the Earth second. One click puts an
+  answer into the comparison.
 - **Sites to start from.** Apollo and robotic landing sites with cited coordinates, named
   south-pole features, the eight best-lit points of NASA's long-term illumination map, or
   any point typed or clicked on the map.
@@ -69,8 +76,8 @@ https://github.com/m4tt187/lunar-landing-site-navigator
   counted as lost, in the numbers and on the map.
 - **Rules you can change.** What counts as "Sun up" (any part of the disc, half, or all of
   it) and as "Earth in view" (its centre on the skyline, or 2° or 5° above it).
-- **Ready-made comparisons** for a first look, and a **link** that reproduces any
-  comparison exactly.
+- **Ready-made comparisons** for a first look, a **link** that reproduces any
+  comparison exactly, and a light and a dark theme.
 
 Plain-language sentences accompany the numbers, so the same screen serves a planner who
 wants degrees and hours and a student who wants to know why the pole is hard.
@@ -126,12 +133,8 @@ flight product.
 ### What we hope to achieve
 
 A tool that a planner opens in a browser before the detailed analysis begins, and that a
-teacher can project in a classroom. The next step is already computed by the engine and
-available from the command line: a recommendation, not only a comparison — describe the
-mission (so many days of operations, a lander that survives so many hours of darkness)
-and get the best sites and landing dates of a year, ranked by power for the whole mission
-first and by contact with the Earth second. After that: the north pole, and energy and
-radio-link budgets on top of the geometry.
+teacher can project in a classroom. Next: the north pole, and energy and radio-link
+budgets on top of the geometry.
 
 ### Tools and languages
 
@@ -204,8 +207,8 @@ No Space Agency Partner data is used.
 
 Software, all open source: Astronomy Engine 2.1.19 by Don Cross (MIT), Preact and
 @preact/signals (MIT), Vite (MIT), Vitest (MIT), tsx (MIT), TypeScript (Apache-2.0),
-Node.js and its type definitions (MIT), Python 3 for one script. The demo is set in the
-Inter typeface (SIL Open Font License 1.1). For checks of the built
+Node.js and its type definitions (MIT), Python 3 for one script. The application and the
+demo are set in the Inter typeface (SIL Open Font License 1.1). For checks of the built
 application: Playwright (Apache-2.0) driving a headless browser. For reading NASA's
 eclipse figures: Poppler (pdftoppm).
 
