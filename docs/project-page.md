@@ -14,21 +14,20 @@ Lunar Landing Site Navigator
 
 At the Moon's south pole the Sun and the Earth never climb more than a few degrees above
 the horizon, so a single ridge decides whether a lander has power and a radio link.
-Choosing a landing site there means asking the same question again and again, for
-different places and dates: if we land here, on this day, will we have power, and can we
-talk to Earth?
+Choosing a landing site means asking the same question again and again, for different
+places and dates: if we land here, on this day, will we have power, and can we talk to
+Earth?
 
 Lunar Landing Site Navigator is a web application that answers it in seconds. It places
 the Sun and the Earth against the real skyline of each site, computed from NASA's LOLA
-elevation model, and compares up to four sites and landing dates side by side: the share
-of the mission in sunlight, the longest night, the windows of direct contact with the
-Earth and the longest gap in the link, eclipses included. A map computed live shows where
-sunlight and the Earth are in view at any moment, and a calendar shows what every landing
-day of the coming year would give.
+elevation model, and compares up to four sites and landing dates side by side: sunlight,
+longest night, windows of contact with the Earth, longest link gap, eclipses included. A
+live map shows where sunlight and the Earth are in view at any moment; a calendar shows
+what every landing day of the coming year would give.
 
-It runs entirely in the browser, on public NASA data, for mission planners, educators and
-anyone curious. Its results are checked against NASA's own: JPL Horizons, the LOLA
-illumination maps, NASA's eclipse predictions and two real landings.
+It runs entirely in the browser, on public NASA data, and its results are checked against
+NASA's own: JPL Horizons, the LOLA illumination maps, NASA's eclipse predictions and real
+landings.
 
 Try it: https://m4tt187.github.io/lunar-landing-site-navigator/
 
@@ -143,7 +142,12 @@ Open source under the Apache License 2.0.
 
 ## Use of Super Intelligence (SI)
 
-Yes. Two AI tools were used throughout: Anthropic Claude (Claude Code) and OpenAI Codex.
+On the form this field is a list of options. Selected: Research or Information
+Gathering; Data Analysis and Interpretation; Coding, Debugging, or Troubleshooting;
+Writing, Editing, or Translation; Visual Design or Image Creation; Presentation, Video,
+or Audio. The statement below is the one made in the repository.
+
+Two AI tools were used throughout: Anthropic Claude (Claude Code) and OpenAI Codex.
 
 How they were used. The idea is the team's: one screen, readable at a glance, on which
 landing sites and dates are compared side by side and the answer — power or not, contact
