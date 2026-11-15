@@ -1,13 +1,14 @@
 // SPDX-License-Identifier: Apache-2.0
 // AI-assisted: written with Anthropic Claude under the direction of the team.
 import { effect, signal } from '@preact/signals';
+import type { ComponentChildren } from 'preact';
 import { useEffect, useRef } from 'preact/hooks';
 import { dataUrl } from '../data';
 import type { AppData, TerrainMeta } from '../data';
 import { fmtLatLon, pct } from '../format';
 import { analyses, moveSelectedTo, selectedAnalysis, selectedIndex, thresholds } from '../session';
 import {
-  DURATIONS, HOUR, MAP_LAYERS, SCENARIO_COLORS, cursorH, data, durationDays, mapLayer, playing, selectedId, updateScenario,
+  DURATIONS, HOUR, MAP_LAYERS, SCENARIO_COLORS, cursorH, data, durationDays, mapLayer, playing, scenarios, selectedId, updateScenario,
 } from '../state';
 import type { MapLayer } from '../state';
 import { mapError, mapGrid, missionResult, nowResult, requestMission, requestNow, startMapEngine } from './engine';
@@ -246,6 +247,90 @@ function CustomCoordinates() {
   );
 }
 
+/** Zoom and pan of the map: scale `k`, and the offset of the drawing as fractions of the frame. */
+const MAX_ZOOM = 6;
+const view = signal({ k: 1, x: 0, y: 0 });
+/** True while (and just after) the map is dragged, so that the drag is not taken for a click. */
+let dragged = false;
+
+function clampView(k: number, x: number, y: number): { k: number; x: number; y: number } {
+  const kk = Math.min(MAX_ZOOM, Math.max(1, k));
+  return { k: kk, x: Math.min(0, Math.max(1 - kk, x)), y: Math.min(0, Math.max(1 - kk, y)) };
+}
+/** Zoom by `factor` keeping the point at (fx, fy) of the frame where it is. */
+function zoomAt(fx: number, fy: number, factor: number): void {
+  const { k, x, y } = view.value;
+  const next = Math.min(MAX_ZOOM, Math.max(1, k * factor));
+  view.value = clampView(next, fx - ((fx - x) / k) * next, fy - ((fy - y) / k) * next);
+}
+
+/** The visible frame of the map: wheel to zoom, drag to move. */
+function MapFrame({ aspect, children }: { aspect: number; children: ComponentChildren }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const wheel = (event: WheelEvent): void => {
+      event.preventDefault();
+      const box = el.getBoundingClientRect();
+      zoomAt((event.clientX - box.left) / box.width, (event.clientY - box.top) / box.height, Math.exp(-event.deltaY * 0.0018));
+    };
+    el.addEventListener('wheel', wheel, { passive: false });
+    return () => el.removeEventListener('wheel', wheel);
+  }, []);
+  const down = (event: PointerEvent): void => {
+    if (event.button !== 0 || view.value.k === 1) return;
+    const el = ref.current!, box = el.getBoundingClientRect(), start = { cx: event.clientX, cy: event.clientY, ...view.value };
+    let moved = false;
+    const move = (e: PointerEvent): void => {
+      const dx = e.clientX - start.cx, dy = e.clientY - start.cy;
+      if (!moved && Math.hypot(dx, dy) < 4) return;
+      moved = true; dragged = true; el.classList.add('dragging');
+      view.value = clampView(start.k, start.x + dx / box.width, start.y + dy / box.height);
+    };
+    const up = (): void => {
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', up);
+      el.classList.remove('dragging');
+      // The click that ends a drag arrives right after this: let it pass first.
+      setTimeout(() => { dragged = false; }, 0);
+    };
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', up);
+  };
+  return <div ref={ref} class={`map ${view.value.k > 1 ? 'zoomed' : ''}`} style={{ aspectRatio: String(aspect) }} onPointerDown={down}>{children}</div>;
+}
+
+/** The scenarios at a glance, next to the map: click one to select it. */
+function ScenarioList() {
+  const list = analyses.value;
+  return (
+    <div class="scenario-list">
+      <span class="field-label">Scenarios</span>
+      <ul>
+        {scenariosOf(list).map(({ a, i, id }) => (
+          <li class={id === selectedId.value ? 'selected' : ''}>
+            <button type="button" onClick={() => { selectedId.value = id; }}>
+              <span class="badge small" style={{ background: SCENARIO_COLORS[i] }}>{i + 1}</span>
+              <span class="name">{a?.name ?? '…'}</span>
+              {a ? (
+                <span class="figures">
+                  <span class="sun" title="Sunlight">{pct(a.summary.sunlitFraction)}</span>
+                  <span class="earth" title="Earth in View">{pct(a.summary.earthVisibleFraction)}</span>
+                  <span class="both" title="Power + Link Together">{pct(a.summary.bothFraction)}</span>
+                </span>
+              ) : null}
+            </button>
+          </li>
+        ))}
+      </ul>
+      <div class="figures-key"><span class="sun">Sunlight</span><span class="earth">Earth</span><span class="both">Both</span></div>
+    </div>
+  );
+}
+const scenariosOf = (list: typeof analyses.value) =>
+  scenarios.value.map((s, i) => ({ a: list[i] ?? null, i, id: s.id }));
+
 export function MapPanel({ app }: { app: AppData }) {
   const meta = app.terrain, layer = mapLayer.value, grid = mapGrid.value;
   const index = selectedIndex.value;
@@ -254,12 +339,17 @@ export function MapPanel({ app }: { app: AppData }) {
   const result = layer === 'now' ? nowResult.value : missionResult.value;
   const at = hover.value;
   const aspect = aspectOf(meta), left = -500 * (aspect - 1), right = 1000 - left;
+  const { k, x: tx, y: ty } = view.value;
   // Pointer position as a fraction of the central square (0..1 from its left and top edges).
+  // The box is that of the zoomed drawing, so the answer holds at any zoom.
   const fraction = (event: MouseEvent): { x: number; y: number } => {
     const box = (event.currentTarget as SVGSVGElement).getBoundingClientRect();
     return { x: ((event.clientX - box.left) / box.width - 0.5) * aspect + 0.5, y: (event.clientY - box.top) / box.height };
   };
   const ring = (lat: number): number => project(meta, lat, 90).x * 1000 - 500;
+  // Symbols and labels keep their size on screen while the terrain is enlarged.
+  const at1 = (px: number, py: number, children: ComponentChildren) =>
+    <g transform={`translate(${px} ${py}) scale(${1 / k})`}>{children}</g>;
   return (
     <section class="panel map-panel">
       <header class="panel-head">
@@ -267,19 +357,29 @@ export function MapPanel({ app }: { app: AppData }) {
           <h2>South Pole Map</h2>
           <p class="sub">Everything south of 80° S, computed live in your browser from NASA LOLA terrain</p>
         </div>
-        <div class="segmented layers" role="group" aria-label="Map layer">
-          {MAP_LAYERS.filter((l) => !l.id.startsWith('nasa') || meta.layers).map((l) => (
-            <button type="button" aria-pressed={layer === l.id} title={l.title} onClick={() => { mapLayer.value = l.id; }}>{l.label}</button>
-          ))}
+        <div class="map-tools">
+          <div class="segmented layers" role="group" aria-label="Map layer">
+            {MAP_LAYERS.filter((l) => !l.id.startsWith('nasa') || meta.layers).map((l) => (
+              <button type="button" aria-pressed={layer === l.id} title={l.title} onClick={() => { mapLayer.value = l.id; }}>{l.label}</button>
+            ))}
+          </div>
+          <div class="segmented zoom" role="group" aria-label="Zoom">
+            <button type="button" aria-label="Zoom Out" title="Zoom Out" disabled={k <= 1} onClick={() => zoomAt(0.5, 0.5, 1 / 1.6)}>−</button>
+            <span class="zoom-level">{Math.round(k * 100)}%</span>
+            <button type="button" aria-label="Zoom In" title="Zoom In" disabled={k >= MAX_ZOOM} onClick={() => zoomAt(0.5, 0.5, 1.6)}>+</button>
+            <button type="button" title="Show the Whole Map" disabled={k === 1} onClick={() => { view.value = { k: 1, x: 0, y: 0 }; }}>Fit</button>
+          </div>
         </div>
       </header>
       <div class="map-body">
-      <div class="map" style={{ aspectRatio: String(aspect) }}>
+      <MapFrame aspect={aspect}>
+        <div class="map-stage" style={{ transform: `translate(${tx * 100}%, ${ty * 100}%) scale(${k})` }}>
         <img src={dataUrl(meta.map.file)} alt="Shaded relief of the lunar south pole computed from NASA LOLA elevation data" draggable={false} />
         {nasa ? <img class="layer" src={dataUrl(nasa.file)} alt="" draggable={false} style={overlayBox(meta, nasa.halfWidthM)} /> : null}
         {grid && isComputed(layer) ? <LayerCanvas grid={grid} layer={layer} result={result} meta={meta} /> : null}
         <svg viewBox={`${left} 0 ${right - left} 1000`}
           onClick={(event) => {
+            if (dragged) return;
             const f = fraction(event), p = unproject(meta, f.x, f.y);
             if (p.latDeg <= meta.map.minLatDeg) moveSelectedTo(p.latDeg, p.lonDeg);
           }}
@@ -291,23 +391,25 @@ export function MapPanel({ app }: { app: AppData }) {
           })}
           {[-88, -86, -84, -82, -78, -76].map((lat) => <circle cx="500" cy="500" r={ring(lat)} class="graticule" />)}
           <circle cx="500" cy="500" r={ring(meta.map.minLatDeg)} class="graticule edge" />
-          {[-88, -86, -84, -82].map((lat) => <text x="503" y={project(meta, lat, 0).y * 1000 - 3} class="map-label faint">{-lat}°S</text>)}
-          {[-80, -78, -76].map((lat) => <text x={500 + ring(lat) + 4} y="490" class="map-label faint">{-lat}°S</text>)}
-          <text x="500" y="24" class="map-label" text-anchor="middle">0° — Towards Earth</text>
-          <text x={right - 12} y="530" class="map-label" text-anchor="end">90° E</text>
-          <text x={left + 12} y="530" class="map-label">90° W</text>
-          <text x="500" y="986" class="map-label" text-anchor="middle">180° — Far Side</text>
+          {[-88, -86, -84, -82].map((lat) => at1(503, project(meta, lat, 0).y * 1000 - 3, <text class="map-label faint">{-lat}°S</text>))}
+          {[-80, -78, -76].map((lat) => at1(500 + ring(lat) + 4, 490, <text class="map-label faint">{-lat}°S</text>))}
+          {at1(500, 24, <text class="map-label" text-anchor="middle">0° — Towards Earth</text>)}
+          {at1(right - 12, 530, <text class="map-label" text-anchor="end">90° E</text>)}
+          {at1(left + 12, 530, <text class="map-label">90° W</text>)}
+          {at1(500, 986, <text class="map-label" text-anchor="middle">180° — Far Side</text>)}
           {app.sites.filter((s) => s.latDeg <= meta.map.minLatDeg).map((s) => {
             const p = project(meta, s.latDeg, s.lonDeg);
             const label = s.group === 'sunlit' ? s.name.split(' (')[0]!.replace('Sunlit Peak ', '') : s.name.replace(' Crater (Centre)', '');
             return (
-              <g class="site-dot" onClick={(event) => { event.stopPropagation(); updateScenario(selectedId.value, { siteId: s.id, custom: null }); }}>
+              <g class="site-dot" onClick={(event) => { event.stopPropagation(); if (!dragged) updateScenario(selectedId.value, { siteId: s.id, custom: null }); }}>
                 <title>{`${s.name} — ${fmtLatLon(s.latDeg, s.lonDeg)}${s.note ? ` — ${s.note}` : ''}`}</title>
-                <circle cx={p.x * 1000} cy={p.y * 1000} r="11" fill="transparent" />
-                {s.group === 'sunlit'
-                  ? <path d={`M${p.x * 1000},${p.y * 1000 - 8}l7,8l-7,8l-7,-8z`} class="sunlit" />
-                  : <circle cx={p.x * 1000} cy={p.y * 1000} r={s.group === 'feature' ? 3.5 : 5} class={s.group} />}
-                <text x={p.x * 1000 + 9} y={p.y * 1000 + 5} class={`map-label ${s.group === 'feature' ? 'faint' : ''}`}>{label}</text>
+                {at1(p.x * 1000, p.y * 1000, <>
+                  <circle r="11" fill="transparent" />
+                  {s.group === 'sunlit'
+                    ? <path d="M0,-8l7,8l-7,8l-7,-8z" class="sunlit" />
+                    : <circle r={s.group === 'feature' ? 3.5 : 5} class={s.group} />}
+                  <text x="10" y="6" class={`map-label ${s.group === 'feature' ? 'faint' : ''}`}>{label}</text>
+                </>)}
               </g>
             );
           })}
@@ -316,15 +418,18 @@ export function MapPanel({ app }: { app: AppData }) {
             const p = project(meta, a.site.latDeg, a.site.lonDeg);
             return (
               <g class="scenario-pin">
-                <circle cx={p.x * 1000} cy={p.y * 1000} r="14" fill="none" stroke="#fff" stroke-width="8" stroke-opacity="0.9" />
-                <circle cx={p.x * 1000} cy={p.y * 1000} r="14" fill="none" stroke={SCENARIO_COLORS[i]} stroke-width="4" />
-                <text x={p.x * 1000} y={p.y * 1000 - 20} text-anchor="middle" fill={SCENARIO_COLORS[i]} class="pin-label">{i + 1}</text>
+                {at1(p.x * 1000, p.y * 1000, <>
+                  <path d="M0,0c-3-6-13-11-13-21a13,13 0 0 1 26,0c0,10-10,15-13,21z" fill={SCENARIO_COLORS[i]} stroke="#fff" stroke-width="2.5" class="pin-shape" />
+                  <text y="-15.5" text-anchor="middle" class="pin-label">{i + 1}</text>
+                </>)}
               </g>
             );
           })}
         </svg>
-      </div>
+        </div>
+      </MapFrame>
       <aside class="map-side">
+        <ScenarioList />
         <div class="readout" aria-live="off">
           <span class="field-label">Under the Pointer</span>
           <p>{at ? readout(app, layer, at.x, at.y) : <>Click the map to move <b style={{ color: SCENARIO_COLORS[index] }}>scenario {index + 1}</b> there, or pick a marked site. ◆ marks the best-lit points in NASA's map.</>}</p>
@@ -337,6 +442,18 @@ export function MapPanel({ app }: { app: AppData }) {
         <div>
           <span class="field-label">Go to Coordinates</span>
           <CustomCoordinates />
+        </div>
+        <div>
+          <span class="field-label">Symbols</span>
+          <ul class="symbols">
+            <li><svg viewBox="-12 -12 24 24" aria-hidden="true"><path d="M0,-8l7,8l-7,8l-7,-8z" fill="#ffbf47" stroke="#000" stroke-width="1.5" /></svg>Best-Lit Point in NASA's Map</li>
+            <li><svg viewBox="-12 -12 24 24" aria-hidden="true"><circle r="5" fill="#fff" stroke="#000" /></svg>Robotic Lander</li>
+            <li><svg viewBox="-12 -12 24 24" aria-hidden="true"><circle r="5" fill="#d9b3ff" stroke="#000" /></svg>Planned Target</li>
+            <li><svg viewBox="-12 -12 24 24" aria-hidden="true"><circle r="3.5" fill="#c9d3e3" stroke="#000" stroke-opacity="0.6" /></svg>Named Feature</li>
+            <li><svg viewBox="-14 -26 28 28" aria-hidden="true"><path d="M0,0c-3-6-13-11-13-21a13,13 0 0 1 26,0c0,10-10,15-13,21z" fill={SCENARIO_COLORS[0]} stroke="#fff" stroke-width="2" /></svg>Scenario Site</li>
+            <li><svg viewBox="-12 -12 24 24" aria-hidden="true"><circle r="10" fill="none" stroke="#6a6862" stroke-width="1.5" stroke-dasharray="3 2.5" /></svg>Edge of the Computed Area (80° S)</li>
+          </ul>
+          <p class="hint" style={{ margin: '6px 0 0' }}>Scroll or use + and − to zoom, drag to move.</p>
         </div>
       </aside>
       </div>

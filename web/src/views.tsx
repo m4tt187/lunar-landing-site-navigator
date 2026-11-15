@@ -77,21 +77,33 @@ export function SkyView({ a, instant }: { a: Analysis; instant: Instant }) {
     };
   }, [a]);
   const { frame } = stat;
-  const marker = (az: number, el: number, color: string, up: boolean, label: string) => (
-    <g>
-      <circle cx={frame.x(az)} cy={frame.y(el)} r="5" fill={color} fill-opacity={up ? 1 : 0.3} stroke={color} stroke-width="1.5" />
-      <circle cx={frame.x(az)} cy={frame.y(el)} r="11" fill="none" stroke={color} stroke-opacity="0.55" stroke-dasharray="2 3" />
-      <text x={Math.min(W - R - 26, Math.max(L + 2, frame.x(az) + 14))} y={Math.max(T + 10, frame.y(el) - 8)} class="marker-label" fill={color}>{label}</text>
-    </g>
-  );
-  const clip = `sky-${a.scenario.id}`;
+  const id = `sky-${a.scenario.id}`;
+  const marker = (az: number, el: number, body: 'sun' | 'earth', up: boolean, label: string) => {
+    const cx = frame.x(az), cy = frame.y(el), color = body === 'sun' ? SUN : EARTH;
+    return (
+      <g>
+        {up ? <circle cx={cx} cy={cy} r="11" fill={color} fill-opacity="0.12" stroke={color} stroke-opacity="0.45" /> : <circle cx={cx} cy={cy} r="11" fill="none" stroke={color} stroke-opacity="0.5" stroke-dasharray="2 3" />}
+        <circle cx={cx} cy={cy} r="6" fill={`url(#${id}-${body})`} fill-opacity={up ? 1 : 0.35} stroke="#fff" stroke-width="1.5" />
+        <text x={Math.min(W - R - 30, Math.max(L + 2, cx + 15))} y={Math.max(T + 11, cy - 9)} class="marker-label" fill={color}>{label}</text>
+      </g>
+    );
+  };
+  const clip = id;
   return (
     <svg class="sky" viewBox={`0 0 ${W} ${H}`} role="img"
       aria-label={`Skyline all around ${a.name}, with the paths of the Sun and the Earth`}>
       <defs>
-        <clipPath id={clip}><rect x={L} y={T} width={W - L - R} height={H - T - B} /></clipPath>
+        <clipPath id={clip}><rect x={L} y={T} width={W - L - R} height={H - T - B} rx="6" /></clipPath>
+        <linearGradient id={`${id}-air`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" style={{ stopColor: 'var(--sky-top)' }} /><stop offset="1" style={{ stopColor: 'var(--sky)' }} />
+        </linearGradient>
+        <radialGradient id={`${id}-sun`} cx="0.38" cy="0.35" r="0.75"><stop offset="0" stop-color="#ffe08a" /><stop offset="1" stop-color="#e08a0b" /></radialGradient>
+        <radialGradient id={`${id}-earth`} cx="0.38" cy="0.35" r="0.75"><stop offset="0" stop-color="#8ec5ff" /><stop offset="1" stop-color="#1d4ed8" /></radialGradient>
+        <linearGradient id={`${id}-ground`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" style={{ stopColor: 'var(--terrain-near)' }} /><stop offset="1" style={{ stopColor: 'var(--terrain-mid)' }} />
+        </linearGradient>
       </defs>
-      <rect x={L} y={T} width={W - L - R} height={H - T - B} class="sky-bg" />
+      <rect x={L} y={T} width={W - L - R} height={H - T - B} rx="6" fill={`url(#${id}-air)`} class="sky-frame" />
       {stat.ticks.map((v) => (
         <g>
           <line x1={L} x2={W - R} y1={frame.y(v)} y2={frame.y(v)} class={v === 0 ? 'grid zero' : 'grid'} />
@@ -104,16 +116,17 @@ export function SkyView({ a, instant }: { a: Analysis; instant: Instant }) {
         </text>
       ))}
       <g clip-path={`url(#${clip})`}>
-        <path d={stat.sunHidden} class="trace" stroke={SUN} stroke-opacity="0.25" />
-        <path d={stat.earthHidden} class="trace" stroke={EARTH} stroke-opacity="0.25" />
+        <path d={stat.sunHidden} class="trace hidden" stroke={SUN} />
+        <path d={stat.earthHidden} class="trace hidden" stroke={EARTH} />
         <path d={stat.far} class="terrain far" />
         {stat.mid ? <path d={stat.mid} class="terrain mid" /> : null}
-        {stat.near ? <path d={stat.near} class="terrain near" /> : null}
+        {stat.near ? <path d={stat.near} class="terrain near" style={{ fill: `url(#${id}-ground)` }} /> : null}
         <path d={stat.sunSeen} class="trace" stroke={SUN} />
         <path d={stat.earthSeen} class="trace" stroke={EARTH} />
-        {marker(instant.sample.earth.azDeg, instant.sample.earth.elDeg, EARTH, instant.earthUp, 'Earth')}
-        {marker(instant.sample.sun.azDeg, instant.sample.sun.elDeg, SUN, instant.sunUp, 'Sun')}
+        {marker(instant.sample.earth.azDeg, instant.sample.earth.elDeg, 'earth', instant.earthUp, 'Earth')}
+        {marker(instant.sample.sun.azDeg, instant.sample.sun.elDeg, 'sun', instant.sunUp, 'Sun')}
       </g>
+      <rect x={L} y={T} width={W - L - R} height={H - T - B} rx="6" class="sky-edge" />
     </svg>
   );
 }
@@ -150,10 +163,11 @@ export function CloseUp({ a, instant, body }: { a: Analysis; instant: Instant; b
   const fraction = instant.margins.sunDiskFraction;
   let caption: string;
   let disc;
+  const gid = `cu-${a.scenario.id}-${body}`;
   if (body === 'sun') {
     caption = fraction >= 0.995 ? 'Whole Disc in View' : fraction <= 0.005 ? 'Hidden by Terrain' : `${pct(fraction)} of the Disc in View`;
     disc = (
-      <circle cx={S / 2} cy={S / 2} r={r} fill="#f2b233" />
+      <circle cx={S / 2} cy={S / 2} r={r} fill={`url(#${gid}-disc)`} />
     );
   } else {
     const phase = earthPhase(instant);
@@ -161,8 +175,8 @@ export function CloseUp({ a, instant, body }: { a: Analysis; instant: Instant; b
     caption = `${up ? 'in View' : 'Hidden by Terrain'} · ${pct(phase.lit)} Lit`;
     disc = (
       <g transform={`rotate(${phase.angleDeg.toFixed(1)} ${S / 2} ${S / 2}) translate(${S / 2} ${S / 2})`}>
-        <circle r={r} fill="#c5cede" />
-        <path d={`M0,${-r}A${r},${r} 0 0 1 0,${r}A${rx.toFixed(2)},${r} 0 0 ${phase.lit > 0.5 ? 1 : 0} 0,${-r}Z`} fill="#3b82f6" />
+        <circle r={r} fill="#1e2a44" />
+        <path d={`M0,${-r}A${r},${r} 0 0 1 0,${r}A${rx.toFixed(2)},${r} 0 0 ${phase.lit > 0.5 ? 1 : 0} 0,${-r}Z`} fill={`url(#${gid}-disc)`} />
       </g>
     );
   }
@@ -170,7 +184,15 @@ export function CloseUp({ a, instant, body }: { a: Analysis; instant: Instant; b
   return (
     <figure class="closeup">
       <svg viewBox={`0 0 ${S} ${S}`} role="img" aria-label={`${body === 'sun' ? 'Sun' : 'Earth'} against the skyline: ${caption}`}>
-        <rect width={S} height={S} class="sky-bg" />
+        <defs>
+          <linearGradient id={`${gid}-air`} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" style={{ stopColor: 'var(--sky-top)' }} /><stop offset="1" style={{ stopColor: 'var(--sky)' }} />
+          </linearGradient>
+          {body === 'sun'
+            ? <radialGradient id={`${gid}-disc`} cx="0.4" cy="0.38" r="0.7"><stop offset="0" stop-color="#fff1b8" /><stop offset="0.55" stop-color="#ffc94a" /><stop offset="1" stop-color="#e88a0c" /></radialGradient>
+            : <radialGradient id={`${gid}-disc`} cx="0.4" cy="0.38" r="0.75"><stop offset="0" stop-color="#b9dcff" /><stop offset="0.6" stop-color="#4b8df0" /><stop offset="1" stop-color="#1d4ed8" /></radialGradient>}
+        </defs>
+        <rect width={S} height={S} fill={`url(#${gid}-air)`} />
         {disc}
         <path d={far} class="terrain far" />
         {mid ? <path d={outline(mid)} class="terrain mid" /> : null}
@@ -196,10 +218,11 @@ export function Timeline({ a, cursorH, onCursor }: { a: Analysis; cursorH: numbe
   const row = (windows: Interval[], index: number, color: string, label: string) => (
     <g>
       <text x={L - 6} y={top + index * (rowH + 4) + rowH - 4} class="axis" text-anchor="end">{label}</text>
-      <rect x={L} y={top + index * (rowH + 4)} width={W - L - R} height={rowH} class="bar-bg" />
-      {windows.map((w) => (
-        <rect x={x(w.startMs)} y={top + index * (rowH + 4)} width={Math.max(0.6, x(w.endMs) - x(w.startMs))} height={rowH} fill={color} />
-      ))}
+      <rect x={L} y={top + index * (rowH + 4)} width={W - L - R} height={rowH} rx="4" class="bar-bg" />
+      {windows.map((w) => {
+        const width = Math.max(0.6, x(w.endMs) - x(w.startMs));
+        return <rect x={x(w.startMs)} y={top + index * (rowH + 4)} width={width} height={rowH} rx={Math.min(4, width / 2)} fill={color} />;
+      })}
     </g>
   );
   const pick = (event: PointerEvent): void => {
@@ -223,7 +246,8 @@ export function Timeline({ a, cursorH, onCursor }: { a: Analysis; cursorH: numbe
           <text x={x(startMs + d * DAY)} y={H - 4} class="axis" text-anchor={d === 0 ? 'start' : 'middle'}>{d === 0 ? 'Landing' : `+${d} d`}</text>
         </g>
       ))}
-      <line x1={cx} x2={cx} y1={0} y2={top + 3 * (rowH + 4)} class="cursor" />
+      <line x1={cx} x2={cx} y1={top} y2={top + 3 * (rowH + 4) - 4} class="cursor" />
+      <circle cx={cx} cy={top + 3 * (rowH + 4) - 4} r="4" class="cursor-knob" />
     </svg>
   );
 }
@@ -256,7 +280,7 @@ export function LandingCalendar({ calendar, rows, currentMs, best, onPick }: {
         if (day >= 0 && day < daysTotal) onPick(calendar.startMs + day * DAY);
       }}>
       {best.map((w) => (
-        <text x={xOf(w.startMs)} y={top - 5} class="axis best" text-anchor="middle"><title>{`Best landing: ${fmtDate(w.startMs)}`}</title>▼</text>
+        <path d={`M${xOf(w.startMs) - 5},${top - 10}h10l-5,7z`} class="best-mark"><title>{`Best landing: ${fmtDate(w.startMs)}`}</title></path>
       ))}
       {rows.map((row, r) => {
         let max = 24;
@@ -265,7 +289,7 @@ export function LandingCalendar({ calendar, rows, currentMs, best, onPick }: {
         return (
           <g>
             <text x={L - 6} y={y0 + rowH - 5} class="axis" text-anchor="end"><title>{row.title}</title>{row.label}</text>
-            <rect x={L} y={y0} width={W - L - R} height={rowH} class="bar-bg" />
+            <rect x={L} y={y0} width={W - L - R} height={rowH} rx="4" class="bar-bg" />
             {Array.from({ length: daysTotal }, (_, d) => {
               const v = row.values[Math.round(d * perDay)]!;
               return v > 0 ? (
@@ -286,6 +310,7 @@ export function LandingCalendar({ calendar, rows, currentMs, best, onPick }: {
       {currentX >= L && currentX <= W - R ? (
         <g>
           <line x1={currentX} x2={currentX} y1={top - 2} y2={bottom} class="cursor" />
+          <circle cx={currentX} cy={bottom} r="4" class="cursor-knob" />
           <text x={Math.min(W - 50, Math.max(L + 40, currentX))} y={H - 4} class="axis strong" text-anchor="middle">Selected Landing</text>
         </g>
       ) : null}

@@ -199,6 +199,13 @@ function explain(a: Analysis): string {
   return `${sun}, and ${earth}.${low}`;
 }
 
+/** Small line icons for sunlight, the Earth link, and both together. */
+const ICONS = {
+  sun: <svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="3" /><path d="M8 1.5v1.8M8 12.7v1.8M1.5 8h1.8M12.7 8h1.8M3.4 3.4l1.3 1.3M11.3 11.3l1.3 1.3M3.4 12.6l1.3-1.3M11.3 4.7l1.3-1.3" /></svg>,
+  earth: <svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6" /><path d="M2.5 6.5c2 .4 3.2-.6 4.3.3s.4 2.3 1.8 2.6 2.4-.8 4.9-.2M6 13.6c.4-1.6 1.6-2 1.4-3.2" /></svg>,
+  both: <svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 12.5h12M4.5 12.5V7.8h3v4.7M6 7.8V5.2M6 5.2l4.5-2.6M6 5.2l3 3.4" /><circle cx="11.5" cy="4.5" r="1.4" /></svg>,
+};
+
 const EVENT_VERB: Record<EventKind, string> = { sunset: 'set', sunrise: 'rise', earthset: 'set', earthrise: 'rise' };
 
 function Card({ scenario, index, app }: { scenario: Scenario; index: number; app: AppData }) {
@@ -263,9 +270,9 @@ function Card({ scenario, index, app }: { scenario: Scenario; index: number; app
     <article class={`card ${selected ? 'selected' : ''}`} style={{ '--accent': color }}>
       {header}{controls}
       <div class="verdict">
-        <div class="metric sun"><span>Sunlight</span><b>{pct(s.sunlitFraction)}</b><small>Longest Night {fmtSpan(s.longestDarkH)}</small></div>
-        <div class="metric earth"><span>Earth in View</span><b>{pct(s.earthVisibleFraction)}</b><small>Longest Gap {fmtSpan(s.longestCommGapH)}</small></div>
-        <div class="metric both"><span>Power + Link Together</span><b>{pct(s.bothFraction)}</b><small>Highest Sun {deg(s.maxSunElDeg)}</small></div>
+        <div class="metric sun"><span>{ICONS.sun}Sunlight</span><b>{pct(s.sunlitFraction)}</b><small>Longest Night {fmtSpan(s.longestDarkH)}</small></div>
+        <div class="metric earth"><span>{ICONS.earth}Earth in View</span><b>{pct(s.earthVisibleFraction)}</b><small>Longest Gap {fmtSpan(s.longestCommGapH)}</small></div>
+        <div class="metric both"><span>{ICONS.both}Power + Link Together</span><b>{pct(s.bothFraction)}</b><small>Highest Sun {deg(s.maxSunElDeg)}</small></div>
       </div>
       <p class="explain">{explain(a)}</p>
       <SkyView a={a} instant={instant} />
@@ -344,11 +351,26 @@ export function App() {
       <header class="appbar">
         <div class="appbar-inner">
           <div class="brand">
-            <svg class="mark" viewBox="0 0 32 32" aria-hidden="true">
-              <rect x="1" y="1" width="30" height="30" rx="8" class="mark-bg" />
-              <path d="M10 21.5a6 6 0 0 1 12 0z" class="mark-sun" />
-              <path d="M5.5 21.5h21" class="mark-ridge" />
-              <circle cx="23" cy="9.5" r="2.4" class="mark-earth" />
+            <svg class="mark" viewBox="0 0 40 40" aria-hidden="true">
+              <defs>
+                <linearGradient id="mark-space" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#07152f" /><stop offset="1" stop-color="#0b3d91" /></linearGradient>
+                <linearGradient id="mark-ground" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e9ecf2" /><stop offset="1" stop-color="#a9b1c0" /></linearGradient>
+                <clipPath id="mark-clip"><rect width="40" height="40" rx="10" /></clipPath>
+              </defs>
+              <g clip-path="url(#mark-clip)">
+                <rect width="40" height="40" fill="url(#mark-space)" />
+                <circle cx="8" cy="9" r="0.8" fill="#fff" opacity="0.8" />
+                <circle cx="15" cy="5.5" r="0.6" fill="#fff" opacity="0.6" />
+                <circle cx="33" cy="17" r="0.6" fill="#fff" opacity="0.6" />
+                <circle cx="26.5" cy="11.5" r="5" fill="#3b82f6" />
+                <path d="M26.5 6.5a5 5 0 0 1 0 10a7 7 0 0 0 0-10z" fill="#0b2a63" opacity="0.55" />
+                <path d="M23.2 9.6c1.4-.6 2.6.2 3.4 1.2.5.7 1.6.6 2.2 1.4" fill="none" stroke="#7ee0a1" stroke-width="1.1" stroke-linecap="round" />
+                <circle cx="20" cy="66" r="42" fill="url(#mark-ground)" />
+                <ellipse cx="27" cy="31.5" rx="3.2" ry="1" fill="#8e97a8" opacity="0.7" />
+                <ellipse cx="9.5" cy="33.5" rx="2.2" ry="0.8" fill="#8e97a8" opacity="0.6" />
+                <path d="M14 25.6c0-2.6 2-4.6 4.4-4.6s4.4 2 4.4 4.6c0 3-4.4 6.6-4.4 6.6s-4.4-3.6-4.4-6.6z" fill="#f59e0b" stroke="#07152f" stroke-width="0.8" />
+                <circle cx="18.4" cy="25.6" r="1.6" fill="#07152f" />
+              </g>
             </svg>
             <div>
               <h1>Lunar Landing Site Navigator</h1>
