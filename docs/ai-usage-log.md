@@ -83,4 +83,4 @@ official rules, guides and challenge page were re-read.
 | 15 Nov 08:50 | Claude | Checked the repository against the official rules: third-party notices kept in the published application, quotations and references, the `aiAssisted` field of the two data files compiled with AI assistance |
 | 15 Nov 14:10 | Claude | Wrote the project demo (`docs/demo/deck.html`, published as `demo.pdf`) from screenshots of the application, and the text of the Space Apps project page (`docs/project-page.md`) |
 | 15 Nov 16:40 | Claude | Rebuilt the interface to the team's brief (clean, compact, an everyday working tool): the "Best Site and Date" panel on the page, a wide map that can be zoomed and dragged with NASA terrain out to 76° S around the computed area, Title Case labels, a light and a dark theme; rendered the wider relief map from the LOLA model |
-| 15 Nov 19:30 | Claude | Took new screenshots, rebuilt the demo (eight slides) and brought README, methodology pages and project page in line with the interface |
+| 15 Nov 19:30 | Claude | Took new screenshots, rebuilt the demo (seven slides) and brought README, methodology pages and project page in line with the interface |

@@ -1,7 +1,7 @@
 <!doctype html>
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 <!-- AI-assisted: written with Anthropic Claude under the direction of the team. -->
-<!-- The project demo: eight slides. The images are screenshots of the application. Rendered to demo.pdf. -->
+<!-- The project demo: seven slides, the most the Project Submission Guide allows. The images are screenshots of the application. Rendered to demo.pdf. -->
 <html lang="en">
 <head>
 <meta charset="utf-8" />
@@ -34,6 +34,8 @@
   li { font-size: 30px; line-height: 1.36; color: var(--fg-2); padding-left: 34px; position: relative; margin-bottom: 14px; }
   li::before { content: ''; position: absolute; left: 0; top: 14px; width: 14px; height: 14px; border-radius: 4px; background: var(--accent); }
   li b { color: var(--fg); font-weight: 650; }
+  ul.tight li { font-size: 26px; margin-bottom: 10px; }
+  ul.tight li::before { top: 12px; width: 12px; height: 12px; }
   .big { font-size: 92px; font-weight: 700; letter-spacing: -0.03em; line-height: 1; }
   .stat { border: 1px solid var(--line); border-radius: 16px; background: var(--panel); padding: 30px 32px; flex: 1; }
   .stat p { font-size: 24px; line-height: 1.36; color: var(--fg-2); margin-top: 16px; }
@@ -68,7 +70,7 @@
       <div class="frame"><img src="img/verdict-floor.png" width="806" alt="0% sunlight, 0% Earth in view" /><img src="img/sky-floor.png" width="806" style="margin-top: 12px;" alt="The Sun and the Earth below the crater wall" /></div>
     </div>
   </div>
-  <div class="foot"><span>Lunar Landing Site Navigator</span><span>2 / 8</span></div>
+  <div class="foot"><span>Lunar Landing Site Navigator</span><span>2 / 7</span></div>
 </section>
 
 <section class="slide">
@@ -80,7 +82,7 @@
     <li style="flex: 1;"><b>Link:</b> windows of direct contact with the Earth, longest gap</li>
     <li style="flex: 1;"><b>The sky the lander sees,</b> on the real skyline, moving in time</li>
   </ul>
-  <div class="foot"><span>Lunar Landing Site Navigator</span><span>3 / 8</span></div>
+  <div class="foot"><span>Lunar Landing Site Navigator</span><span>3 / 7</span></div>
 </section>
 
 <section class="slide">
@@ -95,7 +97,7 @@
     <li style="flex: 1;"><b>Zoom, drag, click</b> anywhere</li>
     <li style="flex: 1;">The <b>best place within 5 km</b>, named</li>
   </ul>
-  <div class="foot"><span>Lunar Landing Site Navigator</span><span>4 / 8</span></div>
+  <div class="foot"><span>Lunar Landing Site Navigator</span><span>4 / 7</span></div>
 </section>
 
 <section class="slide">
@@ -107,7 +109,7 @@
     <li style="flex: 1;"><b>Eclipses</b> of the Sun by the Earth are included</li>
     <li style="flex: 1;">A <b>link</b> reproduces any comparison exactly</li>
   </ul>
-  <div class="foot"><span>Lunar Landing Site Navigator</span><span>5 / 8</span></div>
+  <div class="foot"><span>Lunar Landing Site Navigator</span><span>5 / 7</span></div>
 </section>
 
 <section class="slide">
@@ -119,44 +121,38 @@
     <li style="flex: 1;">Then by <b>contact with the Earth</b></li>
     <li style="flex: 1;">One click puts an answer <b>into the comparison</b></li>
   </ul>
-  <div class="foot"><span>Lunar Landing Site Navigator</span><span>6 / 8</span></div>
+  <div class="foot"><span>Lunar Landing Site Navigator</span><span>6 / 7</span></div>
 </section>
 
 <section class="slide">
-  <h2>Built on NASA data, checked against NASA.</h2>
-  <p class="lead">Every skyline comes from the <b>LOLA elevation model</b> of NASA's Lunar Reconnaissance Orbiter, at 120 m. The results are tested against NASA's own.</p>
-  <div class="row" style="margin-top: 44px; gap: 28px;">
-    <div class="stat"><div class="big sun">0.004°</div><p>largest difference from <b>NASA/JPL Horizons</b> in the direction of the Sun and the Earth, over 9,810 reference values</p></div>
-    <div class="stat"><div class="big both">0.98</div><p>correlation with the <b>NASA LOLA illumination maps</b> at 400 places, for sunlight and for Earth visibility</p></div>
-    <div class="stat"><div class="big earth">8.3 s</div><p>largest difference from <b>NASA's eclipse predictions</b>: 58 contact times of the 14 lunar eclipses of 2025–2030</p></div>
-    <div class="stat"><div class="big">3</div><p><b>real landings</b> as checks: IM-1, Chandrayaan-3, and the eclipse seen by Blue Ghost Mission 1</p></div>
+  <h2>Checked against NASA. Ready to use.</h2>
+  <div class="row" style="margin-top: 30px; gap: 24px;">
+    <div class="stat" style="padding: 24px 28px;"><div class="big sun" style="font-size: 72px;">0.004°</div><p>largest difference from <b>NASA/JPL Horizons</b> in the direction of the Sun and the Earth, over 9,810 reference values</p></div>
+    <div class="stat" style="padding: 24px 28px;"><div class="big both" style="font-size: 72px;">0.98</div><p>correlation with the <b>NASA LOLA illumination maps</b> at 400 places, for sunlight and for Earth visibility</p></div>
+    <div class="stat" style="padding: 24px 28px;"><div class="big earth" style="font-size: 72px;">8.3 s</div><p>largest difference from <b>NASA's eclipse predictions</b> over 58 contact times of 13 eclipses of 2025–2030 (52 s for the one that grazes the Moon)</p></div>
+    <div class="stat" style="padding: 24px 28px;"><div class="big" style="font-size: 72px;">3</div><p><b>real landings</b> as checks: IM-1, Chandrayaan-3, and the eclipse seen by Blue Ghost Mission 1</p></div>
   </div>
-  <p class="note" style="margin-top: 34px; font-size: 27px;">317 automated tests. Every figure can be reproduced with a command given in the repository. Geometry only: a planning aid, not a flight product.</p>
-  <div class="foot"><span>Lunar Landing Site Navigator</span><span>7 / 8</span></div>
-</section>
-
-<section class="slide">
-  <h2>For planners, educators and anyone curious.</h2>
-  <div class="row" style="margin-top: 30px; gap: 64px;">
+  <p class="note" style="margin-top: 18px; font-size: 24px;">South of 80° S every skyline comes from NASA's LOLA elevation model, at 120 m around each site. 317 automated tests; every figure reproducible from the repository. Geometry only: a planning aid, not a flight product.</p>
+  <div class="row" style="margin-top: 30px; gap: 56px;">
     <div class="col">
-      <ul>
+      <ul class="tight">
         <li><b>Mission planners</b> shortlist sites and dates in seconds, with numbers traceable to NASA sources</li>
         <li><b>Educators</b> show why the pole is hard: the Sun circling the horizon, a ridge hiding it for days</li>
         <li><b>Anyone</b> picks a place on the Moon and sees what a lander would see</li>
         <li><b>Next:</b> the north pole, and power and radio-link budgets on top of the geometry</li>
       </ul>
     </div>
-    <div class="col" style="flex: 0.9;">
-      <div class="stat" style="padding: 36px 40px;">
-        <p style="margin: 0; font-size: 24px; color: var(--muted);">Try it, in any browser</p>
-        <p class="url" style="margin-top: 8px;">m4tt187.github.io/lunar-landing-site-navigator</p>
-        <p style="font-size: 24px; color: var(--muted); margin-top: 34px;">Source code, methods, data sources</p>
-        <p class="url" style="margin-top: 8px;">github.com/m4tt187/lunar-landing-site-navigator</p>
-        <p style="margin-top: 34px;">Open source, Apache-2.0. No server: everything runs in the browser, on public NASA data.</p>
+    <div class="col" style="flex: 0.85;">
+      <div class="stat" style="padding: 28px 34px;">
+        <p style="margin: 0; font-size: 22px; color: var(--muted);">Try it, in any browser</p>
+        <p class="url" style="margin-top: 6px; font-size: 30px;">m4tt187.github.io/lunar-landing-site-navigator</p>
+        <p style="font-size: 22px; color: var(--muted); margin-top: 22px;">Source code, methods, data sources</p>
+        <p class="url" style="margin-top: 6px; font-size: 30px;">github.com/m4tt187/lunar-landing-site-navigator</p>
+        <p style="margin-top: 22px;">Open source, Apache-2.0. No server: everything runs in the browser, on public NASA data.</p>
       </div>
     </div>
   </div>
-  <div class="foot"><span>Team Eallweald, Inc. · 2026 NASA Space Apps Challenge · Challenge: Lunar Landing Site Navigator</span><span>8 / 8</span></div>
+  <div class="foot"><span>Team Eallweald, Inc. · 2026 NASA Space Apps Challenge · Challenge: Lunar Landing Site Navigator</span><span>7 / 7</span></div>
 </section>
 
 </body>

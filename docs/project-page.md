@@ -14,11 +14,10 @@ Lunar Landing Site Navigator
 
 At the Moon's south pole the Sun and the Earth never climb more than a few degrees above
 the horizon, so a single ridge decides whether a lander has power and a radio link.
-Choosing a landing site means asking the same question again and again, for different
-places and dates: if we land here, on this day, will we have power, and can we talk to
-Earth?
+Choosing a landing site means asking, place after place and date after date: if we land
+here, on this day, will we have power, and can we talk to Earth?
 
-Lunar Landing Site Navigator is a web application that answers it in seconds. It places
+Lunar Landing Site Navigator answers it in seconds. It places
 the Sun and the Earth against the real skyline of each site, computed from NASA's LOLA
 elevation model, and compares up to four sites and landing dates side by side: sunlight,
 longest night, windows of contact with the Earth, longest link gap, eclipses included. A
@@ -36,7 +35,7 @@ Try it: https://m4tt187.github.io/lunar-landing-site-navigator/
 
 https://m4tt187.github.io/lunar-landing-site-navigator/demo.pdf
 
-Eight slides. The source is `docs/demo/deck.html`; the images are screenshots of the
+Seven slides, the most the Project Submission Guide allows. The source is `docs/demo/deck.html`; the images are screenshots of the
 application.
 
 ## Link to Final Project
@@ -112,7 +111,7 @@ Everything is computed in the browser; there is no server.
 | Sun and Earth directions against NASA/JPL Horizons, 9,810 reference values | largest difference 0.004° (the Sun's disc is 0.53° wide) |
 | Earth elevation at two real landings against a JPL report | IM-1: 15.4° on the landing day (JPL: 15°); Chandrayaan-3: 13.0° above the horizontal (JPL: about 11° above the local terrain) |
 | Share of time with sunlight and with the Earth in view against the NASA LOLA-team illumination maps, 400 places over 18.6 years | correlation 0.98 for both |
-| Eclipses against NASA's predictions for the 14 lunar eclipses of 2025–2030 | 58 contact times within 8.3 s |
+| Eclipses against NASA's predictions for the 14 lunar eclipses of 2025–2030 | 58 contact times of 13 eclipses within 8.3 s; the two contacts of the eclipse that only grazes the Moon (18 July 2027) within 52 s |
 | The eclipse of 14 March 2025 at the Blue Ghost Mission 1 landing site against the mission's own prediction | first and last contact within half a minute |
 | Automated tests | 317 |
 
@@ -176,7 +175,7 @@ test checks the transcription against NASA's catalogue. No NASA logo or branding
 
 - **Lunar Orbiter Laser Altimeter (LOLA) elevation model `LDEM_75S_120M`**, Lunar
   Reconnaissance Orbiter, NASA Planetary Data System (data set LRO-L-LOLA-4-GDR-V1.0). The
-  heart of the project: the skyline of every site is computed from it, the application
+  heart of the project: the skyline of every site south of 80° S is computed from it, the application
   ships it as 120 m tiles and as a 480 m reduction, and the map is drawn from it.
 - **LOLA-team average illumination and Earth-visibility maps**
   (`AVGVISIB_85S_060M_201608` and `AVGVISIB_85S_060M_201608_EARTH`), NASA Planetary Data

@@ -6,7 +6,7 @@ A web tool that puts the Sun and the Earth against the **real skyline** of the M
 south pole, and lets mission planners, educators and anyone curious compare landing
 sites and dates side by side in seconds.
 
-**▶ Live application: https://m4tt187.github.io/lunar-landing-site-navigator/** · [Demo, eight slides](https://m4tt187.github.io/lunar-landing-site-navigator/demo.pdf)
+**▶ Live application: https://m4tt187.github.io/lunar-landing-site-navigator/** · [Demo, seven slides](https://m4tt187.github.io/lunar-landing-site-navigator/demo.pdf)
 
 Built by team **Eallweald, Inc.** for the
 [2026 NASA Space Apps Challenge](https://www.spaceappschallenge.org/2026/), challenge
