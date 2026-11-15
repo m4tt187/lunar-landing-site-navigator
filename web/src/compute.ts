@@ -82,6 +82,11 @@ function tableFor(startMs: number, endMs: number): VectorTable {
   return table;
 }
 
+/** A series from the shared vector table, not kept: for long searches over many sites. */
+export function seriesOnce(site: Site, startMs: number, endMs: number, stepS: number): Series {
+  return seriesFromTable(site, tableFor(startMs, endMs), startMs, endMs, stepS);
+}
+
 // Most recently used series, within a budget of samples (a year at ten minutes is 52,561 of them).
 const SAMPLES_KEPT = 500000;
 const seriesCache = new Map<string, Series>();

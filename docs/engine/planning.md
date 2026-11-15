@@ -124,8 +124,27 @@ Three things are worth noticing.
 - **Candidates.** Only sites with a real skyline are ranked. A whole-map ranking
   (`topCells` on a map layer) uses the 480 m model and names places, not dates.
 
-## How the application should call it
+## In the application
 
-One vector table for the whole span (search days + look-ahead), one ten-minute series per
-site from it, `summarize()` for the windows, then `recommend()`. See
-`tools/planning/recommend.ts` for the complete sequence in thirty lines.
+`web/src/planner.ts` (tests in `web/src/planner.test.ts`) is the layer the interface
+calls. It uses the application's own vector table — exact knots every two hours on a
+fixed grid, kept between calls — and its ten-minute sampling.
+
+| Function | Gives |
+|---|---|
+| `operatingWindowOf(analysis, toleranceH)` | how long an analysed scenario can operate from its landing |
+| `eclipsesOf(analysis)` | the eclipses inside its mission |
+| `calendarOf(analysis, request)` | what every landing date of a search would give at the scenario's site, and the best landing of each stretch of power |
+| `findBest(app, request, options)` | the best site-and-date pairs among the catalogue sites with a real skyline; one site at a time, so that the page stays responsive; it reports its progress and can be abandoned |
+
+Measured on the development machine: a year of hourly landing dates for the 25 sites takes
+0.8 to 1.0 s the first time and 0.6 s once the knots are computed; the calendar of one
+site for a year, 27 ms.
+
+The tests run this layer on the shipped site data. They require the answers of the
+command-line tool above (the same six sites and dates, the first three stretches ending
+at the eclipse of 12 January 2028; the ridge near Mons Malapert first for the 90-day
+mission) and, for the calendar, those of an exact computation sampled every ten minutes.
+
+The screens of the application do not show these answers yet; until they do, the
+recommendation is available from the command line.
