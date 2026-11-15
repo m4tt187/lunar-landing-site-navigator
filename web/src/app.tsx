@@ -22,6 +22,27 @@ import type { CalendarRow } from './views';
 
 const LUNAR_MONTH_DAYS = 29.530589;
 const copied = signal(false);
+const theme = signal<'light' | 'dark'>(document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light');
+
+function setTheme(next: 'light' | 'dark'): void {
+  theme.value = next;
+  if (next === 'dark') document.documentElement.dataset.theme = 'dark';
+  else delete document.documentElement.dataset.theme;
+  try { localStorage.setItem('theme', next); } catch { /* the choice is simply not remembered */ }
+}
+
+function ThemeSwitch() {
+  return (
+    <div class="segmented theme" role="group" aria-label="Theme">
+      <button type="button" aria-pressed={theme.value === 'light'} onClick={() => setTheme('light')}>
+        <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="3" /><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3 3l1.4 1.4M11.6 11.6L13 13M3 13l1.4-1.4M11.6 4.4L13 3" /></svg>Light
+      </button>
+      <button type="button" aria-pressed={theme.value === 'dark'} onClick={() => setTheme('dark')}>
+        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13.5 9.8A5.8 5.8 0 0 1 6.2 2.5a5.8 5.8 0 1 0 7.3 7.3z" /></svg>Dark
+      </button>
+    </div>
+  );
+}
 const activePreset = signal<string | null>(null);
 
 let lastFrame = 0;
@@ -324,10 +345,10 @@ export function App() {
         <div class="appbar-inner">
           <div class="brand">
             <svg class="mark" viewBox="0 0 32 32" aria-hidden="true">
-              <circle cx="16" cy="16" r="15" fill="#111827" />
-              <path d="M1.6 19.5h28.8" stroke="#f59e0b" stroke-width="2" />
-              <circle cx="22" cy="15.5" r="2.6" fill="#f59e0b" />
-              <circle cx="10" cy="12" r="2.2" fill="#60a5fa" />
+              <rect x="1" y="1" width="30" height="30" rx="8" class="mark-bg" />
+              <path d="M10 21.5a6 6 0 0 1 12 0z" class="mark-sun" />
+              <path d="M5.5 21.5h21" class="mark-ridge" />
+              <circle cx="23" cy="9.5" r="2.4" class="mark-earth" />
             </svg>
             <div>
               <h1>Lunar Landing Site Navigator</h1>
@@ -339,6 +360,7 @@ export function App() {
             <button type="button" onClick={() => {
               void navigator.clipboard?.writeText(location.href).then(() => { copied.value = true; setTimeout(() => { copied.value = false; }, 1500); });
             }}>{copied.value ? 'Link Copied' : 'Copy Link to This Comparison'}</button>
+            <ThemeSwitch />
           </div>
         </div>
       </header>

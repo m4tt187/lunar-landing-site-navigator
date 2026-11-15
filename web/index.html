@@ -5,7 +5,11 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="color-scheme" content="dark" />
+    <meta name="color-scheme" content="light dark" />
+    <!-- The chosen theme (light unless the viewer picked dark), applied before the first paint. -->
+    <script>
+      try { if (localStorage.getItem('theme') === 'dark') document.documentElement.dataset.theme = 'dark'; } catch (e) { /* no storage: light */ }
+    </script>
     <meta
       name="description"
       content="Compare lunar landing sites and dates: Sun and Earth positions relative to the local horizon, for solar power and direct-to-Earth communication."
