@@ -14,7 +14,7 @@ export interface Scenario {
   startMs: number;
 }
 
-export const SCENARIO_COLORS = ['#f2b84b', '#5fb4ff', '#7ee0a1', '#e88cc5'];
+export const SCENARIO_COLORS = ['#4f46e5', '#0f766e', '#be123c', '#92400e'];
 export const MAX_SCENARIOS = 4;
 export const DURATIONS = [
   { days: 14, label: '14 days' },

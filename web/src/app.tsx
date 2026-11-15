@@ -5,6 +5,7 @@ import type { EventKind } from '@engine/index';
 import { SEARCH_LIMIT_DAYS, bestWindows, fromLanding, instantAt, landingCalendar, nextChange } from './compute';
 import type { Analysis } from './compute';
 import type { AppData, CatalogSite } from './data';
+import { FinderPanel } from './finder';
 import { compass, deg, fmtDate, fmtLatLon, fmtSpan, fmtUtc, fromInputValue, pct, toInputValue } from './format';
 import { MapPanel } from './map/panel';
 import { PRESETS } from './presets';
@@ -52,10 +53,15 @@ function Presets() {
   const active = PRESETS.find((p) => p.id === activePreset.value);
   return (
     <section class="presets" aria-label="Ready-made comparisons">
-      <span class="muted">Try a comparison:</span>
-      {PRESETS.map((p) => (
-        <button type="button" aria-pressed={p.id === activePreset.value} title={p.hint} onClick={() => applyPreset(p)}>{p.label}</button>
-      ))}
+      <label>Examples
+        <select value={activePreset.value ?? ''} onChange={(e) => {
+          const preset = PRESETS.find((p) => p.id === (e.currentTarget as HTMLSelectElement).value);
+          if (preset) applyPreset(preset);
+        }}>
+          <option value="">Choose a ready-made comparison…</option>
+          {PRESETS.map((p) => <option value={p.id}>{p.label}</option>)}
+        </select>
+      </label>
       {active ? <p class="preset-hint">{active.hint}</p> : null}
     </section>
   );
@@ -88,9 +94,6 @@ function Toolbar() {
             onInput={(e) => { cursorH.value = Number((e.currentTarget as HTMLInputElement).value); }} />
         </label>
       </div>
-      <button type="button" onClick={() => {
-        void navigator.clipboard?.writeText(location.href).then(() => { copied.value = true; setTimeout(() => { copied.value = false; }, 1500); });
-      }}>{copied.value ? 'Link copied' : 'Copy link to this comparison'}</button>
     </section>
   );
 }
@@ -130,7 +133,7 @@ function ComparisonPanel() {
           </tbody>
         </table>
       </div>
-      <p class="muted small">Green marks the better value in each column.</p>
+      <p class="muted small" style={{ margin: '8px 0 0' }}>Green marks the better value in each column.</p>
     </section>
   );
 }
@@ -296,20 +299,30 @@ export function App() {
   if (!app) return <main><p class="hint">Loading…</p></main>;
   return (
     <main>
-      <header class="top">
-        <h1>Lunar Landing Site Navigator</h1>
-        <p class="lead">If we land <em>here</em>, on <em>this day</em> — will we have power, and can we talk to Earth? See the Sun and the Earth against the real skyline of the Moon's south pole, and compare sites and dates side by side.</p>
+      <header class="appbar">
+        <div class="brand">
+          <h1>Lunar Landing Site Navigator</h1>
+          <p class="lead">If we land <em>here</em>, on <em>this day</em> — will we have power, and can we talk to Earth? The Sun and the Earth against the real skyline of the Moon's south pole, for sites and dates side by side.</p>
+        </div>
+        <div class="appbar-actions">
+          <button type="button" onClick={() => {
+            void navigator.clipboard?.writeText(location.href).then(() => { copied.value = true; setTimeout(() => { copied.value = false; }, 1500); });
+          }}>{copied.value ? 'Link copied' : 'Copy link to this comparison'}</button>
+        </div>
       </header>
       <Presets />
       <Toolbar />
-      <ComparisonPanel />
       <div class="layout">
         <div class="side"><MapPanel app={app} /></div>
-        <div class="cards" style={{ '--columns': Math.min(2, scenarios.value.length) }}>
-          {scenarios.value.map((s, i) => <Card key={s.id} scenario={s} index={i} app={app} />)}
+        <div class="main-col">
+          <ComparisonPanel />
+          <div class="cards" style={{ '--columns': Math.min(2, scenarios.value.length) }}>
+            {scenarios.value.map((s, i) => <Card key={s.id} scenario={s} index={i} app={app} />)}
+          </div>
+          <CalendarPanel />
+          <FinderPanel app={app} />
         </div>
       </div>
-      <CalendarPanel />
       <footer>
         <p><b>How far to trust it.</b> Sun and Earth directions are computed in your browser and checked against NASA/JPL Horizons at 9,810 reference moments (nine sites, 2026–2035): the largest difference is 0.004°. Skylines come from NASA's Lunar Orbiter Laser Altimeter (LOLA) terrain; the sunlight and Earth-visibility shares they give were compared with the NASA LOLA-team illumination maps at 400 places (correlation 0.98). What is shown is geometric line of sight, with eclipses of the Sun by the Earth included: the lander's own shadow, dust, slopes and radio link budgets are not modelled. A planning aid, not a flight product.</p>
         <p>Built for the 2026 NASA Space Apps Challenge by team Eallweald, Inc. Not affiliated with or endorsed by NASA. <a href="https://github.com/m4tt187/lunar-landing-site-navigator" target="_blank" rel="noreferrer">Source code, methods, data sources and AI-use statement</a>.</p>

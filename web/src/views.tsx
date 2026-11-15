@@ -8,7 +8,7 @@ import type { Analysis, Calendar, Instant, LandingWindow } from './compute';
 import { compass, fmtDate, fmtSpan, pct } from './format';
 import { DAY, HOUR } from './state';
 
-export const SUN = '#ffbf47', EARTH = '#58a6ff', BOTH = '#6fdc8c';
+export const SUN = '#d97706', EARTH = '#2563eb', BOTH = '#16a34a';
 const DEG = Math.PI / 180;
 
 const wrap180 = (deg: number): number => ((((deg + 180) % 360) + 360) % 360) - 180;
@@ -90,9 +90,8 @@ export function SkyView({ a, instant }: { a: Analysis; instant: Instant }) {
       aria-label={`Skyline all around ${a.name}, with the paths of the Sun and the Earth`}>
       <defs>
         <clipPath id={clip}><rect x={L} y={T} width={W - L - R} height={H - T - B} /></clipPath>
-        <linearGradient id={`${clip}-bg`} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#02030a" /><stop offset="1" stop-color="#0a0f1c" /></linearGradient>
       </defs>
-      <rect x={L} y={T} width={W - L - R} height={H - T - B} fill={`url(#${clip}-bg)`} />
+      <rect x={L} y={T} width={W - L - R} height={H - T - B} class="sky-bg" />
       {stat.ticks.map((v) => (
         <g>
           <line x1={L} x2={W - R} y1={frame.y(v)} y2={frame.y(v)} class={v === 0 ? 'grid zero' : 'grid'} />
@@ -147,7 +146,6 @@ export function CloseUp({ a, instant, body }: { a: Analysis; instant: Instant; b
   const far = outline(a.terrain.profile);
   const mid = ridge(a, 'mid'), near = ridge(a, 'near');
   const r = b.angularRadiusDeg * scale;
-  const id = `close-${body}-${a.scenario.id}`;
   const up = body === 'sun' ? instant.sunUp : instant.earthUp;
   const fraction = instant.margins.sunDiskFraction;
   let caption: string;
@@ -155,10 +153,7 @@ export function CloseUp({ a, instant, body }: { a: Analysis; instant: Instant; b
   if (body === 'sun') {
     caption = fraction >= 0.995 ? 'whole disc in view' : fraction <= 0.005 ? 'hidden by terrain' : `${pct(fraction)} of the disc in view`;
     disc = (
-      <g>
-        <circle cx={S / 2} cy={S / 2} r={r * 2.6} fill={`url(#${id}-glow)`} />
-        <circle cx={S / 2} cy={S / 2} r={r} fill="#ffe08a" />
-      </g>
+      <circle cx={S / 2} cy={S / 2} r={r} fill="#f2b233" />
     );
   } else {
     const phase = earthPhase(instant);
@@ -166,8 +161,8 @@ export function CloseUp({ a, instant, body }: { a: Analysis; instant: Instant; b
     caption = `${up ? 'in view' : 'hidden by terrain'} · ${pct(phase.lit)} lit`;
     disc = (
       <g transform={`rotate(${phase.angleDeg.toFixed(1)} ${S / 2} ${S / 2}) translate(${S / 2} ${S / 2})`}>
-        <circle r={r} fill="#14263f" />
-        <path d={`M0,${-r}A${r},${r} 0 0 1 0,${r}A${rx.toFixed(2)},${r} 0 0 ${phase.lit > 0.5 ? 1 : 0} 0,${-r}Z`} fill="#7dbcff" />
+        <circle r={r} fill="#c5cede" />
+        <path d={`M0,${-r}A${r},${r} 0 0 1 0,${r}A${rx.toFixed(2)},${r} 0 0 ${phase.lit > 0.5 ? 1 : 0} 0,${-r}Z`} fill="#3b82f6" />
       </g>
     );
   }
@@ -175,16 +170,13 @@ export function CloseUp({ a, instant, body }: { a: Analysis; instant: Instant; b
   return (
     <figure class="closeup">
       <svg viewBox={`0 0 ${S} ${S}`} role="img" aria-label={`${body === 'sun' ? 'Sun' : 'Earth'} against the skyline: ${caption}`}>
-        <defs>
-          <radialGradient id={`${id}-glow`}><stop offset="0.3" stop-color="#ffd66b" stop-opacity="0.55" /><stop offset="1" stop-color="#ffd66b" stop-opacity="0" /></radialGradient>
-        </defs>
-        <rect width={S} height={S} fill="#03040b" />
+        <rect width={S} height={S} class="sky-bg" />
         {disc}
         <path d={far} class="terrain far" />
         {mid ? <path d={outline(mid)} class="terrain mid" /> : null}
         {near ? <path d={outline(near)} class="terrain near" /> : null}
         <circle cx={S / 2} cy={S / 2} r={r} fill="none" stroke={body === 'sun' ? SUN : EARTH} stroke-opacity="0.75" stroke-dasharray="3 3" />
-        <line x1="8" x2={8 + barDeg * scale * across} y1={S - 8} y2={S - 8} stroke="#fff" stroke-width="2" />
+        <line x1="8" x2={8 + barDeg * scale * across} y1={S - 8} y2={S - 8} class="scale-bar" />
         <text x="8" y={S - 13} class="axis strong">{barDeg}°</text>
       </svg>
       <figcaption><b style={{ color: body === 'sun' ? SUN : EARTH }}>{body === 'sun' ? 'Sun' : 'Earth'}</b> {caption}</figcaption>

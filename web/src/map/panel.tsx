@@ -296,7 +296,7 @@ export function MapPanel({ app }: { app: AppData }) {
             const p = project(meta, a.site.latDeg, a.site.lonDeg);
             return (
               <g class="scenario-pin">
-                <circle cx={p.x * 1000} cy={p.y * 1000} r="14" fill="none" stroke="#000" stroke-width="7" stroke-opacity="0.6" />
+                <circle cx={p.x * 1000} cy={p.y * 1000} r="14" fill="none" stroke="#fff" stroke-width="8" stroke-opacity="0.9" />
                 <circle cx={p.x * 1000} cy={p.y * 1000} r="14" fill="none" stroke={SCENARIO_COLORS[i]} stroke-width="4" />
                 <text x={p.x * 1000} y={p.y * 1000 - 20} text-anchor="middle" fill={SCENARIO_COLORS[i]} class="pin-label">{i + 1}</text>
               </g>
