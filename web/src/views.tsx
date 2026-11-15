@@ -151,14 +151,14 @@ export function CloseUp({ a, instant, body }: { a: Analysis; instant: Instant; b
   let caption: string;
   let disc;
   if (body === 'sun') {
-    caption = fraction >= 0.995 ? 'whole disc in view' : fraction <= 0.005 ? 'hidden by terrain' : `${pct(fraction)} of the disc in view`;
+    caption = fraction >= 0.995 ? 'Whole Disc in View' : fraction <= 0.005 ? 'Hidden by Terrain' : `${pct(fraction)} of the Disc in View`;
     disc = (
       <circle cx={S / 2} cy={S / 2} r={r} fill="#f2b233" />
     );
   } else {
     const phase = earthPhase(instant);
     const rx = r * Math.abs(1 - 2 * phase.lit);
-    caption = `${up ? 'in view' : 'hidden by terrain'} · ${pct(phase.lit)} lit`;
+    caption = `${up ? 'in View' : 'Hidden by Terrain'} · ${pct(phase.lit)} Lit`;
     disc = (
       <g transform={`rotate(${phase.angleDeg.toFixed(1)} ${S / 2} ${S / 2}) translate(${S / 2} ${S / 2})`}>
         <circle r={r} fill="#c5cede" />
@@ -220,7 +220,7 @@ export function Timeline({ a, cursorH, onCursor }: { a: Analysis; cursorH: numbe
       {ticks.map((d) => (
         <g>
           <line x1={x(startMs + d * DAY)} x2={x(startMs + d * DAY)} y1={top} y2={top + 3 * (rowH + 4) - 4} class="grid" />
-          <text x={x(startMs + d * DAY)} y={H - 4} class="axis" text-anchor={d === 0 ? 'start' : 'middle'}>{d === 0 ? 'landing' : `+${d} d`}</text>
+          <text x={x(startMs + d * DAY)} y={H - 4} class="axis" text-anchor={d === 0 ? 'start' : 'middle'}>{d === 0 ? 'Landing' : `+${d} d`}</text>
         </g>
       ))}
       <line x1={cx} x2={cx} y1={0} y2={top + 3 * (rowH + 4)} class="cursor" />
@@ -286,7 +286,7 @@ export function LandingCalendar({ calendar, rows, currentMs, best, onPick }: {
       {currentX >= L && currentX <= W - R ? (
         <g>
           <line x1={currentX} x2={currentX} y1={top - 2} y2={bottom} class="cursor" />
-          <text x={Math.min(W - 50, Math.max(L + 40, currentX))} y={H - 4} class="axis strong" text-anchor="middle">selected landing</text>
+          <text x={Math.min(W - 50, Math.max(L + 40, currentX))} y={H - 4} class="axis strong" text-anchor="middle">Selected Landing</text>
         </g>
       ) : null}
     </svg>

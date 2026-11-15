@@ -16,31 +16,32 @@ export interface Scenario {
 
 export const SCENARIO_COLORS = ['#4f46e5', '#0f766e', '#be123c', '#92400e'];
 export const MAX_SCENARIOS = 4;
+/** `label` on the controls, `phrase` inside sentences. */
 export const DURATIONS = [
-  { days: 14, label: '14 days' },
-  { days: 29.53, label: '1 lunar day (29.5 d)' },
-  { days: 90, label: '90 days' },
-  { days: 365, label: '1 year' },
+  { days: 14, label: '14 Days', phrase: '14 days' },
+  { days: 29.53, label: '1 Lunar Day (29.5 d)', phrase: '1 lunar day (29.5 d)' },
+  { days: 90, label: '90 Days', phrase: '90 days' },
+  { days: 365, label: '1 Year', phrase: '1 year' },
 ];
 export const SUN_RULES = [
-  { value: 0, label: 'any part of the Sun shows' },
-  { value: 0.5, label: 'at least half the disc shows' },
-  { value: 1, label: 'the whole disc shows' },
+  { value: 0, label: 'Any Part of the Disc' },
+  { value: 0.5, label: 'At Least Half the Disc' },
+  { value: 1, label: 'The Whole Disc' },
 ];
 export const EARTH_RULES = [
-  { value: 0, label: 'its centre clears the skyline' },
-  { value: 2, label: 'it is 2° above the skyline' },
-  { value: 5, label: 'it is 5° above the skyline' },
+  { value: 0, label: 'Centre on the Skyline' },
+  { value: 2, label: '2° Above the Skyline' },
+  { value: 5, label: '5° Above the Skyline' },
 ];
 
 export type MapLayer = 'terrain' | 'now' | 'sun' | 'earth' | 'both' | 'nasa-sun' | 'nasa-earth';
 export const MAP_LAYERS: { id: MapLayer; label: string; title: string }[] = [
   { id: 'terrain', label: 'Terrain', title: 'Shaded relief from NASA LOLA elevation data' },
   { id: 'now', label: 'Now', title: 'Where the Sun and the Earth can be seen at the moment shown by the time slider' },
-  { id: 'both', label: 'Power + link', title: 'Share of the mission with sunlight and the Earth in view at the same time' },
+  { id: 'both', label: 'Power + Link', title: 'Share of the mission with sunlight and the Earth in view at the same time' },
   { id: 'sun', label: 'Sunlight', title: 'Share of the mission with sunlight' },
-  { id: 'earth', label: 'Earth in view', title: 'Share of the mission with the Earth in view' },
-  { id: 'nasa-sun', label: 'NASA: sunlight', title: 'Long-term average sunlight, NASA LOLA team map (south of 85° S)' },
+  { id: 'earth', label: 'Earth in View', title: 'Share of the mission with the Earth in view' },
+  { id: 'nasa-sun', label: 'NASA: Sunlight', title: 'Long-term average sunlight, NASA LOLA team map (south of 85° S)' },
   { id: 'nasa-earth', label: 'NASA: Earth', title: 'Long-term average Earth visibility, NASA LOLA team map (south of 85° S)' },
 ];
 

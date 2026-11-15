@@ -97,5 +97,5 @@ export function moveSelectedTo(latDeg: number, lonDeg: number): void {
   const match = catalogSiteAt(app, lat, lon);
   updateScenario(selectedId.value, match
     ? { siteId: match.id, custom: null }
-    : { siteId: null, custom: { name: 'Custom site', latDeg: lat, lonDeg: lon } });
+    : { siteId: null, custom: { name: 'Custom Site', latDeg: lat, lonDeg: lon } });
 }

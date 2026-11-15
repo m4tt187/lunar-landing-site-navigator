@@ -28,6 +28,19 @@ export const deg = (value: number, digits = 1): string => `${value.toFixed(digit
 const COMPASS = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
 export const compass = (azDeg: number): string => COMPASS[Math.round((((azDeg % 360) + 360) % 360) / 22.5) % 16]!;
 
+const MINOR = new Set(['a', 'an', 'and', 'as', 'at', 'by', 'for', 'in', 'of', 'on', 'or', 'the', 'to', 'vs']);
+const PARTICLES = new Set(['de', 'von', 'van']);
+/** Title Case for names shown in the interface: "Shackleton crater (centre)" → "Shackleton Crater (Centre)". */
+export function titleCase(text: string): string {
+  return text.split(' ').map((word, i) => {
+    const m = /^([("']*)([a-z])(.*)$/.exec(word);
+    if (!m) return word;
+    const bare = word.replace(/^[("']+/, '').replace(/[)"',.:]+$/, '');
+    if (PARTICLES.has(bare) || (i > 0 && !m[1] && MINOR.has(bare))) return word;
+    return m[1]! + m[2]!.toUpperCase() + m[3]!;
+  }).join(' ');
+}
+
 export function fmtLatLon(latDeg: number, lonDeg: number): string {
   return `${Math.abs(latDeg).toFixed(3)}° ${latDeg < 0 ? 'S' : 'N'}, ${Math.abs(lonDeg).toFixed(3)}° ${lonDeg < 0 ? 'W' : 'E'}`;
 }

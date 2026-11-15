@@ -77,6 +77,10 @@ const text = [
   'docs/references.md in the source repository.',
   '',
   ...components.flatMap((c) => [rule, `${c.name} ${c.version}`, c.source, rule, '', c.notice, '']),
+  rule, 'Inter typeface (variable, Latin subset)', 'https://github.com/rsms/inter', rule, '',
+  'Copyright 2016 The Inter Project Authors. Used unmodified under the SIL Open Font',
+  'License, Version 1.1. The font file is fonts/inter-latin-wght-normal.woff2; the',
+  'complete licence is next to it, in fonts/inter-LICENSE.txt.', '',
 ].join('\n');
 
 for (const path of [root + 'THIRD-PARTY-NOTICES.txt', root + 'web/public/THIRD-PARTY-NOTICES.txt']) writeFileSync(path, text);

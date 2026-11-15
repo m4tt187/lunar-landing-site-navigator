@@ -5,6 +5,7 @@ import {
   tilesAround,
 } from '@engine/index';
 import type { HorizonProfile, PolarDem, TileStore } from '@engine/index';
+import { titleCase } from './format';
 
 /** Skylines of the terrain closer than each distance: they show whether an obstacle is a nearby ridge or a far massif. */
 export interface RidgeData { azStepDeg: number; bandsKm: number[]; near: number[]; mid: number[] }
@@ -25,7 +26,8 @@ export interface LayerMeta { id: string; file: string; halfWidthM: number }
 export interface TerrainMeta {
   source: string;
   coarse: { file: string; n: number; scaleM: number; heightScale: number };
-  map: { file: string; sizePx: number; halfWidthM: number; minLatDeg: number };
+  /** `halfWidthM` is half the height of the image (the square south of `minLatDeg`); the image is `aspect` times wider than tall. */
+  map: { file: string; sizePx: number; halfWidthM: number; minLatDeg: number; aspect?: number };
   layers?: { source: string; items: LayerMeta[] };
 }
 export interface AppData { sites: CatalogSite[]; mastHeightsM: number[]; terrain: TerrainMeta }
@@ -52,7 +54,8 @@ export async function loadData(): Promise<AppData> {
     get<{ sites: CatalogSite[]; mastHeightsM: number[] }>('sites.json'),
     get<TerrainMeta>('terrain.json'),
   ]);
-  return { sites: sites.sites, mastHeightsM: sites.mastHeightsM, terrain };
+  // Names are shown in Title Case, like every other label of the interface.
+  return { sites: sites.sites.map((s) => ({ ...s, name: titleCase(s.name) })), mastHeightsM: sites.mastHeightsM, terrain };
 }
 
 export const dataUrl = (file: string): string => base + file;

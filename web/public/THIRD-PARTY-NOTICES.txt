@@ -115,3 +115,12 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+------------------------------------------------------------------------------
+Inter typeface (variable, Latin subset)
+https://github.com/rsms/inter
+------------------------------------------------------------------------------
+
+Copyright 2016 The Inter Project Authors. Used unmodified under the SIL Open Font
+License, Version 1.1. The font file is fonts/inter-latin-wght-normal.woff2; the
+complete licence is next to it, in fonts/inter-LICENSE.txt.

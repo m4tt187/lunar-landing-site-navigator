@@ -50,51 +50,63 @@ function applyPreset(preset: Preset): void {
 }
 
 function Presets() {
-  const active = PRESETS.find((p) => p.id === activePreset.value);
   return (
-    <section class="presets" aria-label="Ready-made comparisons">
-      <label>Examples
-        <select value={activePreset.value ?? ''} onChange={(e) => {
-          const preset = PRESETS.find((p) => p.id === (e.currentTarget as HTMLSelectElement).value);
-          if (preset) applyPreset(preset);
-        }}>
-          <option value="">Choose a ready-made comparison…</option>
-          {PRESETS.map((p) => <option value={p.id}>{p.label}</option>)}
-        </select>
-      </label>
-      {active ? <p class="preset-hint">{active.hint}</p> : null}
-    </section>
+    <label class="inline">Examples
+      <select value={activePreset.value ?? ''} onChange={(e) => {
+        const preset = PRESETS.find((p) => p.id === (e.currentTarget as HTMLSelectElement).value);
+        if (preset) applyPreset(preset);
+      }}>
+        <option value="">Choose a Ready-Made Comparison…</option>
+        {PRESETS.map((p) => <option value={p.id}>{p.label}</option>)}
+      </select>
+    </label>
   );
 }
 
 function Toolbar() {
   const span = durationDays.value * 24;
   const first = scenarios.value[0];
+  const active = PRESETS.find((p) => p.id === activePreset.value);
   return (
-    <section class="panel toolbar">
-      <label>Mission span
-        <select value={String(durationDays.value)} onChange={(e) => { durationDays.value = Number((e.currentTarget as HTMLSelectElement).value); }}>
-          {DURATIONS.map((d) => <option value={String(d.days)}>{d.label}</option>)}
-        </select>
-      </label>
-      <label>The Sun counts as up when
-        <select value={String(sunRule.value)} onChange={(e) => { sunRule.value = Number((e.currentTarget as HTMLSelectElement).value); }}>
-          {SUN_RULES.map((r) => <option value={String(r.value)}>{r.label}</option>)}
-        </select>
-      </label>
-      <label>The Earth counts as in view when
-        <select value={String(earthRule.value)} onChange={(e) => { earthRule.value = Number((e.currentTarget as HTMLSelectElement).value); }}>
-          {EARTH_RULES.map((r) => <option value={String(r.value)}>{r.label}</option>)}
-        </select>
-      </label>
-      <div class="scrub">
-        <button type="button" class="play" onClick={togglePlay} aria-pressed={playing.value}>{playing.value ? '❚❚ Pause' : '▶ Play'}</button>
-        <label class="grow">Time since landing: <b>{fmtSpan(cursorH.value)}</b>{first ? <span class="muted"> · {fmtUtc(first.startMs + cursorH.value * HOUR)} for scenario 1</span> : null}
-          <input type="range" min="0" max={span} step={span / 2000} value={cursorH.value} aria-label="Time since landing"
-            onInput={(e) => { cursorH.value = Number((e.currentTarget as HTMLInputElement).value); }} />
-        </label>
+    <div class="controlbar">
+      <div class="controlbar-inner">
+        <div class="settings">
+          <label>Mission Span
+            <select value={String(durationDays.value)} onChange={(e) => { durationDays.value = Number((e.currentTarget as HTMLSelectElement).value); }}>
+              {DURATIONS.map((d) => <option value={String(d.days)}>{d.label}</option>)}
+            </select>
+          </label>
+          <label>Sun Counts as Up
+            <select value={String(sunRule.value)} onChange={(e) => { sunRule.value = Number((e.currentTarget as HTMLSelectElement).value); }}>
+              {SUN_RULES.map((r) => <option value={String(r.value)}>{r.label}</option>)}
+            </select>
+          </label>
+          <label>Earth Counts as in View
+            <select value={String(earthRule.value)} onChange={(e) => { earthRule.value = Number((e.currentTarget as HTMLSelectElement).value); }}>
+              {EARTH_RULES.map((r) => <option value={String(r.value)}>{r.label}</option>)}
+            </select>
+          </label>
+        </div>
+        <div class="scrub">
+          <button type="button" class="play" onClick={togglePlay} aria-pressed={playing.value} aria-label={playing.value ? 'Pause' : 'Play'}>
+            {playing.value
+              ? <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="3.5" y="2.5" width="3" height="11" rx="1" /><rect x="9.5" y="2.5" width="3" height="11" rx="1" /></svg>
+              : <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 2.6v10.8a.6.6 0 0 0 .9.5l8.4-5.4a.6.6 0 0 0 0-1L5.4 2.1a.6.6 0 0 0-.9.5z" /></svg>}
+            {playing.value ? 'Pause' : 'Play'}
+          </button>
+          <div class="grow scrub-track">
+            <div class="scrub-meta">
+              <span>Time since landing <b>{fmtSpan(cursorH.value)}</b></span>
+              {first ? <span class="muted">{fmtUtc(first.startMs + cursorH.value * HOUR)} · Scenario 1</span> : null}
+            </div>
+            <input type="range" min="0" max={span} step={span / 2000} value={cursorH.value} aria-label="Time since landing"
+              style={{ '--fill': `${(cursorH.value / span) * 100}%` }}
+              onInput={(e) => { cursorH.value = Number((e.currentTarget as HTMLInputElement).value); }} />
+          </div>
+        </div>
       </div>
-    </section>
+      {active ? <p class="preset-hint"><b>{active.label}.</b> {active.hint}</p> : null}
+    </div>
   );
 }
 
@@ -104,11 +116,11 @@ function ComparisonPanel() {
   const light = (a: Analysis): { hours: number; openEnded: boolean } => fromLanding(a.summary.bothWindows, a);
   const columns: { label: string; value: (a: Analysis) => number; text: (a: Analysis) => string; best: 'max' | 'min' }[] = [
     { label: 'Sunlight', value: (a) => a.summary.sunlitFraction, text: (a) => pct(a.summary.sunlitFraction), best: 'max' },
-    { label: 'Longest night', value: (a) => a.summary.longestDarkH, text: (a) => fmtSpan(a.summary.longestDarkH), best: 'min' },
-    { label: 'Earth in view', value: (a) => a.summary.earthVisibleFraction, text: (a) => pct(a.summary.earthVisibleFraction), best: 'max' },
-    { label: 'Longest link gap', value: (a) => a.summary.longestCommGapH, text: (a) => fmtSpan(a.summary.longestCommGapH), best: 'min' },
-    { label: 'Power + link together', value: (a) => a.summary.bothFraction, text: (a) => pct(a.summary.bothFraction), best: 'max' },
-    { label: 'Power + link from touchdown', value: (a) => light(a).hours, text: (a) => (light(a).hours === 0 ? 'none at landing' : `${light(a).openEnded ? 'whole span, ' : ''}${fmtSpan(light(a).hours)}`), best: 'max' },
+    { label: 'Longest Night', value: (a) => a.summary.longestDarkH, text: (a) => fmtSpan(a.summary.longestDarkH), best: 'min' },
+    { label: 'Earth in View', value: (a) => a.summary.earthVisibleFraction, text: (a) => pct(a.summary.earthVisibleFraction), best: 'max' },
+    { label: 'Longest Link Gap', value: (a) => a.summary.longestCommGapH, text: (a) => fmtSpan(a.summary.longestCommGapH), best: 'min' },
+    { label: 'Power + Link Together', value: (a) => a.summary.bothFraction, text: (a) => pct(a.summary.bothFraction), best: 'max' },
+    { label: 'Power + Link from Touchdown', value: (a) => light(a).hours, text: (a) => (light(a).hours === 0 ? 'None at Landing' : `${light(a).openEnded ? 'Whole Span, ' : ''}${fmtSpan(light(a).hours)}`), best: 'max' },
     { label: 'Highest Sun', value: (a) => a.summary.maxSunElDeg, text: (a) => deg(a.summary.maxSunElDeg), best: 'max' },
   ];
   const winners = columns.map((c) => {
@@ -118,14 +130,19 @@ function ComparisonPanel() {
   });
   return (
     <section class="panel">
-      <h2>Side by side <span class="muted">— over {DURATIONS.find((d) => d.days === durationDays.value)?.label} from each landing</span></h2>
+      <header class="panel-head">
+        <div>
+          <h2>Side by Side</h2>
+          <p class="sub">Over {DURATIONS.find((d) => d.days === durationDays.value)?.phrase} from each landing. Green marks the better value in each column.</p>
+        </div>
+      </header>
       <div class="table-wrap">
         <table class="compare">
           <thead><tr><th scope="col">Scenario</th><th scope="col">Landing (UTC)</th>{columns.map((c) => <th scope="col">{c.label}</th>)}</tr></thead>
           <tbody>
             {rows.map(({ a, i }) => (
               <tr class={a.scenario.id === selectedId.value ? 'selected' : ''} onClick={() => { selectedId.value = a.scenario.id; }}>
-                <th scope="row"><span class="badge small" style={{ background: SCENARIO_COLORS[i] }}>{i + 1}</span> {a.name}{a.scenario.mastM !== 2 ? `, ${a.scenario.mastM} m mast` : ''}</th>
+                <th scope="row"><span class="badge small" style={{ background: SCENARIO_COLORS[i] }}>{i + 1}</span> {a.name}{a.scenario.mastM !== 2 ? `, ${a.scenario.mastM} m Mast` : ''}</th>
                 <td>{fmtUtc(a.scenario.startMs).replace(' UTC', '')}</td>
                 {columns.map((c, k) => <td class={winners[k] !== null && c.value(a) === winners[k] ? 'best' : ''}>{c.text(a)}</td>)}
               </tr>
@@ -133,15 +150,14 @@ function ComparisonPanel() {
           </tbody>
         </table>
       </div>
-      <p class="muted small" style={{ margin: '8px 0 0' }}>Green marks the better value in each column.</p>
     </section>
   );
 }
 
 function siteOptions(app: AppData) {
   const groups: [CatalogSite['group'], string][] = [
-    ['sunlit', "Best-lit points in NASA's illumination map"], ['robotic', 'Robotic landers'], ['planned', 'Planned targets'],
-    ['feature', 'South-pole features'], ['apollo', 'Apollo'],
+    ['sunlit', "Best-Lit Points in NASA's Illumination Map"], ['robotic', 'Robotic Landers'], ['planned', 'Planned Targets'],
+    ['feature', 'South-Pole Features'], ['apollo', 'Apollo'],
   ];
   return groups.map(([group, label]) => {
     const sites = app.sites.filter((s) => s.group === group);
@@ -185,7 +201,7 @@ function Card({ scenario, index, app }: { scenario: Scenario; index: number; app
           const v = (e.currentTarget as HTMLSelectElement).value;
           if (v) updateScenario(scenario.id, { siteId: v, custom: null });
         }}>
-          {a?.catalog || scenario.siteId ? null : <option value="">Custom coordinates</option>}
+          {a?.catalog || scenario.siteId ? null : <option value="">Custom Coordinates</option>}
           {siteOptions(app)}
         </select>
       </label>
@@ -196,9 +212,9 @@ function Card({ scenario, index, app }: { scenario: Scenario; index: number; app
             if (Number.isFinite(ms)) updateScenario(scenario.id, { startMs: clampTime(ms) });
           }} />
       </label>
-      <label>Panels / antenna height
+      <label>Panels / Antenna Height
         <select value={String(scenario.mastM)} onChange={(e) => updateScenario(scenario.id, { mastM: Number((e.currentTarget as HTMLSelectElement).value) })}>
-          {app.mastHeightsM.map((m) => <option value={String(m)}>{m} m above the ground</option>)}
+          {app.mastHeightsM.map((m) => <option value={String(m)}>{m} m Above the Ground</option>)}
         </select>
       </label>
     </div>
@@ -226,9 +242,9 @@ function Card({ scenario, index, app }: { scenario: Scenario; index: number; app
     <article class={`card ${selected ? 'selected' : ''}`} style={{ '--accent': color }}>
       {header}{controls}
       <div class="verdict">
-        <div class="metric sun"><b>{pct(s.sunlitFraction)}</b><span>sunlight</span><small>longest night {fmtSpan(s.longestDarkH)}</small></div>
-        <div class="metric earth"><b>{pct(s.earthVisibleFraction)}</b><span>Earth in view</span><small>longest gap {fmtSpan(s.longestCommGapH)}</small></div>
-        <div class="metric both"><b>{pct(s.bothFraction)}</b><span>power + link together</span><small>highest Sun {deg(s.maxSunElDeg)}</small></div>
+        <div class="metric sun"><span>Sunlight</span><b>{pct(s.sunlitFraction)}</b><small>Longest Night {fmtSpan(s.longestDarkH)}</small></div>
+        <div class="metric earth"><span>Earth in View</span><b>{pct(s.earthVisibleFraction)}</b><small>Longest Gap {fmtSpan(s.longestCommGapH)}</small></div>
+        <div class="metric both"><span>Power + Link Together</span><b>{pct(s.bothFraction)}</b><small>Highest Sun {deg(s.maxSunElDeg)}</small></div>
       </div>
       <p class="explain">{explain(a)}</p>
       <SkyView a={a} instant={instant} />
@@ -236,9 +252,9 @@ function Card({ scenario, index, app }: { scenario: Scenario; index: number; app
         <CloseUp a={a} instant={instant} body="sun" />
         <CloseUp a={a} instant={instant} body="earth" />
         <div class="now">
-          <div><span class="dot sun" /><b>Sun {instant.sunUp ? 'up' : 'down'}</b> · {change(instant.sunUp ? 'sunset' : 'sunrise', nextSun)}<br />
+          <div><span class="dot sun" /><b>Sun {instant.sunUp ? 'Up' : 'Down'}</b> · {change(instant.sunUp ? 'sunset' : 'sunrise', nextSun)}<br />
             <span class="muted">{deg(instant.sample.sun.elDeg, 2)} elevation, towards {compass(instant.sample.sun.azDeg)} ({deg(instant.sample.sun.azDeg, 0)})</span></div>
-          <div><span class="dot earth" /><b>Earth {instant.earthUp ? 'in view' : 'hidden'}</b> · {change(instant.earthUp ? 'earthset' : 'earthrise', nextEarth)}<br />
+          <div><span class="dot earth" /><b>Earth {instant.earthUp ? 'in View' : 'Hidden'}</b> ·{change(instant.earthUp ? 'earthset' : 'earthrise', nextEarth)}<br />
             <span class="muted">{deg(instant.sample.earth.elDeg, 2)} elevation, towards {compass(instant.sample.earth.azDeg)} ({deg(instant.sample.earth.azDeg, 0)})</span></div>
           <div class="muted">{fmtUtc(instant.tMs)} · {fmtSpan(cursorH.value)} after landing</div>
         </div>
@@ -249,8 +265,8 @@ function Card({ scenario, index, app }: { scenario: Scenario; index: number; app
         {a.catalog ? <> Coordinates: <a href={a.catalog.source.url} target="_blank" rel="noreferrer">{a.catalog.source.title}</a>.</> : null}
         {a.catalog?.note ? ` ${a.catalog.note}.` : ''}</p>
       <div class="card-actions">
-        <button type="button" disabled={scenarios.value.length >= MAX_SCENARIOS} onClick={() => addScenario({ ...scenario, startMs: clampTime(scenario.startMs + LUNAR_MONTH_DAYS * DAY) })}>+ Same site, one lunar month later</button>
-        <button type="button" disabled={scenarios.value.length >= MAX_SCENARIOS} onClick={() => addScenario({ ...scenario })}>+ Copy, then change site or height</button>
+        <button type="button" disabled={scenarios.value.length >= MAX_SCENARIOS} onClick={() => addScenario({ ...scenario, startMs: clampTime(scenario.startMs + LUNAR_MONTH_DAYS * DAY) })}>+ Same Site, One Lunar Month Later</button>
+        <button type="button" disabled={scenarios.value.length >= MAX_SCENARIOS} onClick={() => addScenario({ ...scenario })}>+ Copy, Then Change Site or Height</button>
       </div>
     </article>
   );
@@ -266,25 +282,30 @@ function CalendarPanel() {
   const rows: CalendarRow[] = [
     { label: `${index + 1} · Sun`, color: SUN, values: calendar.sunRunH, title: `${own.name}: sunlight` },
     { label: `${index + 1} · Earth`, color: EARTH, values: calendar.earthRunH, title: `${own.name}: Earth in view` },
-    { label: `${index + 1} · Power + link`, color: BOTH, values: calendar.bothRunH, title: `${own.name}: power + link` },
+    { label: `${index + 1} · Power + Link`, color: BOTH, values: calendar.bothRunH, title: `${own.name}: power + link` },
   ];
   analyses.value.forEach((other, i) => {
     if (!other || i === index) return;
     // The same site at another date would repeat the same row.
     if (other.site.latDeg === own.site.latDeg && other.site.lonDeg === own.site.lonDeg && other.scenario.mastM === own.scenario.mastM) return;
-    rows.push({ label: `${i + 1} · Power + link`, color: BOTH, values: landingCalendar(other, from, 365).bothRunH, title: `${other.name}: power + link` });
+    rows.push({ label: `${i + 1} · Power + Link`, color: BOTH, values: landingCalendar(other, from, 365).bothRunH, title: `${other.name}: power + link` });
   });
   const best = bestWindows(calendar, 3);
   return (
     <section class="panel">
-      <h2>When to land <span class="muted">— one year of possible landing days</span></h2>
+      <header class="panel-head">
+        <div>
+          <h2>When to Land</h2>
+          <p class="sub">One year of possible landing days</p>
+        </div>
+      </header>
       <p class="hint">Each column is a landing day. Brighter means a longer unbroken stretch after touchdown; dark means landing into night, or with no link. Rows show scenario {index + 1} ({own.name}){rows.length > 3 ? ' and the power + link row of the other sites' : ''}. Hover for the numbers, click a day to move the landing of scenario {index + 1} there.</p>
       <LandingCalendar calendar={calendar} rows={rows} currentMs={own.scenario.startMs} best={best} onPick={(ms) => updateScenario(own.scenario.id, { startMs: clampTime(ms) })} />
       {best.length ? (
         <p class="advice">▼ Longest unbroken power + link at {own.name}:{' '}
           {best.map((w) => (
             <button type="button" onClick={() => updateScenario(own.scenario.id, { startMs: clampTime(w.startMs) })}>
-              land {fmtDate(w.startMs)} → {w.capped ? 'more than ' : ''}{fmtSpan(w.hours)}
+              Land {fmtDate(w.startMs)} → {w.capped ? 'More than ' : ''}{fmtSpan(w.hours)}
             </button>
           ))}
         </p>
@@ -298,35 +319,43 @@ export function App() {
   if (loadError.value) return <main><p class="error">The site data could not be loaded: {loadError.value}</p></main>;
   if (!app) return <main><p class="hint">Loading…</p></main>;
   return (
-    <main>
+    <>
       <header class="appbar">
-        <div class="brand">
-          <h1>Lunar Landing Site Navigator</h1>
-          <p class="lead">If we land <em>here</em>, on <em>this day</em> — will we have power, and can we talk to Earth? The Sun and the Earth against the real skyline of the Moon's south pole, for sites and dates side by side.</p>
-        </div>
-        <div class="appbar-actions">
-          <button type="button" onClick={() => {
-            void navigator.clipboard?.writeText(location.href).then(() => { copied.value = true; setTimeout(() => { copied.value = false; }, 1500); });
-          }}>{copied.value ? 'Link copied' : 'Copy link to this comparison'}</button>
+        <div class="appbar-inner">
+          <div class="brand">
+            <svg class="mark" viewBox="0 0 32 32" aria-hidden="true">
+              <circle cx="16" cy="16" r="15" fill="#111827" />
+              <path d="M1.6 19.5h28.8" stroke="#f59e0b" stroke-width="2" />
+              <circle cx="22" cy="15.5" r="2.6" fill="#f59e0b" />
+              <circle cx="10" cy="12" r="2.2" fill="#60a5fa" />
+            </svg>
+            <div>
+              <h1>Lunar Landing Site Navigator</h1>
+              <p class="lead">If we land here, on this day, will we have power, and can we talk to Earth?</p>
+            </div>
+          </div>
+          <div class="appbar-actions">
+            <Presets />
+            <button type="button" onClick={() => {
+              void navigator.clipboard?.writeText(location.href).then(() => { copied.value = true; setTimeout(() => { copied.value = false; }, 1500); });
+            }}>{copied.value ? 'Link Copied' : 'Copy Link to This Comparison'}</button>
+          </div>
         </div>
       </header>
-      <Presets />
       <Toolbar />
-      <div class="layout">
-        <div class="side"><MapPanel app={app} /></div>
-        <div class="main-col">
-          <ComparisonPanel />
-          <div class="cards" style={{ '--columns': Math.min(2, scenarios.value.length) }}>
-            {scenarios.value.map((s, i) => <Card key={s.id} scenario={s} index={i} app={app} />)}
-          </div>
-          <CalendarPanel />
-          <FinderPanel app={app} />
-        </div>
+      <main>
+      <MapPanel app={app} />
+      <ComparisonPanel />
+      <div class="cards" style={{ '--columns': Math.min(2, scenarios.value.length) }}>
+        {scenarios.value.map((s, i) => <Card key={s.id} scenario={s} index={i} app={app} />)}
       </div>
+      <CalendarPanel />
+      <FinderPanel app={app} />
       <footer>
         <p><b>How far to trust it.</b> Sun and Earth directions are computed in your browser and checked against NASA/JPL Horizons at 9,810 reference moments (nine sites, 2026–2035): the largest difference is 0.004°. Skylines come from NASA's Lunar Orbiter Laser Altimeter (LOLA) terrain; the sunlight and Earth-visibility shares they give were compared with the NASA LOLA-team illumination maps at 400 places (correlation 0.98). What is shown is geometric line of sight, with eclipses of the Sun by the Earth included: the lander's own shadow, dust, slopes and radio link budgets are not modelled. A planning aid, not a flight product.</p>
         <p>Built for the 2026 NASA Space Apps Challenge by team Eallweald, Inc. Not affiliated with or endorsed by NASA. <a href="https://github.com/m4tt187/lunar-landing-site-navigator" target="_blank" rel="noreferrer">Source code, methods, data sources and AI-use statement</a>.</p>
       </footer>
-    </main>
+      </main>
+    </>
   );
 }

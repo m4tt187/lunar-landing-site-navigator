@@ -4,11 +4,12 @@
 // Builds the terrain assets used by the web application from the NASA LOLA
 // 120 m south-polar elevation model (see data/terrain/README.md):
 //   - a 480 m copy of the model for skylines at custom coordinates,
-//   - a shaded-relief map of everything south of 80 S,
+//   - a shaded-relief map: everything south of 80 S, and the model's terrain beyond it on either side,
 //   - skyline profiles for the curated sites, computed at full 120 m resolution,
 //   - colour layers made from the NASA LOLA-team average sunlight and Earth-visibility maps.
 //
-// Usage: npx tsx tools/terrain/build.ts
+// Usage: npx tsx tools/terrain/build.ts             (everything)
+//        npx tsx tools/terrain/build.ts --map-only  (the relief map only)
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
@@ -23,7 +24,7 @@ const SOURCE_SHA256 = 'ae3afc3c75c33d43666ca06c83ca08f0b12ef03b7d36d2d791d972730
 const N = 7624, SCALE_M = 120, HEIGHT_SCALE = 0.5;
 const OUT = root + 'web/public/data/';
 export const MAST_HEIGHTS_M = [2, 10, 50];
-const MAP_PX = 1400, MAP_MIN_LAT = -80;
+const MAP_PX = 1400, MAP_MIN_LAT = -80, MAP_ASPECT = 1.5;
 const R_M = 1737400;
 
 function loadDem(): PolarDem {
@@ -65,38 +66,58 @@ function png(width: number, height: number, rgb: Uint8Array, channels: 3 | 4 = 3
   ]);
 }
 
-/** Shaded relief with a height tint, in the same polar stereographic layout as the model. */
-function reliefMap(dem: PolarDem): { image: Buffer; halfWidthM: number } {
+/**
+ * Shaded relief with a height tint, in the same polar stereographic layout as the model.
+ * The image is MAP_ASPECT times wider than tall: the square of everything south of 80 S
+ * in the middle, and the model's own terrain out towards 75 S on the left and the right.
+ */
+function reliefMap(dem: PolarDem): { image: Buffer; halfWidthM: number; widthPx: number } {
   const halfWidthM = 2 * R_M * Math.tan(((90 + MAP_MIN_LAT) * Math.PI) / 360);
   const px = (2 * halfWidthM) / MAP_PX;
-  const h = new Float32Array(MAP_PX * MAP_PX);
+  const W = Math.round(MAP_PX * MAP_ASPECT), H = MAP_PX;
+  if ((W * px) / 2 > (dem.n * dem.scaleM) / 2) throw new Error('The map is wider than the elevation model.');
+  const h = new Float32Array(W * H);
   const centre = dem.n / 2 - 0.5;
   const block = Math.max(1, Math.round(px / dem.scaleM));
-  for (let y = 0; y < MAP_PX; y++)
-    for (let x = 0; x < MAP_PX; x++) {
-      const col = Math.round(centre + ((x + 0.5) * px - halfWidthM) / dem.scaleM - block / 2);
+  for (let y = 0; y < H; y++)
+    for (let x = 0; x < W; x++) {
+      const col = Math.round(centre + ((x + 0.5) * px - (W * px) / 2) / dem.scaleM - block / 2);
       const row = Math.round(centre + ((y + 0.5) * px - halfWidthM) / dem.scaleM - block / 2);
       let sum = 0;
       for (let dr = 0; dr < block; dr++) for (let dc = 0; dc < block; dc++) sum += dem.raw[(row + dr) * dem.n + col + dc]!;
-      h[y * MAP_PX + x] = (sum / (block * block)) * dem.heightScale;
+      h[y * W + x] = (sum / (block * block)) * dem.heightScale;
     }
-  const rgb = new Uint8Array(MAP_PX * MAP_PX * 3);
+  const rgb = new Uint8Array(W * H * 3);
   const light = [-0.5, -0.5, 0.707];
-  for (let y = 0; y < MAP_PX; y++)
-    for (let x = 0; x < MAP_PX; x++) {
-      const xl = Math.max(0, x - 1), xr = Math.min(MAP_PX - 1, x + 1), yu = Math.max(0, y - 1), yd = Math.min(MAP_PX - 1, y + 1);
-      const dzdx = (h[y * MAP_PX + xr]! - h[y * MAP_PX + xl]!) / ((xr - xl) * px);
-      const dzdy = (h[yd * MAP_PX + x]! - h[yu * MAP_PX + x]!) / ((yd - yu) * px);
+  for (let y = 0; y < H; y++)
+    for (let x = 0; x < W; x++) {
+      const xl = Math.max(0, x - 1), xr = Math.min(W - 1, x + 1), yu = Math.max(0, y - 1), yd = Math.min(H - 1, y + 1);
+      const dzdx = (h[y * W + xr]! - h[y * W + xl]!) / ((xr - xl) * px);
+      const dzdy = (h[yd * W + x]! - h[yu * W + x]!) / ((yd - yu) * px);
       const nx = -dzdx * 2.5, ny = -dzdy * 2.5, norm = Math.hypot(nx, ny, 1);
       const shade = Math.max(0, (nx * light[0]! + ny * light[1]! + light[2]!) / norm);
-      const t = Math.min(1, Math.max(0, (h[y * MAP_PX + x]! + 4500) / 10500));
+      const t = Math.min(1, Math.max(0, (h[y * W + x]! + 4500) / 10500));
       const lum = 0.18 + 0.82 * shade;
-      const i = (y * MAP_PX + x) * 3;
+      const i = (y * W + x) * 3;
       rgb[i] = Math.round(255 * lum * (0.42 + 0.50 * t));
       rgb[i + 1] = Math.round(255 * lum * (0.46 + 0.42 * t));
       rgb[i + 2] = Math.round(255 * lum * (0.56 + 0.26 * t));
     }
-  return { image: png(MAP_PX, MAP_PX, rgb), halfWidthM };
+  return { image: png(W, H, rgb), halfWidthM, widthPx: W };
+}
+
+/** Writes the relief map and returns its entry for terrain.json. */
+function writeReliefMap(dem: PolarDem): { file: string; sizePx: number; widthPx: number; aspect: number; halfWidthM: number; minLatDeg: number } {
+  const map = reliefMap(dem);
+  let mapFile = 'south-pole-relief.png';
+  writeFileSync(OUT + mapFile, map.image);
+  try {
+    // Smaller download where the macOS image tool is available; the PNG is kept otherwise.
+    execFileSync('sips', ['-s', 'format', 'jpeg', '-s', 'formatOptions', '80', OUT + mapFile, '--out', OUT + 'south-pole-relief.jpg'], { stdio: 'ignore' });
+    rmSync(OUT + mapFile);
+    mapFile = 'south-pole-relief.jpg';
+  } catch { /* keep the PNG */ }
+  return { file: mapFile, sizePx: MAP_PX, widthPx: map.widthPx, aspect: map.widthPx / MAP_PX, halfWidthM: map.halfWidthM, minLatDeg: MAP_MIN_LAT };
 }
 
 const LAYER_PX = 1000;
@@ -206,18 +227,19 @@ function main(): void {
   const dem = loadDem();
   console.log(`model loaded: ${dem.n} x ${dem.n}, highest point ${dem.maxHeightM} m`);
 
+  if (process.argv.includes('--map-only')) {
+    // Only the relief map: everything else is left as it is.
+    const terrain = JSON.parse(readFileSync(OUT + 'terrain.json', 'utf8')) as Record<string, unknown>;
+    terrain.map = writeReliefMap(dem);
+    writeFileSync(OUT + 'terrain.json', JSON.stringify(terrain, null, 1));
+    console.log('map done');
+    return;
+  }
+
   const coarse = reduce(dem, 4);
   writeFileSync(OUT + 'ldem_75s_480m.i16', Buffer.from(coarse.raw.buffer, coarse.raw.byteOffset, coarse.raw.byteLength));
 
-  const map = reliefMap(dem);
-  let mapFile = 'south-pole-relief.png';
-  writeFileSync(OUT + mapFile, map.image);
-  try {
-    // Smaller download where the macOS image tool is available; the PNG is kept otherwise.
-    execFileSync('sips', ['-s', 'format', 'jpeg', '-s', 'formatOptions', '80', OUT + mapFile, '--out', OUT + 'south-pole-relief.jpg'], { stdio: 'ignore' });
-    rmSync(OUT + mapFile);
-    mapFile = 'south-pole-relief.jpg';
-  } catch { /* keep the PNG */ }
+  const map = writeReliefMap(dem);
 
   const visibility = LAYERS.map((layer) => ({ layer, raw: loadVisibility(layer) }));
   const layers = visibility.map(({ layer, raw }) => {
@@ -273,7 +295,7 @@ function main(): void {
   writeFileSync(OUT + 'terrain.json', JSON.stringify({
     source: 'NASA LRO LOLA gridded data record LDEM_75S_120M (PDS data set LRO-L-LOLA-4-GDR-V1.0)',
     coarse: { file: 'ldem_75s_480m.i16', n: coarse.n, scaleM: coarse.scaleM, heightScale: coarse.heightScale, sampleType: 'int16 little-endian, block mean of 4 x 4 source pixels' },
-    map: { file: mapFile, sizePx: MAP_PX, halfWidthM: map.halfWidthM, minLatDeg: MAP_MIN_LAT },
+    map,
     layers: { source: 'NASA LOLA team, AVGVISIB_85S_060M_201608 and AVGVISIB_85S_060M_201608_EARTH (average visibility of the solar disc and of the Earth disc, Mazarico et al. 2011 method)', items: layers },
     check: { southPoleHeightM: Math.round(demHeightAt(dem, -90, 0)) },
   }, null, 1));

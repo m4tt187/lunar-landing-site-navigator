@@ -65,21 +65,26 @@ export function FinderPanel({ app }: { app: AppData }) {
   };
   return (
     <section class="panel">
-      <h2>Best site and date <span class="muted">— describe the mission, get where and when to land</span></h2>
+      <header class="panel-head">
+        <div>
+          <h2>Best Site and Date</h2>
+          <p class="sub">Describe the mission, get where and when to land</p>
+        </div>
+      </header>
       <form class="finder-form" onSubmit={(event) => { event.preventDefault(); find(app); }}>
-        <label>Days of surface operations
+        <label>Days of Surface Operations
           <input type="number" min="1" max="180" step="1" value={missionDays.value}
             onChange={(e) => { missionDays.value = number((e.currentTarget as HTMLInputElement).value, 1, 180, 14); }} />
         </label>
-        <label>Darkness the lander survives
+        <label>Darkness the Lander Survives
           <select value={String(toleranceH.value)} onChange={(e) => { toleranceH.value = Number((e.currentTarget as HTMLSelectElement).value); }}>
-            <option value="0">none</option><option value="1">1 hour</option><option value="6">6 hours</option>
-            <option value="24">1 day</option><option value="72">3 days</option><option value="336">14 days</option>
+            <option value="0">None</option><option value="1">1 Hour</option><option value="6">6 Hours</option>
+            <option value="24">1 Day</option><option value="72">3 Days</option><option value="336">14 Days</option>
           </select>
         </label>
         <label class="check"><input type="checkbox" checked={earthAtLanding.value}
-          onChange={(e) => { earthAtLanding.value = (e.currentTarget as HTMLInputElement).checked; }} />Earth in view at touchdown</label>
-        <button type="submit" class="primary" disabled={progress.value !== null}>Find the best site and date</button>
+          onChange={(e) => { earthAtLanding.value = (e.currentTarget as HTMLInputElement).checked; }} />Earth in View at Touchdown</label>
+        <button type="submit" class="primary" disabled={progress.value !== null}>Find the Best Site and Date</button>
         {progress.value ? <p class="finder-status" aria-live="polite">{progress.value}</p> : null}
       </form>
       {failure.value ? <p class="error">The search could not be completed: {failure.value}</p> : null}
@@ -88,8 +93,8 @@ export function FinderPanel({ app }: { app: AppData }) {
           <div class="table-wrap">
             <table class="compare">
               <thead><tr>
-                <th scope="col">Rank</th><th scope="col">Site</th><th scope="col">Landing (UTC)</th><th scope="col">Power lasts</th>
-                <th scope="col">Mission powered</th><th scope="col">Earth in view</th><th scope="col">Longest link gap</th><th scope="col" />
+                <th scope="col">Rank</th><th scope="col">Site</th><th scope="col">Landing (UTC)</th><th scope="col">Power Lasts</th>
+                <th scope="col">Mission Powered</th><th scope="col">Earth in View</th><th scope="col">Longest Link Gap</th><th scope="col" />
               </tr></thead>
               <tbody>
                 {found.list.map((r) => (
@@ -97,14 +102,14 @@ export function FinderPanel({ app }: { app: AppData }) {
                     <td>{r.rank}</td>
                     <th scope="row">{r.candidateName}</th>
                     <td>{fmtUtc(r.landingMs).replace(' UTC', '')}</td>
-                    <td>{r.openEnded ? 'more than ' : ''}{fmtSpan(r.powerHours)}</td>
+                    <td>{r.openEnded ? 'More than ' : ''}{fmtSpan(r.powerHours)}</td>
                     <td class={r.missionCoverage >= 1 ? 'best' : ''}>{pct(r.missionCoverage)}</td>
                     <td>{pct(r.earthFraction)}</td>
-                    <td>{r.longestLinkGapH > 0 ? fmtSpan(r.longestLinkGapH) : 'none'}</td>
+                    <td>{r.longestLinkGapH > 0 ? fmtSpan(r.longestLinkGapH) : 'None'}</td>
                     <td class="actions">
-                      <button type="button" onClick={() => updateScenario(selectedId.value, { siteId: r.candidateId, custom: null, startMs: clampTime(r.landingMs) })}>Set scenario {index + 1}</button>
+                      <button type="button" onClick={() => updateScenario(selectedId.value, { siteId: r.candidateId, custom: null, startMs: clampTime(r.landingMs) })}>Set Scenario {index + 1}</button>
                       <button type="button" disabled={scenarios.value.length >= MAX_SCENARIOS}
-                        onClick={() => addScenario({ siteId: r.candidateId, custom: null, mastM: found.request.mastM, startMs: clampTime(r.landingMs) })}>Add to comparison</button>
+                        onClick={() => addScenario({ siteId: r.candidateId, custom: null, mastM: found.request.mastM, startMs: clampTime(r.landingMs) })}>Add to Comparison</button>
                     </td>
                   </tr>
                 ))}

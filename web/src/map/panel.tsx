@@ -110,18 +110,26 @@ function paint(canvas: HTMLCanvasElement, grid: MapGrid, layer: MapLayer, result
   context.putImageData(image, 0, 0);
 }
 
+/** Width of the map over its height: the square south of 80° S sits in the middle. */
+const aspectOf = (meta: TerrainMeta): number => meta.map.aspect ?? 1;
+
+/** Position of a centred square overlay whose half-width is `halfWidthM`, as percentages of the map. */
+function overlayBox(meta: TerrainMeta, halfWidthM: number): Record<string, string> {
+  const f = halfWidthM / meta.map.halfWidthM, w = (f * 100) / aspectOf(meta);
+  return { left: `${50 - w / 2}%`, top: `${(1 - f) * 50}%`, width: `${w}%`, height: `${f * 100}%` };
+}
+
 function LayerCanvas({ grid, layer, result, meta }: { grid: MapGrid; layer: MapLayer; result: LayerResult | null; meta: TerrainMeta }) {
   const ref = useRef<HTMLCanvasElement>(null);
   useEffect(() => { if (ref.current) paint(ref.current, grid, layer, result); }, [grid, layer, result]);
-  const f = (grid.size * grid.scaleM) / (2 * meta.map.halfWidthM), inset = `${(1 - f) * 50}%`;
-  return <canvas ref={ref} width={grid.size} height={grid.size} class="layer" style={{ left: inset, top: inset, width: `${f * 100}%`, height: `${f * 100}%` }} />;
+  return <canvas ref={ref} width={grid.size} height={grid.size} class="layer" style={overlayBox(meta, (grid.size * grid.scaleM) / 2)} />;
 }
 
 const hover = signal<{ x: number; y: number } | null>(null);
 
 function readout(app: AppData, layer: MapLayer, x: number, y: number): string {
   const p = unproject(app.terrain, x, y);
-  if (p.latDeg > app.terrain.map.minLatDeg) return 'Outside the mapped area';
+  if (p.latDeg > app.terrain.map.minLatDeg) return `${fmtLatLon(p.latDeg, p.lonDeg)} · Outside the Computed Area`;
   let text = fmtLatLon(p.latDeg, p.lonDeg);
   const grid = mapGrid.value;
   if (!grid || !isComputed(layer)) return text;
@@ -129,10 +137,10 @@ function readout(app: AppData, layer: MapLayer, x: number, y: number): string {
   if (k < 0) return text;
   if (layer === 'now') {
     const now = nowResult.value;
-    if (now && now.samples) text += ` · Sun ${now.sun[k] ? 'in view' : 'hidden'} · Earth ${now.earth[k] ? 'in view' : 'hidden'}`;
+    if (now && now.samples) text += ` · Sun ${now.sun[k] ? 'in View' : 'Hidden'} · Earth ${now.earth[k] ? 'in View' : 'Hidden'}`;
   } else {
     const m = missionResult.value;
-    if (m && m.samples) text += ` · sunlight ${pct(m.sun[k]! / m.samples)} · Earth ${pct(m.earth[k]! / m.samples)} · both ${pct(m.both[k]! / m.samples)}`;
+    if (m && m.samples) text += ` · Sunlight ${pct(m.sun[k]! / m.samples)} · Earth ${pct(m.earth[k]! / m.samples)} · Both ${pct(m.both[k]! / m.samples)}`;
   }
   return text;
 }
@@ -162,14 +170,14 @@ function bestNearby(grid: MapGrid, result: LayerResult, latDeg: number, lonDeg: 
 }
 
 function Legend({ layer }: { layer: MapLayer }) {
-  const span = DURATIONS.find((d) => d.days === durationDays.value)?.label ?? '';
+  const span = DURATIONS.find((d) => d.days === durationDays.value)?.phrase ?? '';
   const index = selectedIndex.value + 1;
   if (layer === 'terrain') return <p class="legend muted">Shaded relief computed from NASA LOLA elevation data. Lighter tones are higher ground.</p>;
   if (layer === 'nasa-sun' || layer === 'nasa-earth') {
     return (
       <div class="legend">
         <div class="ramp" style={{ background: `linear-gradient(to right, rgb(10, 12, 22), ${css(RAMP[layer === 'nasa-sun' ? 'sun' : 'earth'])})` }} />
-        <div class="ramp-labels"><span>never</span><span style={{ left: '50%' }}>25%</span><span style={{ left: '70.7%' }}>50%</span><span class="end">always</span></div>
+        <div class="ramp-labels"><span>Never</span><span style={{ left: '50%' }}>25%</span><span style={{ left: '70.7%' }}>50%</span><span class="end">Always</span></div>
         <p class="muted">NASA LOLA team (Mazarico et al. 2011 method): share of time, averaged over many years, in which any part of the {layer === 'nasa-sun' ? "Sun's" : "Earth's"} disc is above the terrain, at ground level. Covers the area south of about 85° S.</p>
       </div>
     );
@@ -181,10 +189,10 @@ function Legend({ layer }: { layer: MapLayer }) {
     return (
       <div class="legend">
         <div class="swatches">
-          <span><i style={{ background: css(RAMP.both) }} />Sun and Earth in view</span>
-          <span><i style={{ background: css(RAMP.sun) }} />Sun only</span>
-          <span><i style={{ background: css(RAMP.earth) }} />Earth only</span>
-          <span><i style={{ background: css(DARK) }} />neither</span>
+          <span><i style={{ background: css(RAMP.both) }} />Sun and Earth in View</span>
+          <span><i style={{ background: css(RAMP.sun) }} />Sun Only</span>
+          <span><i style={{ background: css(RAMP.earth) }} />Earth Only</span>
+          <span><i style={{ background: css(DARK) }} />Neither</span>
         </div>
         <p class="muted">Computed in your browser for the moment shown by the time slider (scenario {index}): every place south of 80° S, {selectedAnalysis.value?.scenario.mastM ?? 2} m above the ground. Press Play to watch the shadows move.</p>
       </div>
@@ -214,7 +222,7 @@ function NearbyAdvice({ app }: { app: AppData }) {
   return (
     <p class="advice">
       Within {NEARBY_KM} km of scenario {index}, the best place for power + link is {fmtLatLon(best.latDeg, best.lonDeg)}: <b>{pct(best.both)}</b> of the mission instead of {pct(best.hereBoth)} on this map.{' '}
-      <button type="button" onClick={() => moveSelectedTo(best.latDeg, best.lonDeg)}>Move scenario {index} there</button>
+      <button type="button" onClick={() => moveSelectedTo(best.latDeg, best.lonDeg)}>Move Scenario {index} There</button>
     </p>
   );
 }
@@ -227,13 +235,13 @@ function CustomCoordinates() {
       const form = new FormData(event.currentTarget as HTMLFormElement);
       moveSelectedTo(Number(form.get('lat')), Number(form.get('lon')));
     }}>
-      <label>Latitude (°, north positive)
+      <label>Latitude (°, North +)
         <input name="lat" type="number" step="0.0001" min="-90" max="90" required value={site?.latDeg ?? ''} key={`lat${site?.latDeg}`} />
       </label>
-      <label>Longitude (°, east positive)
+      <label>Longitude (°, East +)
         <input name="lon" type="number" step="0.0001" min="-180" max="180" required value={site?.lonDeg ?? ''} key={`lon${site?.lonDeg}`} />
       </label>
-      <button type="submit">Use coordinates</button>
+      <button type="submit">Use Coordinates</button>
     </form>
   );
 }
@@ -245,41 +253,53 @@ export function MapPanel({ app }: { app: AppData }) {
     ? meta.layers?.items.find((item) => item.id === (layer === 'nasa-sun' ? 'sun' : 'earth')) : undefined;
   const result = layer === 'now' ? nowResult.value : missionResult.value;
   const at = hover.value;
+  const aspect = aspectOf(meta), left = -500 * (aspect - 1), right = 1000 - left;
+  // Pointer position as a fraction of the central square (0..1 from its left and top edges).
   const fraction = (event: MouseEvent): { x: number; y: number } => {
     const box = (event.currentTarget as SVGSVGElement).getBoundingClientRect();
-    return { x: (event.clientX - box.left) / box.width, y: (event.clientY - box.top) / box.height };
+    return { x: ((event.clientX - box.left) / box.width - 0.5) * aspect + 0.5, y: (event.clientY - box.top) / box.height };
   };
+  const ring = (lat: number): number => project(meta, lat, 90).x * 1000 - 500;
   return (
     <section class="panel map-panel">
-      <h2>South pole <span class="muted">— everything south of 80° S</span></h2>
-      <div class="layers" role="group" aria-label="Map layer">
-        {MAP_LAYERS.filter((l) => !l.id.startsWith('nasa') || meta.layers).map((l) => (
-          <button type="button" aria-pressed={layer === l.id} title={l.title} onClick={() => { mapLayer.value = l.id; }}>{l.label}</button>
-        ))}
-      </div>
-      <div class="map">
+      <header class="panel-head">
+        <div>
+          <h2>South Pole Map</h2>
+          <p class="sub">Everything south of 80° S, computed live in your browser from NASA LOLA terrain</p>
+        </div>
+        <div class="segmented layers" role="group" aria-label="Map layer">
+          {MAP_LAYERS.filter((l) => !l.id.startsWith('nasa') || meta.layers).map((l) => (
+            <button type="button" aria-pressed={layer === l.id} title={l.title} onClick={() => { mapLayer.value = l.id; }}>{l.label}</button>
+          ))}
+        </div>
+      </header>
+      <div class="map-body">
+      <div class="map" style={{ aspectRatio: String(aspect) }}>
         <img src={dataUrl(meta.map.file)} alt="Shaded relief of the lunar south pole computed from NASA LOLA elevation data" draggable={false} />
-        {nasa ? (() => {
-          const f = nasa.halfWidthM / meta.map.halfWidthM, inset = `${(1 - f) * 50}%`;
-          return <img class="layer" src={dataUrl(nasa.file)} alt="" draggable={false} style={{ left: inset, top: inset, width: `${f * 100}%`, height: `${f * 100}%` }} />;
-        })() : null}
+        {nasa ? <img class="layer" src={dataUrl(nasa.file)} alt="" draggable={false} style={overlayBox(meta, nasa.halfWidthM)} /> : null}
         {grid && isComputed(layer) ? <LayerCanvas grid={grid} layer={layer} result={result} meta={meta} /> : null}
-        <svg viewBox="0 0 1000 1000"
+        <svg viewBox={`${left} 0 ${right - left} 1000`}
           onClick={(event) => {
             const f = fraction(event), p = unproject(meta, f.x, f.y);
             if (p.latDeg <= meta.map.minLatDeg) moveSelectedTo(p.latDeg, p.lonDeg);
           }}
           onMouseMove={(event) => { hover.value = fraction(event); }}
           onMouseLeave={() => { hover.value = null; }}>
-          {[-88, -86, -84, -82].map((lat) => <circle cx="500" cy="500" r={project(meta, lat, 90).x * 1000 - 500} class="graticule" />)}
+          {Array.from({ length: 12 }, (_, i) => i * 30).map((lon) => {
+            const a = (lon * Math.PI) / 180, reach = right - 500;
+            return <line x1={500 + 30 * Math.sin(a)} y1={500 - 30 * Math.cos(a)} x2={500 + reach * 1.3 * Math.sin(a)} y2={500 - reach * 1.3 * Math.cos(a)} class="graticule spoke" />;
+          })}
+          {[-88, -86, -84, -82, -78, -76].map((lat) => <circle cx="500" cy="500" r={ring(lat)} class="graticule" />)}
+          <circle cx="500" cy="500" r={ring(meta.map.minLatDeg)} class="graticule edge" />
           {[-88, -86, -84, -82].map((lat) => <text x="503" y={project(meta, lat, 0).y * 1000 - 3} class="map-label faint">{-lat}°S</text>)}
-          <text x="500" y="22" class="map-label" text-anchor="middle">0° — towards Earth</text>
-          <text x="990" y="506" class="map-label" text-anchor="end">90° E</text>
-          <text x="10" y="506" class="map-label">90° W</text>
-          <text x="500" y="990" class="map-label" text-anchor="middle">180° — far side</text>
+          {[-80, -78, -76].map((lat) => <text x={500 + ring(lat) + 4} y="490" class="map-label faint">{-lat}°S</text>)}
+          <text x="500" y="24" class="map-label" text-anchor="middle">0° — Towards Earth</text>
+          <text x={right - 12} y="530" class="map-label" text-anchor="end">90° E</text>
+          <text x={left + 12} y="530" class="map-label">90° W</text>
+          <text x="500" y="986" class="map-label" text-anchor="middle">180° — Far Side</text>
           {app.sites.filter((s) => s.latDeg <= meta.map.minLatDeg).map((s) => {
             const p = project(meta, s.latDeg, s.lonDeg);
-            const label = s.group === 'sunlit' ? s.name.split(' (')[0]!.replace('Sunlit peak ', '') : s.name.replace(' crater (centre)', '');
+            const label = s.group === 'sunlit' ? s.name.split(' (')[0]!.replace('Sunlit Peak ', '') : s.name.replace(' Crater (Centre)', '');
             return (
               <g class="site-dot" onClick={(event) => { event.stopPropagation(); updateScenario(selectedId.value, { siteId: s.id, custom: null }); }}>
                 <title>{`${s.name} — ${fmtLatLon(s.latDeg, s.lonDeg)}${s.note ? ` — ${s.note}` : ''}`}</title>
@@ -304,10 +324,22 @@ export function MapPanel({ app }: { app: AppData }) {
           })}
         </svg>
       </div>
-      <p class="readout" aria-live="off">{at ? readout(app, layer, at.x, at.y) : <>Click the map to move <b style={{ color: SCENARIO_COLORS[index] }}>scenario {index + 1}</b> there, or pick a marked site. ◆ = best-lit points in NASA's map.</>}</p>
-      <Legend layer={layer} />
-      <NearbyAdvice app={app} />
-      <CustomCoordinates />
+      <aside class="map-side">
+        <div class="readout" aria-live="off">
+          <span class="field-label">Under the Pointer</span>
+          <p>{at ? readout(app, layer, at.x, at.y) : <>Click the map to move <b style={{ color: SCENARIO_COLORS[index] }}>scenario {index + 1}</b> there, or pick a marked site. ◆ marks the best-lit points in NASA's map.</>}</p>
+        </div>
+        <div>
+          <span class="field-label">Legend</span>
+          <Legend layer={layer} />
+        </div>
+        <NearbyAdvice app={app} />
+        <div>
+          <span class="field-label">Go to Coordinates</span>
+          <CustomCoordinates />
+        </div>
+      </aside>
+      </div>
     </section>
   );
 }

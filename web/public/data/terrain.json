@@ -10,6 +10,8 @@
  "map": {
   "file": "south-pole-relief.jpg",
   "sizePx": 1400,
+  "widthPx": 2100,
+  "aspect": 1.5,
   "halfWidthM": 304005.6080198807,
   "minLatDeg": -80
  },
