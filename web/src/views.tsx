@@ -23,7 +23,7 @@ interface Frame { x: (az: number) => number; y: (el: number) => number; centre: 
 
 /** Panorama of the skyline all around the site, with the paths of the Sun and the Earth over the mission. */
 export function SkyView({ a, instant }: { a: Analysis; instant: Instant }) {
-  const W = 480, H = 232, L = 30, R = 6, T = 8, B = 22;
+  const W = 720, H = 220, L = 30, R = 6, T = 8, B = 22;
   const stat = useMemo(() => {
     const profile = a.terrain.profile;
     const { series, margins } = a;
@@ -186,7 +186,7 @@ export function CloseUp({ a, instant, body }: { a: Analysis; instant: Instant; b
 
 /** Sunlight, Earth-visibility and combined windows over the mission span. */
 export function Timeline({ a, cursorH, onCursor }: { a: Analysis; cursorH: number; onCursor: (hours: number) => void }) {
-  const W = 480, H = 84, L = 40, R = 6, rowH = 16, top = 4;
+  const W = 720, H = 84, L = 40, R = 6, rowH = 16, top = 4;
   const { startMs, endMs } = a.series;
   const x = (ms: number): number => L + ((ms - startMs) / (endMs - startMs)) * (W - L - R);
   const days = (endMs - startMs) / DAY;
@@ -234,7 +234,7 @@ export interface CalendarRow { label: string; color: string; values: Float32Arra
 export function LandingCalendar({ calendar, rows, currentMs, best, onPick }: {
   calendar: Calendar; rows: CalendarRow[]; currentMs: number; best: LandingWindow[]; onPick: (ms: number) => void;
 }) {
-  const W = 960, L = 150, R = 8, rowH = 18, gap = 3, top = 16;
+  const W = 1440, L = 150, R = 8, rowH = 18, gap = 3, top = 16;
   const H = top + rows.length * (rowH + gap) + 34;
   const perDay = DAY / calendar.stepMs;
   const daysTotal = Math.floor(calendar.sunRunH.length / perDay);
