@@ -11,10 +11,12 @@ Central European Time (CET, UTC+1).
 | Anthropic Claude (Claude Code) | Writes and reviews code and documentation for the web application, the computational core, the terrain pipeline, the repository and the delivery; researches official sources |
 | OpenAI Codex | Writes and tests parts of the computational core; reviews the rest of it independently, with reproductions and regression tests |
 
-The idea of the solution is the team's: one screen on which landing sites and dates are
-compared side by side and the answer is read at a glance. Both tools work under the
-direction of the team, which chose the challenge, sets goals and priorities, decides
-what is built, and reviews the result.
+Both tools work under the direction of the team, which chose the challenge, set what the
+tool had to be (one screen, readable at a glance, on which landing sites and dates are
+compared side by side), sets goals and priorities, decides what is built, and reviews
+the result. Within those requirements and the objectives listed in the challenge
+statement, the tools designed the features and the methods and did the work recorded in
+the log below.
 
 ## How AI-assisted material is marked
 

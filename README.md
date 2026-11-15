@@ -199,13 +199,14 @@ The terrain assets shipped in `web/public/data/` are rebuilt from the NASA files
 
 ## Use of AI tools
 
-The idea is the team's: one screen on which landing sites and dates are compared side by
-side and the answer — power or not, contact with the Earth or not — is read at a glance.
-The team chose the challenge, set the goals and priorities, decided what was built and
-reviewed the results.
+The team chose the challenge and set what the tool had to be: one screen, readable at a
+glance, on which landing sites and dates are compared side by side and the answer —
+power or not, contact with the Earth or not — is plain. The team set the goals and
+priorities, decided what was built and reviewed the results.
 
-To carry it out the team made substantial use of AI tools — Anthropic Claude (Claude
-Code) and OpenAI Codex — under its direction: they worked out the details of the design,
+To build it the team made substantial use of AI tools — Anthropic Claude (Claude Code)
+and OpenAI Codex — under its direction. Within those requirements and the objectives
+listed in the challenge statement, the tools designed the features and the methods,
 wrote and tested the code, researched and checked sources, and drafted the
 documentation, and each reviewed the other's work independently. Every AI-assisted
 source file says so in its header, and
