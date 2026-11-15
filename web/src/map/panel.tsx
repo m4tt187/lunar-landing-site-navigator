@@ -271,9 +271,16 @@ function MapFrame({ aspect, children }: { aspect: number; children: ComponentChi
     const el = ref.current;
     if (!el) return;
     const wheel = (event: WheelEvent): void => {
+      // The page keeps scrolling over the whole map: the wheel zooms only with Ctrl or ⌘
+      // (a trackpad pinch sends Ctrl), or once the map is already zoomed in.
+      const k = view.value.k;
+      if (!(event.ctrlKey || event.metaKey || k > 1)) return;
+      const factor = Math.exp(-event.deltaY * 0.0018);
+      const next = Math.min(MAX_ZOOM, Math.max(1, k * factor));
+      if (next === k) return;
       event.preventDefault();
       const box = el.getBoundingClientRect();
-      zoomAt((event.clientX - box.left) / box.width, (event.clientY - box.top) / box.height, Math.exp(-event.deltaY * 0.0018));
+      zoomAt((event.clientX - box.left) / box.width, (event.clientY - box.top) / box.height, factor);
     };
     el.addEventListener('wheel', wheel, { passive: false });
     return () => el.removeEventListener('wheel', wheel);
@@ -299,6 +306,50 @@ function MapFrame({ aspect, children }: { aspect: number; children: ComponentChi
     window.addEventListener('pointerup', up);
   };
   return <div ref={ref} class={`map ${view.value.k > 1 ? 'zoomed' : ''}`} style={{ aspectRatio: String(aspect) }} onPointerDown={down}>{children}</div>;
+}
+
+interface Box { x0: number; y0: number; x1: number; y1: number }
+const overlaps = (a: Box, b: Box): boolean => a.x0 < b.x1 && b.x0 < a.x1 && a.y0 < b.y1 && b.y0 < a.y1;
+
+/**
+ * Places the map's labels at zoom `k` (in drawing units; labels keep their size on screen).
+ * Direction labels, scenario pins and site marks come first; then site names by importance,
+ * to the right of their mark, else to the left, else not at all; then the latitude rings.
+ * Sets `place` on each site and returns the ring labels that fit.
+ */
+function layoutLabels(
+  k: number, left: number, right: number, pins: { x: number; y: number }[],
+  sites: { s: { group: string }; p: { x: number; y: number }; label: string; place: { anchor: 'start' | 'end'; dy: number } | null }[],
+  order: Record<string, number>, rings: { x: number; y: number; text: string }[],
+): { rings: { x: number; y: number; text: string }[] } {
+  const taken: Box[] = [];
+  const text = (x: number, y: number, chars: number, size: number, anchor: 'start' | 'end'): Box => {
+    const w = (chars * size * 0.56) / k, h = size / k;
+    const x0 = anchor === 'start' ? x : x - w;
+    return { x0, x1: x0 + w, y0: y - h * 0.8, y1: y + h * 0.3 };
+  };
+  taken.push(text(left + 14, 30, 20, 20, 'start'), text(left + 14, 984, 18, 20, 'start'));
+  taken.push(text(right - 12, 530, 5, 20, 'end'), text(left + 12, 530, 5, 20, 'start'));
+  for (const p of pins) taken.push({ x0: p.x * 1000 - 14 / k, x1: p.x * 1000 + 14 / k, y0: p.y * 1000 - 36 / k, y1: p.y * 1000 + 2 / k });
+  for (const { p } of sites) taken.push({ x0: p.x * 1000 - 8 / k, x1: p.x * 1000 + 8 / k, y0: p.y * 1000 - 8 / k, y1: p.y * 1000 + 8 / k });
+  const ranked = [...sites].sort((a, b) => (order[a.s.group] ?? 9) - (order[b.s.group] ?? 9));
+  const inside = (b: Box): boolean => b.y0 >= 0 && b.y1 <= 1000 && b.x0 >= left && b.x1 <= right;
+  const SPOTS = [{ anchor: 'start', dy: 6 }, { anchor: 'end', dy: 6 }, { anchor: 'start', dy: 26 }, { anchor: 'end', dy: 26 }] as const;
+  for (const site of ranked) {
+    const size = site.s.group === 'feature' ? 17 : 20, x = site.p.x * 1000;
+    site.place = null;
+    for (const spot of SPOTS) {
+      const box = text(spot.anchor === 'start' ? x + 10 / k : x - 10 / k, site.p.y * 1000 + spot.dy / k, site.label.length, size, spot.anchor);
+      if (inside(box) && !taken.some((t) => overlaps(t, box))) { taken.push(box); site.place = { anchor: spot.anchor, dy: spot.dy }; break; }
+    }
+  }
+  const fitting = rings.filter((r) => {
+    const box = text(r.x, r.y, r.text.length, 17, 'start');
+    if (taken.some((t) => overlaps(t, box))) return false;
+    taken.push(box);
+    return true;
+  });
+  return { rings: fitting };
 }
 
 /** The scenarios at a glance, next to the map: click one to select it. */
@@ -350,6 +401,16 @@ export function MapPanel({ app }: { app: AppData }) {
   // Symbols and labels keep their size on screen while the terrain is enlarged.
   const at1 = (px: number, py: number, children: ComponentChildren) =>
     <g transform={`translate(${px} ${py}) scale(${1 / k})`}>{children}</g>;
+  // Labels that would overlap at this zoom are moved to the other side of their mark, or left out
+  // (the name stays in the mark's tooltip, and appears as soon as zooming in makes room for it).
+  const pins = analyses.value.flatMap((a) => (a && a.site.latDeg <= meta.map.minLatDeg ? [project(meta, a.site.latDeg, a.site.lonDeg)] : []));
+  const ORDER: Record<string, number> = { robotic: 0, planned: 1, apollo: 2, sunlit: 3, feature: 4 };
+  const sites = app.sites.filter((s) => s.latDeg <= meta.map.minLatDeg).map((s) => ({
+    s, p: project(meta, s.latDeg, s.lonDeg), place: null as { anchor: 'start' | 'end'; dy: number } | null,
+    label: s.group === 'sunlit' ? s.name.split(' (')[0]!.replace('Sunlit Peak ', '') : s.name.replace(' Crater (Centre)', ''),
+  }));
+  const labels = layoutLabels(k, left, right, pins, sites, ORDER, [-88, -86, -84, -82].map((lat) => ({ x: 503, y: project(meta, lat, 0).y * 1000 - 3, text: `${-lat}°S` }))
+    .concat([-80, -78, -76].map((lat) => ({ x: 500 + ring(lat) + 4, y: 490, text: `${-lat}°S` }))));
   return (
     <section class="panel map-panel">
       <header class="panel-head">
@@ -391,28 +452,23 @@ export function MapPanel({ app }: { app: AppData }) {
           })}
           {[-88, -86, -84, -82, -78, -76].map((lat) => <circle cx="500" cy="500" r={ring(lat)} class="graticule" />)}
           <circle cx="500" cy="500" r={ring(meta.map.minLatDeg)} class="graticule edge" />
-          {[-88, -86, -84, -82].map((lat) => at1(503, project(meta, lat, 0).y * 1000 - 3, <text class="map-label faint">{-lat}°S</text>))}
-          {[-80, -78, -76].map((lat) => at1(500 + ring(lat) + 4, 490, <text class="map-label faint">{-lat}°S</text>))}
-          {at1(500, 24, <text class="map-label" text-anchor="middle">0° — Towards Earth</text>)}
+          {at1(left + 14, 30, <text class="map-label">↑ 0°, Towards Earth</text>)}
+          {at1(left + 14, 984, <text class="map-label">↓ 180°, Far Side</text>)}
           {at1(right - 12, 530, <text class="map-label" text-anchor="end">90° E</text>)}
           {at1(left + 12, 530, <text class="map-label">90° W</text>)}
-          {at1(500, 986, <text class="map-label" text-anchor="middle">180° — Far Side</text>)}
-          {app.sites.filter((s) => s.latDeg <= meta.map.minLatDeg).map((s) => {
-            const p = project(meta, s.latDeg, s.lonDeg);
-            const label = s.group === 'sunlit' ? s.name.split(' (')[0]!.replace('Sunlit Peak ', '') : s.name.replace(' Crater (Centre)', '');
-            return (
-              <g class="site-dot" onClick={(event) => { event.stopPropagation(); if (!dragged) updateScenario(selectedId.value, { siteId: s.id, custom: null }); }}>
-                <title>{`${s.name} — ${fmtLatLon(s.latDeg, s.lonDeg)}${s.note ? ` — ${s.note}` : ''}`}</title>
-                {at1(p.x * 1000, p.y * 1000, <>
-                  <circle r="11" fill="transparent" />
-                  {s.group === 'sunlit'
-                    ? <path d="M0,-8l7,8l-7,8l-7,-8z" class="sunlit" />
-                    : <circle r={s.group === 'feature' ? 3.5 : 5} class={s.group} />}
-                  <text x="10" y="6" class={`map-label ${s.group === 'feature' ? 'faint' : ''}`}>{label}</text>
-                </>)}
-              </g>
-            );
-          })}
+          {labels.rings.map((r) => at1(r.x, r.y, <text class="map-label faint">{r.text}</text>))}
+          {sites.map(({ s, p, label, place }) => (
+            <g class="site-dot" onClick={(event) => { event.stopPropagation(); if (!dragged) updateScenario(selectedId.value, { siteId: s.id, custom: null }); }}>
+              <title>{`${s.name} — ${fmtLatLon(s.latDeg, s.lonDeg)}${s.note ? ` — ${s.note}` : ''}`}</title>
+              {at1(p.x * 1000, p.y * 1000, <>
+                <circle r="11" fill="transparent" />
+                {s.group === 'sunlit'
+                  ? <path d="M0,-8l7,8l-7,8l-7,-8z" class="sunlit" />
+                  : <circle r={s.group === 'feature' ? 3.5 : 5} class={s.group} />}
+                {place ? <text x={place.anchor === 'start' ? 10 : -10} y={place.dy} text-anchor={place.anchor} class={`map-label ${s.group === 'feature' ? 'faint' : ''}`}>{label}</text> : null}
+              </>)}
+            </g>
+          ))}
           {analyses.value.map((a, i) => {
             if (!a || a.site.latDeg > meta.map.minLatDeg) return null;
             const p = project(meta, a.site.latDeg, a.site.lonDeg);
@@ -453,7 +509,7 @@ export function MapPanel({ app }: { app: AppData }) {
             <li><svg viewBox="-14 -26 28 28" aria-hidden="true"><path d="M0,0c-3-6-13-11-13-21a13,13 0 0 1 26,0c0,10-10,15-13,21z" fill={SCENARIO_COLORS[0]} stroke="#fff" stroke-width="2" /></svg>Scenario Site</li>
             <li><svg viewBox="-12 -12 24 24" aria-hidden="true"><circle r="10" fill="none" stroke="#6a6862" stroke-width="1.5" stroke-dasharray="3 2.5" /></svg>Edge of the Computed Area (80° S)</li>
           </ul>
-          <p class="hint" style={{ margin: '6px 0 0' }}>Scroll or use + and − to zoom, drag to move.</p>
+          <p class="hint" style={{ margin: '6px 0 0' }}>Zoom with + and −, or Ctrl + scroll (pinch on a trackpad); drag to move. Names hidden where they would overlap appear as you zoom in.</p>
         </div>
       </aside>
       </div>

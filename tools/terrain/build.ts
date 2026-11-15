@@ -253,7 +253,7 @@ function main(): void {
     return sunlight === null || earth === null ? null : { sunlight, earth };
   };
 
-  const catalog = JSON.parse(readFileSync(root + 'data/sites/catalog.json', 'utf8')) as { sites: CatalogSite[] };
+  const catalog = JSON.parse(readFileSync(root + 'data/sites/catalog.json', 'utf8')) as { aiAssisted?: string; sites: CatalogSite[] };
   // Add the best-lit places found in the NASA average-sunlight map as candidate sites.
   const features = catalog.sites.filter((s) => s.group === 'feature');
   const peaks: CatalogSite[] = sunlitPeaks(visibility[0]!.raw, 8, 6000).map((peak, i) => {
@@ -290,7 +290,8 @@ function main(): void {
       nasaLongTerm: longTerm(site.latDeg, site.lonDeg),
     };
   });
-  writeFileSync(OUT + 'sites.json', JSON.stringify({ mastHeightsM: MAST_HEIGHTS_M, sites }));
+  // The catalogue's statement of AI assistance travels with the copy the application loads.
+  writeFileSync(OUT + 'sites.json', JSON.stringify({ aiAssisted: catalog.aiAssisted, mastHeightsM: MAST_HEIGHTS_M, sites }));
 
   writeFileSync(OUT + 'terrain.json', JSON.stringify({
     source: 'NASA LRO LOLA gridded data record LDEM_75S_120M (PDS data set LRO-L-LOLA-4-GDR-V1.0)',

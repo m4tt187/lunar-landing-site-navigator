@@ -153,5 +153,5 @@ command-line tool above (the same six sites and dates, the first three stretches
 at the eclipse of 12 January 2028; the ridge near Mons Malapert first for the 90-day
 mission) and, for the calendar, those of an exact computation sampled every ten minutes.
 
-The screens of the application do not show these answers yet; until they do, the
-recommendation is available from the command line.
+The command-line tool and the "Best Site and Date" panel of the application give the
+same ranking.

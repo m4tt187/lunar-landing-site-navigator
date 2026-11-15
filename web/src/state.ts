@@ -124,7 +124,7 @@ export function decodeState(hash: string, app: AppData): boolean {
     if (site.startsWith('@')) {
       const [lat, lon] = site.slice(1).split('_').map(Number);
       if (lat === undefined || lon === undefined || !(Math.abs(lat) <= 90) || !(Math.abs(lon) <= 180)) continue;
-      list.push({ id: newId(), siteId: null, custom: { name: 'Custom site', latDeg: lat, lonDeg: lon }, mastM, startMs: clampTime(startMs) });
+      list.push({ id: newId(), siteId: null, custom: { name: 'Custom Site', latDeg: lat, lonDeg: lon }, mastM, startMs: clampTime(startMs) });
     } else if (app.sites.some((x) => x.id === site)) {
       list.push({ id: newId(), siteId: site, custom: null, mastM, startMs: clampTime(startMs) });
     }

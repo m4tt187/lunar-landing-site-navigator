@@ -198,8 +198,9 @@ touchdown to the first darkness longer than the lander can bridge — for every 
 time of a year, and ranks sites and dates for a mission: power for the whole mission
 first, then the largest share of it with the Earth in view. It is checked against a
 minute-by-minute simulation (700 random cases) and its first recommendation against the
-exact ephemeris. `tools/planning/recommend.ts` runs it over the 25 sites that have a real
-skyline; the interface does not show it yet.
+exact ephemeris. The application's "Best Site and Date" panel runs it over the 25 sites that have a real
+skyline (`web/src/finder.tsx`); `tools/planning/recommend.ts` runs the same ranking from
+the command line.
 
 ## 5. The whole map at once
 

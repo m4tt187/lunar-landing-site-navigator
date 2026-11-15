@@ -243,7 +243,7 @@ export function Timeline({ a, cursorH, onCursor }: { a: Analysis; cursorH: numbe
       {ticks.map((d) => (
         <g>
           <line x1={x(startMs + d * DAY)} x2={x(startMs + d * DAY)} y1={top} y2={top + 3 * (rowH + 4) - 4} class="grid" />
-          <text x={x(startMs + d * DAY)} y={H - 4} class="axis" text-anchor={d === 0 ? 'start' : 'middle'}>{d === 0 ? 'Landing' : `+${d} d`}</text>
+          <text x={x(startMs + d * DAY)} y={H - 4} class="axis" text-anchor={d === 0 ? 'start' : x(startMs + d * DAY) > W - R - 24 ? 'end' : 'middle'}>{d === 0 ? 'Landing' : `+${d} d`}</text>
         </g>
       ))}
       <line x1={cx} x2={cx} y1={top} y2={top + 3 * (rowH + 4) - 4} class="cursor" />

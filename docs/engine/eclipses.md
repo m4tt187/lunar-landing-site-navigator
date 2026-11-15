@@ -86,7 +86,8 @@ first contact falls up to 7.9 minutes, last contact up to 6.9 minutes and the en
 totality up to 8.4 minutes from their instants at the pole. So every cell is tested
 against the Earth's disc as seen from that cell (`hideEclipsedPlaces`). A quick test for
 the whole area (`eclipseOverArea`) says when no cell, or every cell, can be affected; the
-cell-by-cell pass (about 7 ms for the 1.6 million cells of the map on the development
+cell-by-cell pass (about 7 ms for the 1.6 million cells of the map's square window, 1.26
+million of them south of 80° S, on the development
 machine) runs only in between.
 
 | Check | Result |

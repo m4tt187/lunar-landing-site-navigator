@@ -37,6 +37,8 @@ export default defineConfig({
     // No source maps in the published build: they would embed local build paths.
     sourcemap: false,
     target: 'es2022',
+    // Browsers that run es2022 preload modules themselves: no polyfill (it would be Vite code in the bundle).
+    modulePreload: { polyfill: false },
   },
   plugins: [noticeBanner],
   worker: { plugins: () => [noticeBanner] },

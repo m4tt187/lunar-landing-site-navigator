@@ -40,7 +40,8 @@
   .stat { border: 1px solid var(--line); border-radius: 16px; background: var(--panel); padding: 30px 32px; flex: 1; }
   .stat p { font-size: 24px; line-height: 1.36; color: var(--fg-2); margin-top: 16px; }
   .stat p b { color: var(--fg); font-weight: 650; }
-  .url { font-size: 34px; font-weight: 650; color: var(--accent); }
+  .url { font-size: 34px; font-weight: 650; color: var(--accent); white-space: nowrap; }
+  .url a { color: inherit; text-decoration: none; }
 </style>
 </head>
 <body>
@@ -95,7 +96,7 @@
     <li style="flex: 1;"><b>1.26 million places</b> south of 80° S</li>
     <li style="flex: 1;">One moment in <b>a tenth of a second</b>, no server</li>
     <li style="flex: 1;"><b>Zoom, drag, click</b> anywhere</li>
-    <li style="flex: 1;">The <b>best place within 5 km</b>, named</li>
+    <li style="flex: 1;">The <b>best place within 5&nbsp;km</b>, named</li>
   </ul>
   <div class="foot"><span>Lunar Landing Site Navigator</span><span>4 / 7</span></div>
 </section>
@@ -145,9 +146,9 @@
     <div class="col" style="flex: 0.85;">
       <div class="stat" style="padding: 28px 34px;">
         <p style="margin: 0; font-size: 22px; color: var(--muted);">Try it, in any browser</p>
-        <p class="url" style="margin-top: 6px; font-size: 30px;">m4tt187.github.io/lunar-landing-site-navigator</p>
+        <p class="url" style="margin-top: 6px; font-size: 28px;"><a href="https://m4tt187.github.io/lunar-landing-site-navigator/">m4tt187.github.io/lunar-landing-site-navigator</a></p>
         <p style="font-size: 22px; color: var(--muted); margin-top: 22px;">Source code, methods, data sources</p>
-        <p class="url" style="margin-top: 6px; font-size: 30px;">github.com/m4tt187/lunar-landing-site-navigator</p>
+        <p class="url" style="margin-top: 6px; font-size: 28px;"><a href="https://github.com/m4tt187/lunar-landing-site-navigator">github.com/m4tt187/lunar-landing-site-navigator</a></p>
         <p style="margin-top: 22px;">Open source, Apache-2.0. No server: everything runs in the browser, on public NASA data.</p>
       </div>
     </div>
