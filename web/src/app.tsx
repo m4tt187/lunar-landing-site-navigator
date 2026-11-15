@@ -311,7 +311,7 @@ export function App() {
       </div>
       <CalendarPanel />
       <footer>
-        <p><b>How far to trust it.</b> Sun and Earth directions are computed in your browser and checked against NASA/JPL Horizons at 9,810 reference moments (nine sites, 2026–2035): the largest difference is 0.004°. Skylines come from NASA's Lunar Orbiter Laser Altimeter (LOLA) terrain; the sunlight and Earth-visibility shares they give were compared with the NASA LOLA-team illumination maps at 400 places (correlation 0.98). What is shown is geometric line of sight: eclipses, the lander's own shadow, dust, slopes and radio link budgets are not modelled. A planning aid, not a flight product.</p>
+        <p><b>How far to trust it.</b> Sun and Earth directions are computed in your browser and checked against NASA/JPL Horizons at 9,810 reference moments (nine sites, 2026–2035): the largest difference is 0.004°. Skylines come from NASA's Lunar Orbiter Laser Altimeter (LOLA) terrain; the sunlight and Earth-visibility shares they give were compared with the NASA LOLA-team illumination maps at 400 places (correlation 0.98). What is shown is geometric line of sight, with eclipses of the Sun by the Earth included: the lander's own shadow, dust, slopes and radio link budgets are not modelled. A planning aid, not a flight product.</p>
         <p>Built for the 2026 NASA Space Apps Challenge by team Eallweald, Inc. Not affiliated with or endorsed by NASA. <a href="https://github.com/m4tt187/lunar-landing-site-navigator" target="_blank" rel="noreferrer">Source code, methods, data sources and AI-use statement</a>.</p>
       </footer>
     </main>

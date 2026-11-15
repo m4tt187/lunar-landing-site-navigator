@@ -173,7 +173,7 @@ totality from 06:18 for about 2 h 16 min, end 09:52) and this engine (04:59:28,
 06:15:57 for 2 h 20 min, 09:52:26) agree within half a minute at first and last contact
 and within 2.1 minutes at the start of totality, where the assumed depth of opaque
 atmosphere matters most. The three photographs the lander took (partial at 05:30, total
-at 07:30, "about to emerge from totality" at 08:30) fall in the phases computed for
+at 07:30, the Sun about to come out at 08:30) fall in the phases computed for
 those times.
 
 **Over a mission.** The scenario is sampled every ten minutes. Windows of sunlight, of

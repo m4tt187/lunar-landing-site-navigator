@@ -19,11 +19,14 @@ and priorities, decides what is built, and reviews the result.
 - **Code and documentation:** every AI-assisted source file carries a header line naming
   the tool that helped write it, and the log below records what each tool did and when.
 - **Data:** no dataset in this repository is AI-generated. Every dataset comes from a
-  cited source or is computed by code in this repository from cited sources. One file
-  was transcribed with AI assistance: the contact times in
-  `data/eclipses/nasa-lunar-eclipses.json` are printed on NASA's eclipse figures, which
-  are images; Claude read them from the 14 figures and checked every one against the
-  phase durations of NASA's catalogue page (a test repeats that check).
+  cited source or is computed by code in this repository from cited sources. Two files
+  were put together with AI assistance, and say so in a field of their own
+  (`aiAssisted`): the site catalogue `data/sites/catalog.json`, which Claude compiled
+  from the sources cited entry by entry; and `data/eclipses/nasa-lunar-eclipses.json`,
+  whose contact times are printed on NASA's eclipse figures, which are images: Claude
+  read them from the 14 figures and checked every one against the phase durations of
+  NASA's catalogue page (a test repeats that check). The reports written by the
+  validation tools name the tool that helped write the code in the same way.
 - **Images, video, audio:** none are AI-generated. If that ever changes, the item will
   carry a visible watermark and be listed here.
 - No NASA logos, insignia or other NASA branding are used anywhere.

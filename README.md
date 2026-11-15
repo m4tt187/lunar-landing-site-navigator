@@ -58,8 +58,8 @@ This tool draws that picture for any site and any date, instantly, in a browser.
   120 m terrain too: the application fetches the nine terrain tiles around it.
 - **Eclipses included.** When the Earth passes in front of the Sun — a lunar eclipse,
   seen from the Earth — the sunlight is counted as lost for as long as the chosen rule
-  says. Seen from the south pole, the eclipse of 14 March 2025 covered the whole Sun for
-  2 h 48 min.
+  says, in the numbers and on the map. Seen from the south pole, the eclipse of 14 March
+  2025 covered the whole Sun for 2 h 48 min.
 - **Rules you can change.** What counts as "Sun up" (any part of the disc, half, or all
   of it) and as "Earth in view" (its centre on the skyline, or 2° or 5° above it, since
   links that graze the terrain fade).
@@ -99,7 +99,8 @@ Everything is computed in the browser; there is no server.
 5. **The whole map at once.** For a distant light the terrain is resampled into a frame
    aligned with the light's direction; one running maximum per row then tells every
    place at once whether it sees the light. A whole-map answer takes about a tenth of a
-   second, so the map layers are computed live, in background workers.
+   second, so the map layers are computed live, in background workers. During an eclipse
+   every place is also tested against the Earth's disc as seen from that place.
 
 Full description, conventions and formulas: [docs/methodology.md](docs/methodology.md).
 The engine, module by module: [contract](docs/engine/contract.md),
@@ -192,9 +193,9 @@ The terrain assets shipped in `web/public/data/` are rebuilt from the NASA files
 | `engine/` | Computational core: Sun and Earth positions, ten-minute sampling, skylines, eclipses, windows, planning, terrain tiles, whole-map sweep |
 | `web/` | The application (Preact, TypeScript, Vite); `web/public/data/` holds the terrain assets it loads |
 | `tests/` | Automated tests, including the comparisons with NASA/JPL data |
-| `tools/` | Scripts that fetch the Horizons reference tables, build the terrain assets and tiles, run the validations, list eclipses, recommend a site and date |
+| `tools/` | Scripts that fetch the Horizons reference tables, build the terrain assets and tiles, run the validations, list eclipses, recommend a site and date, write the third-party notices |
 | `data/` | Site catalogue with sources, Horizons reference tables, NASA eclipse predictions, data provenance |
-| `docs/` | Methodology, references and attributions, AI usage log, one page per engine module |
+| `docs/` | Methodology, references and attributions, AI usage log, one page per engine module, the text of the Space Apps project page |
 
 ## Use of AI tools
 
@@ -211,6 +212,8 @@ branding is used.
 ## Licence
 
 [Apache License 2.0](LICENSE). Third-party components and data keep their own licences
-and terms, listed in [docs/references.md](docs/references.md).
+and terms, listed in [docs/references.md](docs/references.md); the notices of the
+open-source components built into the application are in
+[THIRD-PARTY-NOTICES.txt](THIRD-PARTY-NOTICES.txt).
 
 This project is not affiliated with or endorsed by NASA.

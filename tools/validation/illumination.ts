@@ -71,6 +71,7 @@ function stats(ours: number[], nasa: number[]): Record<string, number> {
   };
 }
 const report = {
+  aiAssisted: 'Anthropic Claude under the direction of the team',
   reference: 'NASA LOLA team, AVGVISIB_85S_060M_201608 and AVGVISIB_85S_060M_201608_EARTH (PDS LRO-L-LOLA-4-GDR-V1.0 extras)',
   method: `${POINTS} pseudo-random surface points south of 85.4 S; skyline from LDEM_75S_120M; ${YEARS} years from 2010-01-01 at ${STEP_H} h steps; a body counts as visible when any part of its disc is above the skyline`,
   sunIllumination: stats(rows.map((r) => r.sun), rows.map((r) => r.nasaSun)),

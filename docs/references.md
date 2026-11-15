@@ -23,7 +23,7 @@ None is used.
 
 | Resource | Source | Terms | Used for |
 |---|---|---|---|
-| *Blue Ghost Mission 1: Live Updates*, Firefly Aerospace (the lander was a NASA Commercial Lunar Payload Services delivery) | https://fireflyspace.com/news/blue-ghost-mission-1-live-updates/ | Public web page; short quotations with attribution | The mission's predicted times of the eclipse of 14 March 2025 at its landing site and the times of three photographs, used as a check of the eclipse module (`tests/engine/eclipse.test.ts`, `docs/engine/eclipses.md`) |
+| *Blue Ghost Mission 1: Live Updates*, Firefly Aerospace (the lander was a NASA Commercial Lunar Payload Services delivery) | https://fireflyspace.com/news/blue-ghost-mission-1-live-updates/ | Public web page; only the times it reports are used, with attribution | The mission's predicted times of the eclipse of 14 March 2025 at its landing site and the times of three photographs, used as a check of the eclipse module (`tests/engine/eclipse.test.ts`, `docs/engine/eclipses.md`) |
 
 ## Software
 
@@ -36,6 +36,19 @@ None is used.
 | tsx | https://tsx.is/ | MIT | Runs the build scripts |
 | Vitest | https://vitest.dev/ | MIT | Automated tests |
 | Astronomy Engine 2.1.19 (Don Cross) | https://github.com/cosinekitty/astronomy | MIT | Geocentric Sun and Moon vectors inside the computational core; validated against NASA/JPL Horizons |
+| @preact/signals-core (brought in by @preact/signals) | https://github.com/preactjs/signals | MIT | State of the user interface |
+| @types/node (DefinitelyTyped) | https://github.com/DefinitelyTyped/DefinitelyTyped | MIT | Type definitions for the build scripts and the tests |
+| Python 3 | https://www.python.org/ | PSF License | Runs `tools/horizons/fetch_fixtures.py`, which downloads the reference tables from NASA/JPL Horizons |
+| sips (part of macOS) | https://support.apple.com/guide/terminal/welcome/mac | Supplied with the operating system; not redistributed | Converts the shaded-relief map to JPEG when the terrain assets are rebuilt on a Mac (a PNG is written elsewhere) |
+| Poppler (`pdftoppm`) | https://poppler.freedesktop.org/ | GPL-2.0-or-later; used as a tool, not redistributed | Rendered NASA's eclipse figures (PDF) as images, from which the contact times were read |
+| Playwright (`playwright-core`) with Microsoft Edge | https://playwright.dev/ | Apache-2.0 (Playwright); the browser is used as a tool, not redistributed | Ran the built application in a browser without a window for the checks described in `docs/engine/eclipses.md`; not a dependency of this repository |
+| Git and GitHub, GitHub Pages | https://git-scm.com/ , https://pages.github.com/ | GPL-2.0 (Git); GitHub's terms of service | Version control, the public repository, hosting of the application |
+| Anthropic Claude (Claude Code) and OpenAI Codex | https://www.anthropic.com/ , https://openai.com/ | Commercial services | AI tools used to write, test and review the code and the documentation: see `docs/ai-usage-log.md` |
+
+The notices that the MIT License asks to keep with the components built into the
+published application (Astronomy Engine, Preact, @preact/signals, @preact/signals-core)
+are in [`THIRD-PARTY-NOTICES.txt`](../THIRD-PARTY-NOTICES.txt), written by
+`tools/notices.ts` and published next to the application.
 
 ## Documents
 

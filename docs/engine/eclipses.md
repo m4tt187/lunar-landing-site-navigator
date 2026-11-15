@@ -172,10 +172,9 @@ images; the transcription was checked against the phase durations of the catalog
 
 Firefly Aerospace's Blue Ghost Mission 1, a NASA CLPS delivery, was operating in Mare
 Crisium on 14 March 2025 and photographed the eclipse. The mission's own updates
-(https://fireflyspace.com/news/blue-ghost-mission-1-live-updates/) give, the day before:
-"The eclipse will last nearly 5 hours starting at 12 am CST through 4:52 am CST at
-Firefly's landing site in Mare Crisium and will include approximately 2 hours and 16
-minutes of totality, starting at 1:18 am CST."
+(https://fireflyspace.com/news/blue-ghost-mission-1-live-updates/) give, the day before,
+the prediction for its landing site: an eclipse of nearly five hours, from 12:00 am to
+4:52 am local time, with about 2 hours 16 minutes of totality starting at 1:18 am.
 
 | At the lander's coordinates | Firefly | This engine | Difference |
 |---|---|---|---|
@@ -184,12 +183,12 @@ minutes of totality, starting at 1:18 am CST."
 | Totality lasts | about 2 h 16 min | 2 h 20 min | +4 min |
 | Earth leaves the Sun | 09:52 UTC | 09:52:26 | +0.4 min |
 
-The photographs fit as well: "around 12:30 am CDT … as Earth began to block the sun"
-(engine: partly covered at 05:30 UTC); "around 2:30 am CDT during the totality" (total at
-07:30); "around 3:30 am CDT, the photo shows the sun about to emerge from totality" (total
-at 08:30, ending 08:35:52).
+The photographs fit as well. The updates date three of them: at about 12:30 am, as the
+Earth began to cover the Sun (engine: partly covered at 05:30 UTC); at about 2:30 am,
+during totality (total at 07:30); and at about 3:30 am, with the Sun about to come out
+(total at 08:30, ending 08:35:52).
 
-Two notes. The prediction says "CST" and the reports "CDT"; daylight time was in force in
+Two notes. The prediction gives its times as CST and the reports as CDT; daylight time was in force in
 Texas on that date, and read as UTC−6 the predicted end would fall after NASA's last
 contact for the whole Moon, so all times are taken as UTC−5. And the start of totality is
 where the atmosphere matters most: how deep into the Earth's air the last sunlight is

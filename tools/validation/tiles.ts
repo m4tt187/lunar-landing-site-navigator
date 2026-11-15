@@ -211,6 +211,7 @@ function randomPoints(grid: PolarDem): object {
 
 const notMeasured = { note: `Not measured: ${FULL_GRID} is not on this machine.` };
 const report = {
+  aiAssisted: 'Anthropic Claude under the direction of the team',
   reference: 'Catalogue skylines in web/public/data/sites.json: computed by tools/terrain/build.ts from the complete NASA LOLA LDEM_75S_120M grid (2 m above ground, 0.25 degree azimuth step, 400 km), stored rounded to 0.01 degree',
   method: `Every catalogue site with a terrain skyline at or south of ${index.capLatDeg} degrees. Composite: 120 m tiles in the 3 x 3 block around the site, shipped 480 m model beyond. 480 m: the shipped 480 m model alone. Answers: share of 2027 (UTC, one sample per hour, both ends included) with any part of the solar disc above the skyline and with the centre of the Earth above it. Skyline statistics pool all azimuth bins of all sites; answer differences are in percentage points.`,
   tileSet: { capLatDeg: index.capLatDeg, tiles: index.tiles.length, totalBytes: index.totalBytes, encoding: index.encoding },

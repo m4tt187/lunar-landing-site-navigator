@@ -1,4 +1,5 @@
 {
+ "aiAssisted": "Compiled with the assistance of Anthropic Claude under the direction of the team: each entry was taken from the source it cites and checked against it. No value is AI-generated.",
  "note": "Curated lunar sites. Latitude north-positive, longitude east-positive in -180..180 (converted from the source where noted). Every coordinate is taken from the cited source.",
  "sites": [
   {

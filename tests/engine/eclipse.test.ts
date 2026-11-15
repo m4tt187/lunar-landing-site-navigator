@@ -898,12 +898,10 @@ describe('eclipses over an area, place by place', () => {
 
 describe('Blue Ghost Mission 1 in Mare Crisium, 14 March 2025', () => {
   // Firefly Aerospace, "Blue Ghost Mission 1: Live Updates", https://fireflyspace.com/news/blue-ghost-mission-1-live-updates/
-  // - 13 March 2025, the prediction: "The eclipse will last nearly 5 hours starting at 12 am CST through 4:52 am CST
-  //   at Firefly's landing site in Mare Crisium and will include approximately 2 hours and 16 minutes of totality,
-  //   starting at 1:18 am CST."
-  // - 14 March 2025, what the lander photographed: "her first look at the solar eclipse from the Moon around
-  //   12:30 am CDT ... as Earth began to block the sun"; "captured around 2:30 am CDT during the totality of the
-  //   solar eclipse"; "around 3:30 am CDT, the photo shows the sun about to emerge from totality behind Earth".
+  // - 13 March 2025, the prediction for the landing site: an eclipse of nearly five hours, from 12:00 am to 4:52 am
+  //   (given as CST), with about 2 hours 16 minutes of totality starting at 1:18 am.
+  // - 14 March 2025, what the lander photographed (times given as CDT): at about 12:30 am the Earth beginning to
+  //   cover the Sun; at about 2:30 am totality; at about 3:30 am the Sun about to come out from behind the Earth.
   // Time zone: the prediction says CST, the reports say CDT. Daylight time was in force in Texas on that date, so
   // the reports' CDT (UTC-5) is the local time; read as UTC-6 the predicted end (10:52 UTC) would fall after NASA's
   // P4 (10:00:01 UT), when the penumbra has left the whole Moon. All times are therefore taken as UTC-5.
