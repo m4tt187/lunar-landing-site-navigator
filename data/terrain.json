@@ -1,0 +1,48 @@
+{
+ "source": "NASA LRO LOLA gridded data record LDEM_75S_120M (PDS data set LRO-L-LOLA-4-GDR-V1.0)",
+ "coarse": {
+  "file": "ldem_75s_480m.i16",
+  "n": 1906,
+  "scaleM": 480,
+  "heightScale": 0.5,
+  "sampleType": "int16 little-endian, block mean of 4 x 4 source pixels"
+ },
+ "map": {
+  "file": "south-pole-relief.jpg",
+  "sizePx": 1400,
+  "widthPx": 2100,
+  "aspect": 1.5,
+  "halfWidthM": 304005.6080198807,
+  "minLatDeg": -80
+ },
+ "layers": {
+  "source": "NASA LOLA team, AVGVISIB_85S_060M_201608 and AVGVISIB_85S_060M_201608_EARTH (average visibility of the solar disc and of the Earth disc, Mazarico et al. 2011 method)",
+  "items": [
+   {
+    "id": "sun",
+    "file": "nasa-average-sunlight.png",
+    "halfWidthM": 151740,
+    "grid": {
+     "file": "nasa-average-sunlight-240m.u8",
+     "n": 1264,
+     "scaleM": 240,
+     "valueScale": 0.004
+    }
+   },
+   {
+    "id": "earth",
+    "file": "nasa-average-earth-visibility.png",
+    "halfWidthM": 151740,
+    "grid": {
+     "file": "nasa-average-earth-visibility-240m.u8",
+     "n": 1264,
+     "scaleM": 240,
+     "valueScale": 0.004
+    }
+   }
+  ]
+ },
+ "check": {
+  "southPoleHeightM": 1292
+ }
+}
