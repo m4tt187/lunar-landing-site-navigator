@@ -33,8 +33,9 @@ time. They are computed exactly at knots two hours apart, once for all sites, an
 interpolated between the knots with a four-point (cubic) formula
 (`engine/src/ephemeris.ts`, [engine/ephemeris.md](engine/ephemeris.md)). Against the exact
 computation, at 25,000 pseudo-random sites and instants between 2026 and 2035, the largest
-difference in direction is 1.4 × 10⁻⁷ °. This is what makes a ten-minute sampling of a
-whole year affordable: 11 ms for a site.
+difference in direction is 1.4 × 10⁻⁷ ° (`tools/validation/ephemeris.ts`,
+`validation-ephemeris.json`). This is what makes a ten-minute sampling of a whole year
+affordable: 11 ms for a site.
 
 **Check.** `tools/horizons/fetch_fixtures.py` downloads from NASA/JPL Horizons the
 apparent azimuth and elevation of the Sun and of the Earth for observers at nine places on
@@ -223,26 +224,36 @@ Earth's direction. The Earth's direction is taken as seen from the pole; across 
 mapped area it varies by less than 0.05°.
 
 The "Now" layer runs the sweep for the moment on the time slider. The mission layers run
-it for 120 moments spread evenly over the mission (a low-discrepancy sequence, so that a
-partial result is already unbiased) and count, for every cell, the moments with sunlight,
-with the Earth in view, and with both. The "best place within 5 km" is the cell with the
+it for 120 moments spread over the mission (a fixed low-discrepancy sequence: the moments
+computed so far always cover the whole mission, so the picture is refined as the rest
+arrive) and count, for every cell, the moments with sunlight, with the Earth in view, and
+with both. An event that falls between two of the 120 moments does not appear. The "best place within 5 km" is the cell with the
 largest count of both around the selected site.
 
 **Check.** `tests/engine/sweep.test.ts` compares the sweep with an independent
 calculation — a ray marched from the place along the body's azimuth over the same 480 m
-model — at 160 random places and 8 dates: the two agree for 98.9 % (Sun) and 99.5 %
-(Earth) of the 1,280 cases, and for more than 99.3 % of those where the margin exceeds
-0.3°. The differences sit on shadow edges and on steep slopes, where a place takes the
-answer of the sweep bin it falls in.
+model — at 160 random places south of 84° S and 8 dates: the two agree for 98.9 % (Sun)
+and 99.5 % (Earth) of the 1,280 cases, and for more than 99.3 % of those where the margin
+exceeds 0.3°. The differences sit on shadow edges and on steep slopes, where a place
+takes the answer of the sweep bin it falls in. The comparison is between two methods on
+the same model: it says nothing about how the 480 m model compares with the 120 m one
+(for that, see the "480 m alone" column of the table in section 3).
 
 **Limits of the map.** The sweep is the approximate method of the two, and it works on
 the 480 m model. It is used to draw the map and to suggest a better place nearby; the
 numbers of a site always come from its own skyline. Terrain outside the elevation model
-(north of 75° S, 150 km beyond the mapped area) does not exist for the sweep. An eclipse
-is one event for the whole map: when the Earth hides the Sun at the pole under the chosen
-rule, the map shows no sunlight anywhere. Across the mapped area the Earth's direction
-differs by less than 0.05°, so the contacts of an eclipse differ by a few minutes at
-most, which the map ignores.
+(north of 75° S, 150 km beyond the mapped area) does not exist for the sweep.
+
+**Eclipses on the map.** The contacts of an eclipse fall up to eight minutes apart
+between the pole and the edge of the mapped area, so every cell is tested against the
+Earth's disc as seen from that cell: 393,300 comparisons with the per-site computation,
+no difference. While the Earth covers part of the Sun, the terrain is tested against
+what is left of the disc: the direction tested is the highest skyline under which enough
+of the uncovered part still shows, so that a Sun whose uncovered part lies behind a ridge
+is not counted. That level is computed as seen from the pole and used for the whole map;
+for 99 % of places and instants it is within 0.08° of the level the place itself would
+compute (largest difference 0.21°, in the minutes around a contact). Details and checks:
+[engine/eclipses.md](engine/eclipses.md), "On the map".
 
 ## 6. Reproducing everything
 
@@ -254,6 +265,9 @@ npx tsx tools/terrain/build.ts                   # rebuild terrain assets (needs
 npx tsx tools/terrain/tiles.ts --verify          # every sample of the 120 m tiles against the NASA file
 npx tsx tools/validation/illumination.ts 400     # comparison with the NASA illumination maps
 npx tsx tools/validation/tiles.ts                # what a chosen point gets, against the complete 120 m model
+npx tsx tools/validation/timing.ts               # window ends from ten-minute samples against one-minute samples and the exact crossing
+npx tsx tools/validation/ephemeris.ts            # the interpolated Sun and Earth vectors against the exact ones
+npx tsx tools/validation/map-eclipses.ts         # eclipses on the map: contacts across the area, the level used for the whole map
 npx tsx tools/eclipses/list.ts --lat -90         # eclipses seen from a point, next to NASA's list
 npx tsx tools/planning/recommend.ts              # best sites and landing dates for a mission
 ```
@@ -270,6 +284,14 @@ npx tsx tools/planning/recommend.ts              # best sites and landing dates 
   Earth. "Earth in view" is geometric line of sight to the Earth's centre.
 - Terrain north of 80° S (smooth-sphere horizon there), terrain north of 75° S as an
   obstacle for the polar sites, and terrain detail finer than the grid in use.
-- Events shorter than the ten-minute sampling step. The ends of each window are placed on
-  a straight line between two samples: good to seconds for sunrises and sunsets, up to
-  two minutes off for the ends of a very brief total eclipse.
+- Events shorter than the ten-minute sampling step, and the exact instant of each window
+  end, which is placed on a straight line between two samples. Measured on the 25
+  catalogue skylines over four months of 2027 against one-minute samples, with the
+  largest differences then refined on the exact ephemeris (`tools/validation/timing.ts`,
+  `validation-timing.json`): of 354 window ends, half are within 0.02 s and 95 % within
+  14.4 s, but where the skyline changes abruptly the difference reaches minutes (the
+  largest, 6.5 minutes, at a sunset), and two events are missed altogether: 73 s of
+  sunlight and a night of 4 minutes. For the ends of a very brief
+  total eclipse the difference can reach two minutes
+  ([engine/eclipses.md](engine/eclipses.md)). These are measures of the arithmetic inside
+  the model, not of how well the model matches the real Moon.

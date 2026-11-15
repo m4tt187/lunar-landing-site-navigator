@@ -9,7 +9,7 @@
 // and the Earth, the Earth's disc being enlarged for its atmosphere. Sources of
 // the constants and the comparison with NASA's eclipse predictions are in
 // docs/engine/eclipses.md.
-import { moonFixedVectors, sampleFromVectors, validateSite, validateTime } from './geometry';
+import { SUN_RADIUS_KM, moonFixedVectors, sampleFromVectors, validateSite, validateTime } from './geometry';
 import type { EclipseEvent, Series, Site } from './types';
 
 const DEG = Math.PI / 180;
@@ -438,6 +438,53 @@ export function sunMarginWithEarth(
   return Math.min(skylineMarginDeg, ((visible - minVisibleFraction) * Math.PI * a) / 2);
 }
 
+/**
+ * The highest straight skyline, in degrees above the Sun's centre, under which
+ * the Sun still counts as up while the Earth covers part of it: at least
+ * minVisibleFraction of the solar disc is above the skyline and outside the
+ * Earth's opaque disc exactly when the skyline is lower than this level.
+ * Without the Earth it is the top of the disc for "any part shows" (+radius),
+ * its centre for "half" (0) and its bottom for "the whole disc" (-radius).
+ * Null when no skyline is low enough: the Earth alone hides that much of the Sun.
+ *
+ * - "Any part shows" (0): exact. The level is the highest point of the disc that
+ *   the Earth leaves uncovered: the top of the disc when the Earth does not reach
+ *   it, otherwise the higher of the two points where the limbs cross.
+ * - "The whole disc shows" (1): exact. The bottom of the disc, and only while the
+ *   Earth does not touch the Sun.
+ * - A fraction in between: the level at which the visible fraction, which only
+ *   falls as the skyline rises, equals the required one (bisection).
+ * No input checks.
+ */
+export function skylineLimitInEclipse(sunRadiusDeg: number, state: EclipseState, minVisibleFraction: number): number | null {
+  const a = sunRadiusDeg, b = state.earthDiscDeg, d = state.separationDeg;
+  if (minVisibleFraction >= 1) return d >= a + b ? -a : null;
+  if (d >= a + b) return minVisibleFraction <= 0 ? a : skylineForFraction(a, minVisibleFraction, 0, 0, 0);
+  if (b >= a && d <= b - a) return null;
+  if (minVisibleFraction <= 0) {
+    // Top of the disc, at (0, a), unless the Earth covers it.
+    if (Math.hypot(state.acrossDeg, a - state.upDeg) >= b) return a;
+    if (!(d > 0)) return null;
+    // The limbs cross on the line at distance m from the Sun's centre towards the Earth's, half a chord k either side.
+    const m = (d * d + a * a - b * b) / (2 * d);
+    const k = Math.sqrt(Math.max(0, a * a - m * m));
+    return (m * state.upDeg + k * Math.abs(state.acrossDeg)) / d;
+  }
+  if (1 - state.coveredFraction < minVisibleFraction) return null;
+  return skylineForFraction(a, minVisibleFraction, state.acrossDeg, state.upDeg, b);
+}
+
+/** Skyline level above the Sun's centre at which exactly `fraction` of the disc shows (b = 0: no Earth). */
+function skylineForFraction(a: number, fraction: number, across: number, up: number, b: number): number {
+  const visible = (h: number): number => (b > 0 ? visibleFractionUnchecked(0, a, h, across, up, b) : fractionAboveSkyline(0, a, h));
+  let lit = -a, dark = a;
+  for (let i = 0; i < 60 && dark - lit > 1e-12 * a; i++) {
+    const mid = (lit + dark) / 2;
+    if (visible(mid) >= fraction) lit = mid; else dark = mid;
+  }
+  return (lit + dark) / 2;
+}
+
 interface DiscState { tMs: number; separationDeg: number; sunRadiusDeg: number; earthDiscDeg: number }
 
 function discStateAt(site: Site, tMs: number): DiscState {
@@ -466,8 +513,7 @@ export function sunCoverAt(site: Site, tMs: number): { coveredFraction: number; 
  * True when the Earth alone keeps the Sun from counting as up at a site and
  * instant: with "any part shows" (0) when the whole Sun is covered, otherwise
  * when less than the required fraction of the disc is left. Terrain is not
- * considered. Used by the map layers, which treat an eclipse as one event for the
- * whole mapped area.
+ * considered.
  */
 export function sunHiddenByEarth(site: Site, tMs: number, minVisibleFraction: number): boolean {
   validateSite(site);
@@ -476,6 +522,130 @@ export function sunHiddenByEarth(site: Site, tMs: number, minVisibleFraction: nu
   const s = discStateAt(site, tMs);
   const visible = 1 - lensFraction(s.separationDeg, s.sunRadiusDeg, s.earthDiscDeg);
   return minVisibleFraction > 0 ? visible < minVisibleFraction : visible <= 0;
+}
+
+/** A point or a body: Moon-centred, Moon-fixed frame, kilometres. */
+export type MoonFixedKm = readonly [number, number, number];
+
+/** Radius of the Earth's opaque disc, kilometres. */
+const EARTH_DISC_KM = EARTH_EQUATORIAL_RADIUS_KM * EARTH_DISC_SCALE;
+
+/**
+ * Separation of the two centres below which the Earth alone keeps the Sun from
+ * counting as up (a: the Sun's radius, b: the Earth's opaque disc, in one unit).
+ * Negative when the Earth's disc can never hide that much of the Sun.
+ */
+function hidingSeparation(a: number, b: number, minVisibleFraction: number): number {
+  if (minVisibleFraction <= 0) return b - a;
+  if (minVisibleFraction >= 1) return a + b;
+  const cover = 1 - minVisibleFraction;
+  if (b < a && cover >= (b * b) / (a * a)) return -1;
+  return separationForCover(cover, a, b);
+}
+
+/**
+ * By how much the hiding separation d grows for each unit by which the Earth's
+ * disc grows. One when the limit is a tangency. In between, the lens area gains
+ * the arc of the Earth's limb inside the Sun and loses the common chord, so the
+ * ratio is that arc over that chord (the Earth's disc is the larger one).
+ */
+function hidingSeparationGrowth(a: number, b: number, d: number, minVisibleFraction: number): number {
+  if (minVisibleFraction <= 0 || minVisibleFraction >= 1) return 1;
+  const chord = Math.sqrt(Math.max(0, (a + b - d) * (d + a - b) * (d - a + b) * (d + a + b))) / d;
+  const sinHalf = Math.min(1, chord / (2 * b));
+  return sinHalf > 0 ? Math.asin(sinHalf) / sinHalf : 1;
+}
+
+/** The two discs as seen from one point; angles in radians, distances in kilometres. */
+interface DiscsFromPoint {
+  separation: number;
+  /** Separation below which the Sun does not count as up, and its growth per unit of growth of the Earth's disc. */
+  hideWithin: number;
+  growth: number;
+  earthDisc: number;
+  earthDistanceKm: number;
+  sunDistanceKm: number;
+}
+
+function requireVector(v: MoonFixedKm, name: string): void {
+  if (!(Number.isFinite(v[0]) && Number.isFinite(v[1]) && Number.isFinite(v[2])))
+    throw new RangeError(`${name} must be three finite numbers.`);
+}
+
+function discsFromPoint(pointKm: MoonFixedKm, sunKm: MoonFixedKm, earthKm: MoonFixedKm, minVisibleFraction: number): DiscsFromPoint {
+  requireVector(pointKm, 'Point'); requireVector(sunKm, 'Sun position'); requireVector(earthKm, 'Earth position');
+  if (!(minVisibleFraction >= 0 && minVisibleFraction <= 1))
+    throw new RangeError('Minimum visible fraction must be between 0 and 1.');
+  const sx = sunKm[0] - pointKm[0], sy = sunKm[1] - pointKm[1], sz = sunKm[2] - pointKm[2];
+  const ex = earthKm[0] - pointKm[0], ey = earthKm[1] - pointKm[1], ez = earthKm[2] - pointKm[2];
+  const sunDistanceKm = Math.hypot(sx, sy, sz), earthDistanceKm = Math.hypot(ex, ey, ez);
+  if (!(sunDistanceKm > SUN_RADIUS_KM && earthDistanceKm > EARTH_DISC_KM))
+    throw new RangeError('The point must be outside the Sun and the Earth.');
+  const cx = sy * ez - sz * ey, cy = sz * ex - sx * ez, cz = sx * ey - sy * ex;
+  const sunRadius = Math.asin(SUN_RADIUS_KM / sunDistanceKm), earthDisc = Math.asin(EARTH_DISC_KM / earthDistanceKm);
+  const hideWithin = hidingSeparation(sunRadius, earthDisc, minVisibleFraction);
+  return {
+    separation: Math.atan2(Math.hypot(cx, cy, cz), sx * ex + sy * ey + sz * ez),
+    hideWithin,
+    growth: hideWithin > 0 ? hidingSeparationGrowth(sunRadius, earthDisc, hideWithin, minVisibleFraction) : 1,
+    earthDisc, earthDistanceKm, sunDistanceKm,
+  };
+}
+
+/**
+ * Eclipses over an area. From where the Sun and the Earth stand (Moon-centred,
+ * Moon-fixed frame, kilometres), says whether the Earth alone keeps the Sun from
+ * counting as up at no place within reachKm of a point (0), at every such place
+ * (1), or at some of them (2: test them one by one with hideEclipsedPlaces).
+ * Terrain is not considered.
+ */
+export function eclipseOverArea(
+  pointKm: MoonFixedKm, reachKm: number, sunKm: MoonFixedKm, earthKm: MoonFixedKm, minVisibleFraction: number,
+): 0 | 1 | 2 {
+  const r = discsFromPoint(pointKm, sunKm, earthKm, minVisibleFraction);
+  if (!(reachKm >= 0 && reachKm < r.earthDistanceKm / 2)) throw new RangeError('Reach must be zero or more and far smaller than the distance of the Earth.');
+  if (r.hideWithin < 0) return 0;
+  // Within reach of the point the direction of a body turns by at most asin(reach / distance),
+  // and the Earth's disc, and with it the limit, changes by at most disc * reach / (distance - reach).
+  // The denominators and the factor two leave room for both.
+  const near = r.earthDistanceKm - reachKm;
+  const band = Math.asin(reachKm / near) + reachKm / (r.sunDistanceKm - reachKm) + (2 * r.earthDisc * reachKm) / near;
+  const gap = r.separation - r.hideWithin;
+  return gap > band ? 0 : gap < -band ? 1 : 2;
+}
+
+/**
+ * Eclipses over an area, place by place. x, y and z give every place in metres
+ * from pointKm along the Moon-fixed axes. Wherever mask is 1 and, seen from that
+ * place, the Earth alone keeps the Sun from counting as up, writes 0; returns how
+ * many places it cleared. The limit separation is computed once, at the point,
+ * and moved at each place as the Earth's disc looks larger or smaller from there.
+ */
+export function hideEclipsedPlaces(
+  x: Float32Array, y: Float32Array, z: Float32Array, pointKm: MoonFixedKm,
+  sunKm: MoonFixedKm, earthKm: MoonFixedKm, minVisibleFraction: number, mask: Uint8Array,
+): number {
+  if (x.length !== mask.length || y.length !== mask.length || z.length !== mask.length)
+    throw new RangeError('Positions and mask must have the same length.');
+  const r = discsFromPoint(pointKm, sunKm, earthKm, minVisibleFraction);
+  if (r.hideWithin < 0) return 0;
+  const sx0 = (sunKm[0] - pointKm[0]) * 1000, sy0 = (sunKm[1] - pointKm[1]) * 1000, sz0 = (sunKm[2] - pointKm[2]) * 1000;
+  const ex0 = (earthKm[0] - pointKm[0]) * 1000, ey0 = (earthKm[1] - pointKm[1]) * 1000, ez0 = (earthKm[2] - pointKm[2]) * 1000;
+  const cosLimit = Math.cos(r.hideWithin), sinLimit = Math.sin(r.hideWithin);
+  const earthDistanceM = r.earthDistanceKm * 1000;
+  let cleared = 0;
+  for (let k = 0; k < mask.length; k++) {
+    if (!mask[k]) continue;
+    const px = x[k]!, py = y[k]!, pz = z[k]!;
+    const sx = sx0 - px, sy = sy0 - py, sz = sz0 - pz;
+    const ex = ex0 - px, ey = ey0 - py, ez = ez0 - pz;
+    const earthM = Math.sqrt(ex * ex + ey * ey + ez * ez);
+    const cosSeparation = (sx * ex + sy * ey + sz * ez) / (Math.sqrt(sx * sx + sy * sy + sz * sz) * earthM);
+    // cos(limit + more), where "more" follows how much larger the Earth's disc is from here: a few millionths of a radian.
+    const more = r.growth * r.earthDisc * (earthDistanceM / earthM - 1);
+    if (cosSeparation > cosLimit - more * sinLimit) { mask[k] = 0; cleared++; }
+  }
+  return cleared;
 }
 
 /**

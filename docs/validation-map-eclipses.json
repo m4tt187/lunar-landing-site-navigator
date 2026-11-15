@@ -1,0 +1,74 @@
+{
+  "license": "Apache-2.0",
+  "aiAssisted": "Anthropic Claude under the direction of the team",
+  "contactsAcrossTheMap": {
+    "scope": {
+      "years": "2025-2039",
+      "eclipsesAtThePole": 27,
+      "places": "24 places on the 85 S and 80 S circles, every 30 degrees of longitude, on the reference sphere"
+    },
+    "method": "findEclipses at each place against findEclipses at the south pole; the largest difference of each kind of contact.",
+    "largestFirstContactDifferenceMin": 7.9,
+    "largestLastContactDifferenceMin": 6.9,
+    "largestTotalityContactDifferenceMin": 8.4,
+    "totalAtAPlaceAndNotAtThePole": 0,
+    "totalAtThePoleAndNotAtAPlace": 0,
+    "seenAtAPlaceAndNotAtThePole": [
+      "2034-09-28"
+    ]
+  },
+  "levelForTheWholeMap": {
+    "scope": {
+      "years": "2025-2030",
+      "eclipsesAtThePole": 11,
+      "places": "300 pseudo-random places south of 80 S, from 4 km below to 6 km above the reference sphere",
+      "everyMinutes": 2
+    },
+    "method": "The level computed by web/src/map/visibility.ts as seen from the pole against skylineLimitInEclipse for the sky of each place, wherever the Earth alone does not hide the Sun at that place.",
+    "limitations": "Numerical comparison inside the model. The skyline is taken as straight across the solar disc, as in the per-site analysis.",
+    "rules": [
+      {
+        "sunMinDiskFraction": 0,
+        "levelForTheMapAgainstEachPlace": {
+          "cases": 286810,
+          "medianDeg": 0,
+          "p95Deg": 0.0381,
+          "p99Deg": 0.0808,
+          "largestDeg": 0.2123
+        },
+        "sameAwayFromTheLimit": {
+          "cases": 250627,
+          "medianDeg": 0,
+          "p95Deg": 0.0255,
+          "p99Deg": 0.051,
+          "largestDeg": 0.0993
+        },
+        "largestDropBelowTheLevelWithoutTheEarthAtThePole": {
+          "deg": 0.517,
+          "at": "2028-01-12T03:44Z"
+        }
+      },
+      {
+        "sunMinDiskFraction": 0.5,
+        "levelForTheMapAgainstEachPlace": {
+          "cases": 185171,
+          "medianDeg": 0.0015,
+          "p95Deg": 0.0339,
+          "p99Deg": 0.0686,
+          "largestDeg": 0.2034
+        },
+        "sameAwayFromTheLimit": {
+          "cases": 169470,
+          "medianDeg": 0.0011,
+          "p95Deg": 0.0265,
+          "p99Deg": 0.0468,
+          "largestDeg": 0.0907
+        },
+        "largestDropBelowTheLevelWithoutTheEarthAtThePole": {
+          "deg": 0.259,
+          "at": "2028-12-31T14:58Z"
+        }
+      }
+    ]
+  }
+}

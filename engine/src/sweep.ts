@@ -16,8 +16,10 @@
 // This is an independent method from the per-site skyline in terrain.ts and is
 // tested against it (tests/engine/sweep.test.ts). It is the approximate one of
 // the two: a receiver takes the answer of the bin it falls in, so on steep slopes
-// and at the edges of shadows about one cell in a hundred differs from the
-// per-site skyline. Numbers quoted for a site always come from the skyline.
+// and at the edges of shadows about one cell in a hundred differs from a
+// place-by-place calculation on the same elevation model (the test compares the
+// two south of 84 degrees south). Numbers quoted for a site always come from the
+// site's own skyline, computed on the finer model.
 //
 // Terrain outside the elevation model does not exist for the sweep: it cannot
 // hide anything. Receivers therefore have to lie well inside the model. With the
@@ -49,6 +51,13 @@ export interface Sweep {
   readonly origin: number;
   /** 1 where the window cell is a receiver (poleward of the latitude limit), 0 elsewhere. */
   readonly inside: Uint8Array;
+  /**
+   * Where every receiver stands (ground height and observer height included):
+   * metres from `originKm` along the Moon-fixed axes; zero outside the receiver disc.
+   */
+  readonly positions: { readonly x: Float32Array; readonly y: Float32Array; readonly z: Float32Array };
+  /** The point the positions are measured from: the south pole on the reference sphere (Moon-centred, Moon-fixed frame, kilometres). */
+  readonly originKm: readonly [number, number, number];
   /**
    * For a light arriving from `direction` (Moon-fixed frame, pointing from the Moon
    * towards the body), writes 1 into `out` for every receiver that sees it and 0
@@ -231,5 +240,5 @@ export function createSweep(dem: PolarDem, options: SweepOptions): Sweep {
     }
   }
 
-  return { size, origin, inside, run };
+  return { size, origin, inside, positions: { x: px, y: py, z: pz }, originKm: [0, 0, -R_M / 1000], run };
 }

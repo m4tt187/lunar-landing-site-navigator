@@ -1,0 +1,108 @@
+{
+  "license": "Apache-2.0",
+  "aiAssisted": "Anthropic Claude under the direction of the team",
+  "scope": {
+    "years": "2026-2035",
+    "tables": 100,
+    "tableDays": 20,
+    "instantsPerTable": 250,
+    "cases": 25000,
+    "sites": [
+      {
+        "id": "south-pole",
+        "name": "South pole",
+        "latDeg": -90,
+        "lonDeg": 0,
+        "heightM": 0
+      },
+      {
+        "id": "north-pole",
+        "name": "North pole",
+        "latDeg": 90,
+        "lonDeg": 0,
+        "heightM": 0
+      },
+      {
+        "id": "sub-earth",
+        "name": "Sub-Earth point",
+        "latDeg": 0,
+        "lonDeg": 0,
+        "heightM": 0
+      },
+      {
+        "id": "far-side",
+        "name": "Far side",
+        "latDeg": 0,
+        "lonDeg": 180,
+        "heightM": 5000
+      },
+      {
+        "id": "mid-south",
+        "name": "Mid southern latitude",
+        "latDeg": -45,
+        "lonDeg": 90,
+        "heightM": 0
+      },
+      {
+        "id": "ridge",
+        "name": "Polar ridge",
+        "latDeg": -89.5,
+        "lonDeg": -137,
+        "heightM": 1500
+      },
+      {
+        "id": "mid-north",
+        "name": "Mid northern latitude",
+        "latDeg": 30,
+        "lonDeg": -120,
+        "heightM": -2000
+      },
+      {
+        "id": "massif",
+        "name": "Polar massif",
+        "latDeg": -85,
+        "lonDeg": 31,
+        "heightM": 5000
+      }
+    ]
+  },
+  "method": "Direction, range and angular radius of the Sun and of the Earth from the interpolated table (four-point Lagrange between exact knots) against the exact ephemeris at the same site and instant; the largest difference for each spacing of the knots.",
+  "limitations": "Numerical agreement between two ways of evaluating the same ephemeris, not a validation of the ephemeris itself (for that, see the comparison with NASA/JPL Horizons).",
+  "rows": [
+    {
+      "knotStepS": 1800,
+      "largestSunErrorDeg": 1.4159738360683638e-7,
+      "largestEarthErrorDeg": 3.037486309818097e-8,
+      "largestRangeErrorRelative": 1.9034451792521168e-10,
+      "largestAngularRadiusErrorRelative": 1.90362836605118e-10
+    },
+    {
+      "knotStepS": 3600,
+      "largestSunErrorDeg": 1.4162888214626274e-7,
+      "largestEarthErrorDeg": 3.042190673396473e-8,
+      "largestRangeErrorRelative": 1.9952417495971986e-10,
+      "largestAngularRadiusErrorRelative": 1.9954315977344095e-10
+    },
+    {
+      "knotStepS": 7200,
+      "largestSunErrorDeg": 1.425857016516825e-7,
+      "largestEarthErrorDeg": 6.970381467644925e-8,
+      "largestRangeErrorRelative": 2.3510202673548974e-9,
+      "largestAngularRadiusErrorRelative": 2.351036698655662e-9
+    },
+    {
+      "knotStepS": 21600,
+      "largestSunErrorDeg": 3.8307744864431697e-7,
+      "largestEarthErrorDeg": 0.00000474633660024407,
+      "largestRangeErrorRelative": 1.9019824737398494e-7,
+      "largestAngularRadiusErrorRelative": 1.901996158348851e-7
+    },
+    {
+      "knotStepS": 43200,
+      "largestSunErrorDeg": 0.000005418978409733393,
+      "largestEarthErrorDeg": 0.00007604879699739034,
+      "largestRangeErrorRelative": 0.000003040201774107132,
+      "largestAngularRadiusErrorRelative": 0.000003040232355866479
+    }
+  ]
+}

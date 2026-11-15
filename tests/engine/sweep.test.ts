@@ -111,6 +111,30 @@ describe('whole-map sweep vs independent per-site ray march', () => {
   });
 });
 
+describe('whole-map sweep: where the receivers stand', () => {
+  it('gives every receiver its position on the terrain, measured from the south pole of the reference sphere', () => {
+    const observer = 10;
+    const sweep = createSweep(dem, { minLatDeg: -82, observerHeightM: observer });
+    expect(sweep.originKm).toEqual([0, 0, -R_M / 1000]);
+    const centre = dem.n / 2 - 0.5;
+    let checked = 0;
+    for (let k = 17; k < sweep.size * sweep.size; k += 9973) {
+      const { x, y, z } = sweep.positions;
+      if (!sweep.inside[k]) { expect([x[k], y[k], z[k]]).toEqual([0, 0, 0]); continue; }
+      const row = sweep.origin + Math.floor(k / sweep.size), col = sweep.origin + (k % sweep.size);
+      // Inverse of the polar stereographic projection of the model, written out here.
+      const east = (col - centre) * dem.scaleM, up = (centre - row) * dem.scaleM;
+      const colatitude = 2 * Math.atan(Math.hypot(east, up) / (2 * R_M));
+      const lon = Math.atan2(east, up);
+      const radius = R_M + dem.raw[row * dem.n + col]! * dem.heightScale + observer;
+      const expected = [radius * Math.sin(colatitude) * Math.cos(lon), radius * Math.sin(colatitude) * Math.sin(lon), -radius * Math.cos(colatitude) + R_M];
+      expect(Math.hypot(x[k]! - expected[0]!, y[k]! - expected[1]!, z[k]! - expected[2]!)).toBeLessThan(0.1);
+      checked++;
+    }
+    expect(checked).toBeGreaterThan(40);
+  });
+});
+
 describe('whole-map sweep: limits and bad input', () => {
   // A small smooth model: 64 x 64 cells of 1 km around the pole, all at the reference radius.
   const flat: PolarDem = makePolarDem(new Int16Array(64 * 64), 64, 1000, 0.5);

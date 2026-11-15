@@ -1,0 +1,224 @@
+{
+  "license": "Apache-2.0",
+  "aiAssisted": "OpenAI Codex under the direction of the team",
+  "scope": {
+    "year": 2027,
+    "months": [
+      3,
+      6,
+      9,
+      12
+    ],
+    "sites": 25,
+    "mastM": 2,
+    "thresholds": {
+      "sunMinDiskFraction": 0,
+      "earthMinElevationAboveHorizonDeg": 0
+    },
+    "coarseStepS": 600,
+    "fineStepS": 60
+  },
+  "method": "Same vector table and shipped skyline at both cadences; one-to-one nearest contacts of the same kind within 20 minutes. Worst 12 refined with exact ephemeris to a 0.1-second bracket. Span endpoints excluded.",
+  "limitations": "Numerical convergence within this model, not NASA or physical event validation. One-minute sampling can also miss short events. This sample is not a universal timing bound.",
+  "fineContacts": 358,
+  "coarseContacts": 354,
+  "matchedContacts": 354,
+  "medianAbsoluteDifferenceS": 0.015638671875,
+  "p95AbsoluteDifferenceS": 14.411482666015624,
+  "worst": [
+    {
+      "id": "feature-16070",
+      "month": 3,
+      "body": "sun",
+      "contact": "endMs",
+      "fineMs": 1805319505756.581,
+      "coarseMs": 1805319115191.4836,
+      "errorS": -390.56509741210937,
+      "exactMs": 1805319505751.9531,
+      "exactIso": "2027-03-17T21:38:25.751Z",
+      "exactErrorS": -390.56046948242187
+    },
+    {
+      "id": "feature-16070",
+      "month": 6,
+      "body": "sun",
+      "contact": "startMs",
+      "fineMs": 1813172921145.0483,
+      "coarseMs": 1813172676334.795,
+      "errorS": -244.81025341796874,
+      "exactMs": 1813172921162.1094,
+      "exactIso": "2027-06-16T19:08:41.162Z",
+      "exactErrorS": -244.827314453125
+    },
+    {
+      "id": "feature-16070",
+      "month": 6,
+      "body": "sun",
+      "contact": "startMs",
+      "fineMs": 1813176503863.158,
+      "coarseMs": 1813176388614.311,
+      "errorS": -115.24884692382813,
+      "exactMs": 1813176503876.9531,
+      "exactIso": "2027-06-16T20:08:23.876Z",
+      "exactErrorS": -115.26264208984375
+    },
+    {
+      "id": "sunlit-6",
+      "month": 3,
+      "body": "sun",
+      "contact": "endMs",
+      "fineMs": 1806511399151.8843,
+      "coarseMs": 1806511321160.0754,
+      "errorS": -77.99180883789063,
+      "exactMs": 1806511399130.8594,
+      "exactIso": "2027-03-31T16:43:19.130Z",
+      "exactErrorS": -77.97078393554688
+    },
+    {
+      "id": "sunlit-5",
+      "month": 3,
+      "body": "sun",
+      "contact": "startMs",
+      "fineMs": 1805669550971.7607,
+      "coarseMs": 1805669478351.4043,
+      "errorS": -72.6203564453125,
+      "exactMs": 1805669559814.4531,
+      "exactIso": "2027-03-21T22:52:39.814Z",
+      "exactErrorS": -81.463048828125
+    },
+    {
+      "id": "sunlit-7",
+      "month": 9,
+      "body": "sun",
+      "contact": "startMs",
+      "fineMs": 1820372203285.3865,
+      "coarseMs": 1820372148733.958,
+      "errorS": -54.55142846679688,
+      "exactMs": 1820372205029.2969,
+      "exactIso": "2027-09-08T02:56:45.029Z",
+      "exactErrorS": -56.2953388671875
+    },
+    {
+      "id": "sunlit-5",
+      "month": 3,
+      "body": "sun",
+      "contact": "startMs",
+      "fineMs": 1805969534340.223,
+      "coarseMs": 1805969587786.6094,
+      "errorS": 53.446386474609376,
+      "exactMs": 1805969534326.1719,
+      "exactIso": "2027-03-25T10:12:14.326Z",
+      "exactErrorS": 53.4604375
+    },
+    {
+      "id": "feature-16338",
+      "month": 9,
+      "body": "sun",
+      "contact": "startMs",
+      "fineMs": 1820095951839.2449,
+      "coarseMs": 1820095913362.184,
+      "errorS": -38.477060791015624,
+      "exactMs": 1820095951845.7031,
+      "exactIso": "2027-09-04T22:12:31.845Z",
+      "exactErrorS": -38.48351904296875
+    },
+    {
+      "id": "sunlit-2",
+      "month": 3,
+      "body": "sun",
+      "contact": "startMs",
+      "fineMs": 1805989082915.1184,
+      "coarseMs": 1805989046549.2915,
+      "errorS": -36.365826904296874,
+      "exactMs": 1805989082900.3906,
+      "exactIso": "2027-03-25T15:38:02.900Z",
+      "exactErrorS": -36.35109912109375
+    },
+    {
+      "id": "feature-16338",
+      "month": 12,
+      "body": "sun",
+      "contact": "startMs",
+      "fineMs": 1828062394297.9355,
+      "coarseMs": 1828062425698.1108,
+      "errorS": 31.40017529296875,
+      "exactMs": 1828062394306.6406,
+      "exactIso": "2027-12-06T03:06:34.306Z",
+      "exactErrorS": 31.39147021484375
+    },
+    {
+      "id": "sunlit-5",
+      "month": 3,
+      "body": "sun",
+      "contact": "endMs",
+      "fineMs": 1805976650018.2173,
+      "coarseMs": 1805976676675.7358,
+      "errorS": 26.6575185546875,
+      "exactMs": 1805976650009.7656,
+      "exactIso": "2027-03-25T12:10:50.009Z",
+      "exactErrorS": 26.66597021484375
+    },
+    {
+      "id": "sunlit-5",
+      "month": 6,
+      "body": "sun",
+      "contact": "endMs",
+      "fineMs": 1813638691234.4358,
+      "coarseMs": 1813638716076.0044,
+      "errorS": 24.841568603515626,
+      "exactMs": 1813638691259.7656,
+      "exactIso": "2027-06-22T04:31:31.259Z",
+      "exactErrorS": 24.81623876953125
+    }
+  ],
+  "unmatched": [
+    {
+      "id": "sunlit-5",
+      "month": 3,
+      "body": "sun",
+      "contact": "startMs",
+      "fineCount": 6,
+      "coarseCount": 5,
+      "unmatchedFine": [
+        "2027-03-21T21:53:07.243Z"
+      ],
+      "unmatchedCoarse": []
+    },
+    {
+      "id": "sunlit-5",
+      "month": 3,
+      "body": "sun",
+      "contact": "endMs",
+      "fineCount": 6,
+      "coarseCount": 5,
+      "unmatchedFine": [
+        "2027-03-21T21:54:20.382Z"
+      ],
+      "unmatchedCoarse": []
+    },
+    {
+      "id": "sunlit-6",
+      "month": 3,
+      "body": "sun",
+      "contact": "startMs",
+      "fineCount": 2,
+      "coarseCount": 1,
+      "unmatchedFine": [
+        "2027-03-22T17:04:21.851Z"
+      ],
+      "unmatchedCoarse": []
+    },
+    {
+      "id": "sunlit-6",
+      "month": 3,
+      "body": "sun",
+      "contact": "endMs",
+      "fineCount": 3,
+      "coarseCount": 2,
+      "unmatchedFine": [
+        "2027-03-22T17:00:06.339Z"
+      ],
+      "unmatchedCoarse": []
+    }
+  ]
+}

@@ -3,22 +3,22 @@
 //
 // Background worker for the map layers: for each time sample it runs the
 // whole-map sweep once for the Sun and once for the Earth, and returns how many
-// samples each map cell saw the Sun, the Earth, and both at once.
+// samples each map cell saw the Sun, the Earth, and both at once. The
+// computation itself is in visibility.ts.
 import { createSweep, makePolarDem } from '@engine/index';
 import type { PolarDem, Sweep } from '@engine/index';
+import { countVisible } from './visibility';
+import type { Directions } from './visibility';
 
 export interface InitMessage { type: 'init'; raw: ArrayBuffer; n: number; scaleM: number; heightScale: number; minLatDeg: number }
-export interface RunMessage {
+/** What to test at a set of instants (see Directions), for one height above the ground and one size of sweep bins. */
+export interface RunMessage extends Directions {
   type: 'run';
   job: number;
   mastM: number;
   binM: number;
-  /** Three numbers per time sample: the direction to test for the Sun. */
-  sun: Float64Array;
-  /** Three numbers per time sample: the direction to test for the Earth. */
-  earth: Float64Array;
-  /** One flag per time sample: 1 when an eclipse hides the Sun from the whole mapped area. */
-  sunHidden: Uint8Array;
+  /** Minimum visible fraction of the solar disc: 0, 0.5 or 1. */
+  sunFraction: number;
 }
 export interface ReadyMessage { type: 'ready'; size: number; origin: number; inside: Uint8Array }
 export interface DoneMessage { type: 'done'; job: number; samples: number; sun: Uint16Array; earth: Uint16Array; both: Uint16Array }
@@ -55,20 +55,7 @@ scope.onmessage = (event: MessageEvent<InitMessage | RunMessage>): void => {
       scope.postMessage(ready);
       return;
     }
-    const s = sweepFor(message.mastM, message.binM);
-    const cells = s.size * s.size;
-    const samples = message.sun.length / 3;
-    const sun = new Uint16Array(cells), earth = new Uint16Array(cells), both = new Uint16Array(cells);
-    const sunMask = new Uint8Array(cells), earthMask = new Uint8Array(cells);
-    for (let i = 0; i < samples; i++) {
-      if (message.sunHidden[i]) sunMask.fill(0);
-      else s.run([message.sun[3 * i]!, message.sun[3 * i + 1]!, message.sun[3 * i + 2]!], sunMask);
-      s.run([message.earth[3 * i]!, message.earth[3 * i + 1]!, message.earth[3 * i + 2]!], earthMask);
-      for (let k = 0; k < cells; k++) {
-        const a = sunMask[k]!, b = earthMask[k]!;
-        sun[k] = sun[k]! + a; earth[k] = earth[k]! + b; both[k] = both[k]! + (a & b);
-      }
-    }
+    const { samples, sun, earth, both } = countVisible(sweepFor(message.mastM, message.binM), message.sunFraction, message);
     const done: DoneMessage = { type: 'done', job: message.job, samples, sun, earth, both };
     scope.postMessage(done, [sun.buffer, earth.buffer, both.buffer]);
   } catch (error) {

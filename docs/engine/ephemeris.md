@@ -38,7 +38,9 @@ const series = seriesFromTable(site, table, startMs, endMs, 600); // every 10 mi
 
 Direction of the Sun and of the Earth from the table against the exact ephemeris, at
 25,000 pseudo-random sites and instants between 2026 and 2035 (both poles, the equator,
-mid-latitudes; heights from −2,000 m to 5,000 m):
+mid-latitudes; heights from −2,000 m to 5,000 m). Reproduce with
+`npx tsx tools/validation/ephemeris.ts`; the output is kept in
+[`validation-ephemeris.json`](../validation-ephemeris.json):
 
 | Knots every | Largest error, Sun | Largest error, Earth | Range and angular radius (relative) |
 |---|---|---|---|
@@ -50,7 +52,8 @@ mid-latitudes; heights from −2,000 m to 5,000 m):
 
 Below two-hour knots the error stops falling: what is left is the numerical noise of the
 exact call itself. For scale, this engine and NASA/JPL Horizons differ by up to 0.004°,
-and the Sun's disc is 0.53° wide. The test fails if the default exceeds 5 × 10⁻⁶ °.
+and the Sun's disc is 0.53° wide. The automated test repeats the measurement for the
+default spacing on 20,000 other cases and fails if the error exceeds 5 × 10⁻⁶ °.
 
 ## Measured speed
 

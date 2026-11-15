@@ -117,13 +117,17 @@ The engine, module by module: [contract](docs/engine/contract.md),
 | The eclipse of 14 March 2025 at the **Blue Ghost Mission 1** landing site against the mission's own prediction (Firefly Aerospace, NASA CLPS) | first and last contact within half a minute; start of totality within 2.1 min; the three photographs the lander took fall in the phases computed for their times |
 | A clicked point (120 m tiles nearby, 480 m beyond) against the complete 120 m model, 100 random places south of 80° S | yearly sunlight within **0.11** percentage points, Earth visibility within 0.12 (the 480 m model alone: up to 17.5 and 15.3) |
 | Ten-minute sampling: interpolated Sun and Earth directions against the exact ones, 25,000 cases | largest difference 1.4 × 10⁻⁷ ° |
+| Ends of the sunlight and Earth-visibility windows from ten-minute samples against one-minute samples and the exact crossing, 25 sites, four months of 2027 | 354 window ends: half within 0.02 s, 95 % within 14.4 s, the largest **6.5 min** off; two events shorter than ten minutes are missed |
 | Planning (operating window, landing calendar) against a minute-by-minute simulation | same answer in 700 random cases |
-| Whole-map sweep against an independent ray march over the same model | same answer for 98.9 % (Sun) and 99.5 % (Earth) of 1,280 place-and-time pairs; above 99.3 % away from shadow edges |
-| Automated tests | 287 tests in 16 files, run with `npm test` (one compares the terrain tiles with the 116 MB NASA source file and is skipped when that file has not been downloaded) |
+| Whole-map sweep against an independent ray march over the same 480 m model, at places south of 84° S | same answer for 98.9 % (Sun) and 99.5 % (Earth) of 1,280 place-and-time pairs; above 99.3 % away from shadow edges |
+| The map during an eclipse against each place's own answer (its own sky, its skyline on the same 480 m model, the Earth's disc), 2,500 random cells while the Earth covers part of the Sun | same answer at 99.1 % ("any part of the Sun") and 99.0 % ("half the disc") of the cells; where the Earth alone hides the Sun, 393,300 comparisons without a difference |
+| Automated tests | 312 tests in 18 files, run with `npm test` (one compares the terrain tiles with the 116 MB NASA source file and is skipped when that file has not been downloaded) |
 
 Reproduce: `npm test`, `python3 tools/horizons/fetch_fixtures.py`,
 `npx tsx tools/validation/illumination.ts`, `npx tsx tools/validation/tiles.ts`,
-`npx tsx tools/eclipses/list.ts` (details in [docs/methodology.md](docs/methodology.md)).
+`npx tsx tools/validation/timing.ts`, `npx tsx tools/validation/ephemeris.ts`,
+`npx tsx tools/validation/map-eclipses.ts`, `npx tsx tools/eclipses/list.ts` (details in
+[docs/methodology.md](docs/methodology.md)).
 
 ### Limits, stated plainly
 
@@ -136,15 +140,21 @@ Reproduce: `npm test`, `python3 tools/horizons/fetch_fixtures.py`,
   terrain tiles cannot be loaded it falls back to the 480 m model alone and says so
   (results can then differ by ten percentage points and more). The map layers always use
   the 480 m model and a faster, approximate method: about one cell in a hundred, on steep
-  slopes and at shadow edges, differs from the per-site answer. Numbers quoted for a site
-  never come from the map.
+  slopes and at shadow edges, differs from a place-by-place calculation on that same
+  480 m model (checked south of 84° S), and the 480 m model itself differs from the
+  120 m one as just said. Numbers quoted for a site never come from the map.
 - **Where terrain is modelled.** South of 80° S, from a model that ends at 75° S: terrain
   farther north does not exist for the application. Sites elsewhere (Apollo, mid-latitude
   landers) are computed with the horizon of a smooth sphere, and say so.
 - **Dates.** Landings between February 2000 and August 2049.
 - **Sampling.** Every mission is sampled every ten minutes, and the ends of each window
-  are placed on a straight line between two samples. An event shorter than ten minutes
-  can be missed; the ends of a very brief total eclipse can be up to two minutes off.
+  are placed on a straight line between two samples. Most ends fall within seconds of
+  the exact crossing, but where the skyline changes abruptly they can be minutes off
+  (6.5 minutes in the worst case found), and up to two minutes for a very brief total
+  eclipse. An event shorter than ten minutes can be missed.
+- **Eclipses on the map.** Every cell is tested against the Earth's disc as seen from
+  that cell, but the part of the Sun the Earth leaves uncovered is taken as seen from the
+  pole: within 0.08° of each cell's own for 99 % of cells and instants.
 - **A planning aid, not a flight product.**
 
 ## NASA data and other sources

@@ -5,7 +5,7 @@ import type { BodySample, Sample, Series, Site } from './types';
 
 export const MOON_RADIUS_KM = 1737.4;
 const DEG = Math.PI / 180;
-const SUN_RADIUS_KM = 695700;
+export const SUN_RADIUS_KM = 695700;
 const EARTH_RADIUS_KM = 6378.137;
 export const MIN_TIME_MS = Date.UTC(2000, 0, 1);
 export const MAX_TIME_MS = Date.UTC(2051, 0, 1);

@@ -32,6 +32,10 @@ that page before any comparison was run; nothing was tuned.
   contacts to the second; `sunCoverAt(site, t)` — one instant.
 - `eclipsesInSeries(series)` — the eclipses inside a sampled mission, from the samples
   alone (accuracy below). `summarize()` returns them as `Summary.eclipses`.
+- `sunHiddenByEarth(site, t, rule)` — whether the Earth alone keeps the Sun from counting
+  as up at a site, under one of the rules.
+- `eclipseOverArea`, `hideEclipsedPlaces`, `skylineLimitInEclipse` — the same questions
+  for many places at once: what the map layers use (see "On the map" below).
 
 ## How it enters the answers
 
@@ -65,6 +69,78 @@ longitude 0° on 15 June 2030, reported 3.7 minutes shorter than it is. Where to
 that brief the separation of the two discs is far from a straight line in time, and the
 sunlight windows of the mission analysis carry the same error. `findEclipses` has none of
 it.
+
+## On the map
+
+The map layers come from the whole-map sweep ([methodology](../methodology.md), section
+5), which tests one direction of the Sun against the terrain for every cell at once.
+During an eclipse two things are added.
+
+The measurements of this section that are not automated tests are reproduced by
+`npx tsx tools/validation/map-eclipses.ts`; its output is kept in
+[`validation-map-eclipses.json`](../validation-map-eclipses.json).
+
+**The Earth alone, cell by cell.** The same contact does not fall at the same instant
+everywhere. Over the 27 eclipses of 2025–2039, at places on the 85° S and 80° S circles,
+first contact falls up to 7.9 minutes, last contact up to 6.9 minutes and the ends of
+totality up to 8.4 minutes from their instants at the pole. So every cell is tested
+against the Earth's disc as seen from that cell (`hideEclipsedPlaces`). A quick test for
+the whole area (`eclipseOverArea`) says when no cell, or every cell, can be affected; the
+cell-by-cell pass (about 7 ms for the 1.6 million cells of the map on the development
+machine) runs only in between.
+
+| Check | Result |
+|---|---|
+| Against each place's own sky: 300 places south of 80° S, four eclipses, every 2.5 minutes, the three rules | 393,300 comparisons, no difference |
+| Start and end of totality at 60 of those places against the exact search (`findEclipses`, itself exact to half a second) | within 0.6 s |
+| In a browser, total eclipse of 26 June 2029, at the minute the pole crosses each rule's limit: sampled cells that had the Sun a quarter of an hour earlier | of 8,014 / 7,630 / 7,326 cells ("any part" / "half" / "whole disc"), the 4,005 / 3,693 / 3,470 that the per-site computation says the Earth hides are all dark on the map; no cell is lit where the Earth hides the Sun |
+
+**The Earth and the terrain together.** While the Earth covers part of the Sun, testing
+the top of the disc ("any part shows") or its centre ("half") against the terrain is no
+longer right: the part still uncovered may be the lower one, behind the skyline. Each
+obstruction alone would leave some Sun; together they leave none. The direction tested
+therefore becomes the highest skyline under which enough of the uncovered disc still
+shows (`skylineLimitInEclipse`):
+
+- "any part shows": the highest point the Earth leaves uncovered — the top of the disc
+  if the Earth does not reach it, otherwise the higher of the two points where the limbs
+  cross (exact);
+- a fraction in between: the level at which the visible fraction equals the required one;
+- "the whole disc shows": the bottom of the disc, as without the Earth; the Earth must
+  simply not touch the Sun, which the cell-by-cell test decides.
+
+Against an independent strip integration, for 1,500 positions of the Earth and five
+rules, the fraction showing at the level found differs from the required one by less
+than 2 × 10⁻⁵. Seen from the south pole, 2025–2030, the level drops by up to 0.52° below
+the top of the disc (12 January 2028, when the Earth passes above the Sun).
+
+The level is computed once per instant, as seen from the pole, and used for the whole
+map. Measured against the level each place would compute from its own sky (300 places
+south of 80° S, the eleven eclipses of 2025–2030, every two minutes): the difference is
+below 0.04° for 95 % of place-and-instant pairs and below 0.08° for 99 %; the largest,
+0.21°, falls in the minutes around a contact, when the pole has already lost the Sun and
+a place at the edge of the map has not. This is finer than the sweep itself, which
+answers for a cell from bins 480 m wide.
+
+**Checked against each place's own answer.** `web/src/map/visibility.test.ts` runs the
+map's computation (`web/src/map/visibility.ts`, the code the background workers run) and
+compares it with what each place answers on its own — its own sky, a skyline marched
+over the same 480 m model along the Sun's azimuth, and the part of the disc above that
+skyline and outside the Earth — at 2,500 random cells while the Earth covers part of the
+Sun on 12 January 2028:
+
+| Rule, instant (UTC) | Same answer | Cells dark only because the two act together | Of these, dark on the map |
+|---|---|---|---|
+| any part shows, 03:30 | 99.1 % | 45 | 38 |
+| half the disc shows, 02:50 | 99.0 % | 19 | 14 |
+
+Tested one obstruction at a time, all of those cells would be lit. The same file holds a
+real case found on the shipped terrain in the independent review (81.107° S, 92.189° W,
+12 January 2028 03:12:37 UTC: the terrain leaves 20 % of the Sun, the Earth 22 %, the two
+together nothing; the map shows it dark) and two constructed cases on a smooth sphere. In
+a browser, on the built application, 3,000 random cells per rule against the engine's
+complete per-site computation (`computeTerrainHorizon` and `sampleMargins`) agreed at
+99.3 % and 99.1 %.
 
 ## Checked against NASA's predictions
 
@@ -155,6 +231,9 @@ of darkness has to know.
   (NASA's page discusses values from 1/85 to 1/41 for the enlargement of the shadow).
 - **Terrain inside this module.** `findEclipses` ignores the skyline; the mission
   analysis combines the two, with the skyline taken as straight across the solar disc.
+- **One level for the whole map.** On the map the part of the Sun that the Earth leaves
+  is taken as seen from the pole (differences above); the numbers of a site use the
+  site's own sky.
 - **Sampling.** In a mission analysis an eclipse shorter than the sampling step
   (ten minutes in the application) can be missed, like any other short event.
   `findEclipses` cannot miss an eclipse that covers more than 1 % of the Sun: it steps by

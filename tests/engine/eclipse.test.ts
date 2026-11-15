@@ -15,9 +15,10 @@ import { describe, expect, it } from 'vitest';
 import { marginsOf, sampleMargins, summarize, sunDiskFractionVisible } from '../../engine/src/analysis.ts';
 import {
   EARTH_ATMOSPHERE_KM, EARTH_MEAN_RADIUS_FACTOR, MAX_SEPARATION_RATE_DEG_PER_H, earthOffsetFromSun, eclipseMarginDeg, eclipseState,
-  eclipsesInSeries, enlargedEarthRadiusDeg, findEclipses, separationDeg, sunCoverAt, sunDiskFractionVisibleWithEarth,
-  sunFractionCoveredByEarth, sunHiddenByEarth, sunMarginWithEarth,
+  eclipseOverArea, eclipsesInSeries, enlargedEarthRadiusDeg, findEclipses, hideEclipsedPlaces, separationDeg, skylineLimitInEclipse,
+  sunCoverAt, sunDiskFractionVisibleWithEarth, sunFractionCoveredByEarth, sunHiddenByEarth, sunMarginWithEarth,
 } from '../../engine/src/eclipse.ts';
+import type { EclipseState } from '../../engine/src/eclipse.ts';
 import { buildVectorTable, seriesFromTable } from '../../engine/src/ephemeris.ts';
 import { MOON_RADIUS_KM, computeSample, moonFixedVectors, sampleFromVectors } from '../../engine/src/geometry.ts';
 import type { EclipseEvent, HorizonProfile, Site, Thresholds } from '../../engine/src/types.ts';
@@ -424,6 +425,97 @@ function signChange(f: (tMs: number) => number, fromMs: number, toMs: number): n
   return (lo + hi) / 2;
 }
 
+describe('the highest skyline under which the Sun still counts as up during an eclipse', () => {
+  const b = enlargedEarthRadiusDeg(EARTH_R);
+  /** The Earth's opaque disc centred at (across, up) degrees from the Sun's centre. */
+  const stateAt = (a: number, across: number, up: number): EclipseState => {
+    const separation = Math.hypot(across, up);
+    return { acrossDeg: across, upDeg: up, separationDeg: separation, earthDiscDeg: b, coveredFraction: sunFractionCoveredByEarth(separation, a, EARTH_R) };
+  };
+
+  it('is the top, the centre or the bottom of the disc while the Earth does not touch the Sun', () => {
+    const away = stateAt(SUN_R, 1.4, 0.6);
+    expect(away.coveredFraction).toBe(0);
+    expect(skylineLimitInEclipse(SUN_R, away, 0)).toBe(SUN_R);
+    expect(skylineLimitInEclipse(SUN_R, away, 1)).toBe(-SUN_R);
+    expect(skylineLimitInEclipse(SUN_R, away, 0.5)!).toBeCloseTo(0, 10);
+    const quarter = skylineLimitInEclipse(SUN_R, away, 0.25)!;
+    expect(sunDiskFractionVisible(0, SUN_R, quarter)).toBeCloseTo(0.25, 9);
+  });
+
+  it('is exact against an independent strip integration, for every rule (1,500 positions of the Earth)', () => {
+    const next = generator(56);
+    const found = [0, 0, 0, 0, 0], none = [0, 0, 0, 0, 0];
+    const rules = [0, 0.25, 0.5, 0.75, 1];
+    let worstFraction = 0;
+    for (let i = 0; i < 1500; i++) {
+      const a = 0.26 + 0.015 * next();
+      const separation = (a + b + 0.15) * next();
+      const angle = 2 * Math.PI * next();
+      const across = separation * Math.cos(angle), up = separation * Math.sin(angle);
+      const state = stateAt(a, across, up);
+      const uncovered = visibleFractionByStrips(a, -a, across, up, b);
+      rules.forEach((rule, r) => {
+        const limit = skylineLimitInEclipse(a, state, rule);
+        if (limit === null) {
+          none[r]!++;
+          // Even with no skyline at all the rule fails.
+          if (rule === 0) expect(uncovered).toBeLessThan(1e-7);
+          else if (rule === 1) expect(separation).toBeLessThan(a + b);
+          else expect(uncovered).toBeLessThan(rule + 1e-5);
+          return;
+        }
+        found[r]!++;
+        expect(limit).toBeGreaterThanOrEqual(-a);
+        expect(limit).toBeLessThanOrEqual(a);
+        if (rule === 0) {
+          // Something shows just below the level, nothing above it.
+          expect(visibleFractionByStrips(a, limit - 0.004, across, up, b)).toBeGreaterThan(1e-7);
+          expect(visibleFractionByStrips(a, limit + 0.0005, across, up, b)).toBeLessThan(1e-9);
+        } else if (rule === 1) {
+          expect(limit).toBe(-a);
+          expect(separation).toBeGreaterThanOrEqual(a + b);
+        } else {
+          const error = Math.abs(visibleFractionByStrips(a, limit, across, up, b) - rule);
+          // A level at the very bottom of the disc means the uncovered part is exactly the required fraction or more.
+          if (limit > -a + 1e-9) { worstFraction = Math.max(worstFraction, error); expect(error).toBeLessThan(2e-5); }
+          else expect(uncovered).toBeGreaterThan(rule - 2e-5);
+        }
+      });
+    }
+    // Every rule met both outcomes many times.
+    for (let r = 0; r < rules.length; r++) { expect(found[r]!).toBeGreaterThan(100); expect(none[r]!).toBeGreaterThan(100); }
+    expect(worstFraction).toBeLessThan(2e-5);
+  });
+
+  it('never rises when the Earth covers more: the level only moves down from the level without the Earth', () => {
+    for (const rule of [0, 0.5]) {
+      const clear = rule === 0 ? SUN_R : 0;
+      for (let k = 0; k < 400; k++) {
+        const angle = (2 * Math.PI * k) / 400;
+        const state = stateAt(SUN_R, 1.05 * Math.cos(angle), 1.05 * Math.sin(angle));
+        const limit = skylineLimitInEclipse(SUN_R, state, rule);
+        if (limit !== null) expect(limit).toBeLessThanOrEqual(clear + 1e-9);
+      }
+    }
+  });
+
+  it('answers the case in which each obstruction alone leaves some Sun and the two together leave none', () => {
+    // The Sun's centre on the skyline, the Earth's centre 0.85 degrees above it: the Earth leaves 13.6 % of the disc, all of it below the skyline.
+    const a = 0.25, bigEarth = enlargedEarthRadiusDeg(1);
+    const state: EclipseState = { acrossDeg: 0, upDeg: 0.85, separationDeg: 0.85, earthDiscDeg: bigEarth, coveredFraction: sunFractionCoveredByEarth(0.85, a, 1) };
+    expect(1 - state.coveredFraction).toBeCloseTo(0.13575, 4);
+    expect(sunDiskFractionVisible(0, a, 0)).toBeCloseTo(0.5, 12);
+    expect(sunDiskFractionVisibleWithEarth(0, a, 0, 0, 0.85, 1)).toBe(0);
+    const limit = skylineLimitInEclipse(a, state, 0)!;
+    // The limbs cross 0.138 degrees below the Sun's centre: only a skyline lower than that lets any light through.
+    expect(limit).toBeCloseTo((0.85 * 0.85 + a * a - bigEarth * bigEarth) / (2 * 0.85), 12);
+    expect(limit).toBeLessThan(-0.13);
+    expect(sunDiskFractionVisibleWithEarth(0, a, limit - 0.01, 0, 0.85, 1)).toBeGreaterThan(0);
+    expect(sunDiskFractionVisibleWithEarth(0, a, limit + 0.001, 0, 0.85, 1)).toBe(0);
+  });
+});
+
 describe("NASA's lunar eclipse predictions, 2025-2030 (Five Millennium Canon of Lunar Eclipses)", () => {
   it('holds every eclipse of the six years, with contacts consistent with the catalogue durations', () => {
     expect(nasa.eclipses.length).toBe(14);
@@ -637,6 +729,127 @@ describe('eclipses seen from a site', () => {
 });
 
 /* A lander that watched one ------------------------------------------------------- */
+
+describe('eclipses over an area, place by place', () => {
+  // 300 places south of 80 degrees south, from 4 km below to 6 km above the reference sphere: the area of the map.
+  const random = generator(20281231);
+  const places: Site[] = Array.from({ length: 300 }, (_, i) => ({
+    id: `place-${i}`, name: `Place ${i}`, latDeg: -80 - 10 * random(), lonDeg: -180 + 360 * random(), heightM: -4000 + 10000 * random(),
+  }));
+  const POLE_KM: [number, number, number] = [0, 0, -MOON_RADIUS_KM];
+  const REACH_KM = 330;
+  const n = places.length;
+  const x = new Float32Array(n), y = new Float32Array(n), z = new Float32Array(n);
+  places.forEach((p, k) => {
+    const r = MOON_RADIUS_KM + p.heightM / 1000, lat = p.latDeg * DEG, lon = p.lonDeg * DEG;
+    x[k] = r * Math.cos(lat) * Math.cos(lon) * 1000;
+    y[k] = r * Math.cos(lat) * Math.sin(lon) * 1000;
+    z[k] = (r * Math.sin(lat) + MOON_RADIUS_KM) * 1000;
+    expect(Math.hypot(x[k]!, y[k]!, z[k]!) / 1000).toBeLessThan(REACH_KM);
+  });
+  const events = findEclipses(SOUTH_POLE, Date.UTC(2025, 0, 1), Date.UTC(2031, 0, 1));
+  const RULES = [0, 0.5, 1];
+
+  /** The per-site answer, from the site's own sky: independent of the vector arithmetic under test. */
+  function hiddenAtSite(site: Site, tMs: number, vectors: ReturnType<typeof moonFixedVectors>, rule: number): boolean {
+    const sky = sampleFromVectors(site, tMs, vectors);
+    const separation = separationDeg(sky.sun.azDeg, sky.sun.elDeg, sky.earth.azDeg, sky.earth.elDeg);
+    const visible = 1 - sunFractionCoveredByEarth(separation, sky.sun.angularRadiusDeg, sky.earth.angularRadiusDeg);
+    return rule > 0 ? visible < rule : visible <= 0;
+  }
+
+  it('gives every place the answer of its own sky, through four eclipses and under every rule', () => {
+    const chosen = [events[0]!, events.find((e) => new Date(e.maxAtMs).getUTCFullYear() === 2027)!, events.find((e) => new Date(e.maxAtMs).getUTCFullYear() === 2028)!, events[events.length - 1]!];
+    let compared = 0, mismatches = 0, mixedInstants = 0, wrongCount = 0;
+    const states = [0, 0, 0];
+    const mask = new Uint8Array(n);
+    for (const event of chosen) {
+      for (let tMs = event.startMs - 15 * MIN; tMs <= event.endMs + 15 * MIN; tMs += 2.5 * MIN) {
+        const vectors = moonFixedVectors(tMs);
+        for (const rule of RULES) {
+          mask.fill(1);
+          const cleared = hideEclipsedPlaces(x, y, z, POLE_KM, vectors.sun, vectors.earth, rule, mask);
+          let hidden = 0;
+          for (let k = 0; k < n; k++) {
+            const reference = hiddenAtSite(places[k]!, tMs, vectors, rule);
+            compared++;
+            if ((mask[k] === 0) !== reference) mismatches++;
+            if (mask[k] === 0) hidden++;
+          }
+          if (cleared !== hidden) wrongCount++;
+          if (hidden > 0 && hidden < n) mixedInstants++;
+          // The quick answer for the whole area never contradicts the places.
+          const state = eclipseOverArea(POLE_KM, REACH_KM, vectors.sun, vectors.earth, rule);
+          states[state]!++;
+          if (state === 0) expect(hidden).toBe(0);
+          if (state === 1) expect(hidden).toBe(n);
+        }
+      }
+    }
+    expect(compared).toBe(393300);
+    expect(mismatches).toBe(0);
+    expect(wrongCount).toBe(0);
+    // The places really do disagree with one another around the contacts, and the quick answer settles most instants.
+    expect(mixedInstants).toBeGreaterThan(20);
+    expect(states[0]!).toBeGreaterThan(0);
+    expect(states[1]!).toBeGreaterThan(0);
+    expect(states[2]!).toBeLessThan(0.25 * (states[0]! + states[1]! + states[2]!));
+  });
+
+  it('places the start and the end of totality at 60 places within 0.6 s of the exact search', () => {
+    const event = events.find((e) => new Date(e.maxAtMs).getUTCFullYear() === 2028 && e.totalStartMs !== null)!;
+    const mask = new Uint8Array(n);
+    const hiddenAt = (k: number, tMs: number): boolean => {
+      const vectors = moonFixedVectors(tMs);
+      mask.fill(0); mask[k] = 1;
+      hideEclipsedPlaces(x, y, z, POLE_KM, vectors.sun, vectors.earth, 0, mask);
+      return mask[k] === 0;
+    };
+    let worst = 0, farthestFromPole = 0;
+    for (let k = 0; k < n; k += 5) {
+      const own = findEclipses(places[k]!, event.startMs - HOUR, event.endMs + HOUR)[0]!;
+      expect(own.totalStartMs).not.toBeNull();
+      for (const [inside, outside, exact] of [
+        [own.maxAtMs, own.startMs, own.totalStartMs!], [own.maxAtMs, own.endMs, own.totalEndMs!],
+      ] as const) {
+        // Bisection between an instant inside totality and one outside it.
+        let hiddenMs: number = inside, clearMs: number = outside;
+        expect(hiddenAt(k, hiddenMs)).toBe(true);
+        expect(hiddenAt(k, clearMs)).toBe(false);
+        while (Math.abs(hiddenMs - clearMs) > 20) {
+          const mid = (hiddenMs + clearMs) / 2;
+          if (hiddenAt(k, mid)) hiddenMs = mid; else clearMs = mid;
+        }
+        worst = Math.max(worst, Math.abs((hiddenMs + clearMs) / 2 - exact));
+      }
+      farthestFromPole = Math.max(farthestFromPole, Math.abs(own.totalStartMs! - event.totalStartMs!));
+    }
+    expect(worst).toBeLessThan(600);
+    // The same contact falls minutes apart across the area: one answer for the whole map would not do.
+    expect(farthestFromPole).toBeGreaterThan(3 * MIN);
+  });
+
+  it('leaves alone the places that were already dark and rejects bad input', () => {
+    const vectors = moonFixedVectors(events[0]!.maxAtMs);
+    const mask = new Uint8Array(n);
+    expect(hideEclipsedPlaces(x, y, z, POLE_KM, vectors.sun, vectors.earth, 1, mask)).toBe(0);
+    expect(mask.every((value) => value === 0)).toBe(true);
+    mask.fill(1);
+    expect(hideEclipsedPlaces(x, y, z, POLE_KM, vectors.sun, vectors.earth, 1, mask)).toBe(n);
+    // Far from any eclipse nothing is hidden and the quick answer says so.
+    const quiet = moonFixedVectors(events[0]!.maxAtMs + 7 * DAY);
+    mask.fill(1);
+    expect(hideEclipsedPlaces(x, y, z, POLE_KM, quiet.sun, quiet.earth, 1, mask)).toBe(0);
+    expect(eclipseOverArea(POLE_KM, REACH_KM, quiet.sun, quiet.earth, 1)).toBe(0);
+    expect(() => hideEclipsedPlaces(x, y, z.subarray(1), POLE_KM, vectors.sun, vectors.earth, 0, mask)).toThrow(RangeError);
+    expect(() => hideEclipsedPlaces(x, y, z, POLE_KM, vectors.sun, vectors.earth, 1.5, mask)).toThrow(RangeError);
+    expect(() => hideEclipsedPlaces(x, y, z, POLE_KM, [Number.NaN, 0, 0], vectors.earth, 0, mask)).toThrow(RangeError);
+    expect(() => eclipseOverArea(POLE_KM, -1, vectors.sun, vectors.earth, 0)).toThrow(RangeError);
+    expect(() => eclipseOverArea(POLE_KM, 250000, vectors.sun, vectors.earth, 0)).toThrow(RangeError);
+    expect(() => eclipseOverArea(POLE_KM, REACH_KM, vectors.sun, vectors.earth, -0.1)).toThrow(RangeError);
+    expect(() => eclipseOverArea(vectors.earth, REACH_KM, vectors.sun, vectors.earth, 0)).toThrow(RangeError);
+  });
+});
 
 describe('Blue Ghost Mission 1 in Mare Crisium, 14 March 2025', () => {
   // Firefly Aerospace, "Blue Ghost Mission 1: Live Updates", https://fireflyspace.com/news/blue-ghost-mission-1-live-updates/

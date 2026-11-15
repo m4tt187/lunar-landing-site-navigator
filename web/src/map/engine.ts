@@ -5,10 +5,11 @@
 // the map layers: "now" (one instant) and the mission layers (many instants,
 // added up into a share of the mission).
 import { signal } from '@preact/signals';
-import { directionFromPole, moonFixedVectors, raiseDirection, sunHiddenByEarth } from '@engine/index';
-import type { Site } from '@engine/index';
+import { moonFixedVectors } from '@engine/index';
 import { loadDem } from '../data';
 import type { TerrainMeta } from '../data';
+import { directionsFor, mapReachKm } from './visibility';
+import type { Directions } from './visibility';
 import type { InitMessage, RunMessage, WorkerReply } from './worker';
 
 export interface MapGrid { size: number; origin: number; inside: Uint8Array; scaleM: number; n: number }
@@ -40,17 +41,11 @@ export const nowResult = signal<LayerResult | null>(null);
 
 export const MISSION_SAMPLES = 120;
 const BATCH = 2;
-const SUN_RADIUS_KM = 695700;
-const DEG = Math.PI / 180;
 
-interface Batch { job: number; mastM: number; binM: number; sun: Float64Array; earth: Float64Array; sunHidden: Uint8Array }
+interface Batch extends Directions { job: number; mastM: number; binM: number; sunFraction: number }
 
-/**
- * An eclipse is one event for the whole map: the Earth's direction differs by
- * less than 0.05 degrees across the mapped area, which shifts the contacts by a
- * few minutes at most. It is judged at the pole.
- */
-const POLE: Site = { id: 'south-pole', name: 'South pole', latDeg: -90, lonDeg: 0, heightM: 0 };
+/** How far from the pole a cell of the map can be (set when the map starts). */
+let reachKm = mapReachKm(-80);
 interface Slot { worker: Worker; busy: boolean }
 
 const slots: Slot[] = [];
@@ -62,25 +57,20 @@ let missionQueue: Batch[] = [];
 let nowQueue: Batch | null = null;
 let nowKey = '';
 
-/** Low-discrepancy sequence in [0, 1): any prefix covers the span evenly, so partial results are unbiased. */
+/**
+ * Low-discrepancy sequence in [0, 1): any prefix of it is spread evenly over the
+ * span, so the picture drawn from the samples received so far is refined as the
+ * rest arrive instead of filling in from one end.
+ */
 function vanDerCorput(index: number): number {
   let result = 0, f = 0.5, i = index;
   while (i > 0) { if (i & 1) result += f; i >>= 1; f /= 2; }
   return result;
 }
 
-function directionsFor(request: LayerRequest, times: number[]): { sun: Float64Array; earth: Float64Array; sunHidden: Uint8Array } {
-  const sun = new Float64Array(times.length * 3), earth = new Float64Array(times.length * 3);
-  const sunHidden = new Uint8Array(times.length);
-  times.forEach((tMs, i) => {
-    sunHidden[i] = sunHiddenByEarth(POLE, tMs, request.sunFraction) ? 1 : 0;
-    const v = moonFixedVectors(tMs);
-    const sunRadiusDeg = Math.asin(SUN_RADIUS_KM / Math.hypot(v.sun[0], v.sun[1], v.sun[2])) / DEG;
-    // Raise or lower the tested direction so that the rule ("any part", "half", "whole disc") becomes a point test.
-    sun.set(raiseDirection(v.sun, (1 - 2 * request.sunFraction) * sunRadiusDeg), 3 * i);
-    earth.set(raiseDirection(directionFromPole(v.earth), -request.earthMarginDeg), 3 * i);
-  });
-  return { sun, earth, sunHidden };
+/** What to test at each of the given instants (see visibility.ts). */
+function directionsAt(request: LayerRequest, times: number[]): Directions {
+  return directionsFor(request, times.map((tMs) => moonFixedVectors(tMs)), reachKm);
 }
 
 function pump(): void {
@@ -120,6 +110,7 @@ export function startMapEngine(meta: TerrainMeta): void {
   if (started) return;
   started = true;
   scaleM = meta.coarse.scaleM;
+  reachKm = mapReachKm(meta.map.minLatDeg);
   const cores = navigator.hardwareConcurrency || 4;
   const count = Math.max(1, Math.min(3, cores - 1));
   loadDem(meta).then(
@@ -148,13 +139,14 @@ export function requestMission(request: LayerRequest): void {
   if (!grid || missionResult.value?.key === key) return;
   const times: number[] = [];
   for (let i = 0; i < MISSION_SAMPLES; i++) times.push(request.startMs + vanDerCorput(i + 1) * (request.endMs - request.startMs));
-  const { sun, earth, sunHidden } = directionsFor(request, times);
+  const { sun, earth, eclipse, bodies } = directionsAt(request, times);
   missionJob = ++jobCounter;
   missionQueue = [];
   for (let i = 0; i < MISSION_SAMPLES; i += BATCH)
     missionQueue.push({
-      job: missionJob, mastM: request.mastM, binM: scaleM,
-      sun: sun.slice(3 * i, 3 * (i + BATCH)), earth: earth.slice(3 * i, 3 * (i + BATCH)), sunHidden: sunHidden.slice(i, i + BATCH),
+      job: missionJob, mastM: request.mastM, binM: scaleM, sunFraction: request.sunFraction,
+      sun: sun.slice(3 * i, 3 * (i + BATCH)), earth: earth.slice(3 * i, 3 * (i + BATCH)),
+      eclipse: eclipse.slice(i, i + BATCH), bodies: bodies.slice(6 * i, 6 * (i + BATCH)),
     });
   const cells = grid.size * grid.size;
   missionResult.value = { key, samples: 0, total: MISSION_SAMPLES, sun: new Uint16Array(cells), earth: new Uint16Array(cells), both: new Uint16Array(cells) };
@@ -166,8 +158,8 @@ export function requestNow(request: LayerRequest): void {
   const key = keyOf(request);
   if (!mapGrid.value || key === nowKey) return;
   nowKey = key;
-  const { sun, earth, sunHidden } = directionsFor(request, [request.startMs]);
+  const directions = directionsAt(request, [request.startMs]);
   nowJob = ++jobCounter;
-  nowQueue = { job: nowJob, mastM: request.mastM, binM: request.coarse ? scaleM * 2 : scaleM, sun, earth, sunHidden };
+  nowQueue = { job: nowJob, mastM: request.mastM, binM: request.coarse ? scaleM * 2 : scaleM, sunFraction: request.sunFraction, ...directions };
   pump();
 }
