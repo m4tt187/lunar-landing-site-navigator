@@ -42,6 +42,7 @@ None is used.
 | sips (part of macOS) | https://support.apple.com/guide/terminal/welcome/mac | Supplied with the operating system; not redistributed | Converts the shaded-relief map to JPEG when the terrain assets are rebuilt on a Mac (a PNG is written elsewhere) |
 | Poppler (`pdftoppm`) | https://poppler.freedesktop.org/ | GPL-2.0-or-later; used as a tool, not redistributed | Rendered NASA's eclipse figures (PDF) as images, from which the contact times were read |
 | Playwright (`playwright-core`) with Microsoft Edge | https://playwright.dev/ | Apache-2.0 (Playwright); the browser is used as a tool, not redistributed | Ran the built application in a browser without a window for the checks described in `docs/engine/eclipses.md`; not a dependency of this repository |
+| Inter typeface (The Inter Project Authors), from the `@fontsource-variable/inter` package | https://github.com/rsms/inter | SIL Open Font License 1.1 (`docs/demo/inter-LICENSE.txt`) | The typeface of the project demo (`docs/demo/deck.html`, published as `demo.pdf`) |
 | Git and GitHub, GitHub Pages | https://git-scm.com/ , https://pages.github.com/ | GPL-2.0 (Git); GitHub's terms of service | Version control, the public repository, hosting of the application |
 | Anthropic Claude (Claude Code) and OpenAI Codex | https://www.anthropic.com/ , https://openai.com/ | Commercial services | AI tools used to write, test and review the code and the documentation: see `docs/ai-usage-log.md` |
 

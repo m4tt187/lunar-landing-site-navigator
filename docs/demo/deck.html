@@ -1,0 +1,150 @@
+<!doctype html>
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<!-- AI-assisted: written with Anthropic Claude under the direction of the team. -->
+<!-- The project demo: seven slides. The images are screenshots of the application. Rendered to demo.pdf. -->
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Lunar Landing Site Navigator: project demo</title>
+<style>
+  @font-face { font-family: 'Inter'; src: url('inter-latin-wght-normal.woff2') format('woff2'); font-weight: 100 900; }
+  @page { size: 1920px 1080px; margin: 0; }
+  :root { --bg: #07090e; --panel: #10141c; --line: #232a37; --fg: #e9edf3; --muted: #9aa6b8; --sun: #ffbf47; --earth: #58a6ff; --both: #6fdc8c; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--fg); font-family: 'Inter', sans-serif; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .slide { width: 1920px; height: 1080px; padding: 84px 96px 0; position: relative; overflow: hidden; page-break-after: always; break-after: page; }
+  .slide:last-child { page-break-after: auto; break-after: auto; }
+  h1 { font-size: 92px; line-height: 1.04; letter-spacing: -0.03em; margin: 0; font-weight: 700; }
+  h2 { font-size: 62px; line-height: 1.1; letter-spacing: -0.025em; margin: 0 0 18px; font-weight: 700; max-width: 1640px; }
+  p { margin: 0; }
+  .lead { font-size: 34px; line-height: 1.38; color: #c6cfdc; max-width: 1560px; }
+  .lead b { color: var(--fg); font-weight: 600; }
+  .sun { color: var(--sun); } .earth { color: var(--earth); } .both { color: var(--both); }
+  .foot { position: absolute; left: 96px; right: 96px; bottom: 40px; display: flex; justify-content: space-between; font-size: 20px; color: var(--muted); }
+  img { display: block; border-radius: 14px; }
+  .frame { border: 1px solid var(--line); border-radius: 16px; background: var(--panel); padding: 14px; }
+  .row { display: flex; gap: 56px; }
+  .col { flex: 1; min-width: 0; }
+  .label { font-size: 30px; font-weight: 600; margin: 0 0 12px; }
+  .note { font-size: 26px; line-height: 1.4; color: var(--muted); margin-top: 14px; }
+  ul { margin: 0; padding: 0; list-style: none; }
+  li { font-size: 32px; line-height: 1.36; color: #c6cfdc; padding-left: 34px; position: relative; margin-bottom: 16px; }
+  li::before { content: ''; position: absolute; left: 0; top: 17px; width: 14px; height: 14px; border-radius: 50%; background: var(--sun); }
+  li b { color: var(--fg); font-weight: 600; }
+  .big { font-size: 96px; font-weight: 700; letter-spacing: -0.03em; line-height: 1; }
+  .stat { border: 1px solid var(--line); border-radius: 16px; background: var(--panel); padding: 30px 32px; flex: 1; }
+  .stat p { font-size: 25px; line-height: 1.36; color: #c6cfdc; margin-top: 16px; }
+  .stat p b { color: var(--fg); font-weight: 600; }
+  .url { font-size: 34px; font-weight: 600; color: var(--earth); }
+</style>
+</head>
+<body>
+
+<section class="slide" style="padding-top: 0;">
+  <div class="row" style="height: 1080px; align-items: center; gap: 72px;">
+    <div class="col" style="flex: 1.15;">
+      <p style="font-size: 26px; color: var(--muted); margin-bottom: 30px;">2026 NASA Space Apps Challenge · Challenge: Lunar Landing Site Navigator</p>
+      <h1>Lunar Landing<br />Site Navigator</h1>
+      <p class="lead" style="margin-top: 38px; font-size: 40px;">If we land <b>here</b>, on <b>this day</b> — will we have <span class="sun">power</span>, and can we talk to <span class="earth">Earth</span>?</p>
+      <p style="font-size: 28px; color: var(--muted); margin-top: 56px;">Team Eallweald, Inc.</p>
+    </div>
+    <div style="width: 800px;"><img src="img/map-now.png" width="800" height="800" alt="The Moon's south pole: where the Sun, the Earth, or both are in view at one moment" /></div>
+  </div>
+</section>
+
+<section class="slide">
+  <h2>At the Moon's south pole, one ridge decides.</h2>
+  <p class="lead">The Sun and the Earth never climb more than a few degrees above the horizon. These two places are <b>ten kilometres apart</b>.</p>
+  <div class="row" style="margin-top: 40px;">
+    <div class="col">
+      <p class="label"><span class="sun">●</span> On the rim of Shackleton crater</p>
+      <div class="frame"><img src="img/verdict-rim.png" width="806" alt="96% sunlight, 50% Earth in view" /><img src="img/sky-rim.png" width="806" style="margin-top: 10px;" alt="The Sun just above the skyline" /></div>
+    </div>
+    <div class="col">
+      <p class="label"><span class="earth">●</span> On the floor of the same crater</p>
+      <div class="frame"><img src="img/verdict-floor.png" width="806" alt="0% sunlight, 0% Earth in view" /><img src="img/sky-floor.png" width="806" style="margin-top: 10px;" alt="The Sun and the Earth below the crater wall" /></div>
+    </div>
+  </div>
+  <div class="foot"><span>Lunar Landing Site Navigator</span><span>2 / 7</span></div>
+</section>
+
+<section class="slide">
+  <h2>Compare sites and landing dates, side by side.</h2>
+  <p class="lead">Up to four scenarios: a site, a landing date, the height of the panels. The better value of each column is marked.</p>
+  <div class="frame" style="margin-top: 36px;"><img src="img/compare-four.png" width="1698" alt="Four sunlit peaks compared over one year" /></div>
+  <ul style="margin-top: 40px; display: flex; gap: 48px;">
+    <li style="flex: 1;"><b>Power:</b> share of the mission in sunlight, longest night</li>
+    <li style="flex: 1;"><b>Link:</b> windows of direct contact with the Earth, longest gap</li>
+    <li style="flex: 1;"><b>The sky the lander sees,</b> on the real skyline, moving in time</li>
+  </ul>
+  <div class="foot"><span>Lunar Landing Site Navigator</span><span>3 / 7</span></div>
+</section>
+
+<section class="slide">
+  <h2>Where? A map computed live in the browser.</h2>
+  <div class="row" style="margin-top: 26px; gap: 48px;">
+    <div style="width: 610px;"><img src="img/map-now.png" width="610" height="610" alt="Where the Sun and the Earth are in view now" /><p class="note"><b style="color: var(--fg);">At this moment:</b> <span class="sun">Sun</span>, <span class="earth">Earth</span> or <span class="both">both</span> in view. Shadows move as time plays.</p></div>
+    <div style="width: 610px;"><img src="img/map-share.png" width="610" height="610" alt="Share of the mission with power and link" /><p class="note"><b style="color: var(--fg);">Over the mission:</b> the share of time with power and link together.</p></div>
+    <div class="col" style="padding-top: 20px;">
+      <ul>
+        <li>Everything south of 80° S: <b>1.26 million places</b></li>
+        <li>One moment in <b>a tenth of a second</b>, no server</li>
+        <li>Names <b>the best place within 5 km</b> of the chosen site</li>
+        <li>Click anywhere: NASA's <b>120 m terrain</b> is loaded for that point</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot"><span>Lunar Landing Site Navigator</span><span>4 / 7</span></div>
+</section>
+
+<section class="slide">
+  <h2>When? Every landing day of the coming year.</h2>
+  <p class="lead">A schedule slips, and the question changes from "where" to "when". Each column is a landing day: the brighter, the longer power, the link, or both last unbroken after touchdown.</p>
+  <div class="frame" style="margin-top: 36px;"><img src="img/calendar.png" width="1698" alt="Calendar of landing days for one year" /></div>
+  <ul style="margin-top: 38px; display: flex; gap: 48px;">
+    <li style="flex: 1;">The <b>best landing days</b> are marked</li>
+    <li style="flex: 1;"><b>Eclipses</b> of the Sun by the Earth are included</li>
+    <li style="flex: 1;">A <b>link</b> reproduces any comparison exactly</li>
+  </ul>
+  <div class="foot"><span>Lunar Landing Site Navigator</span><span>5 / 7</span></div>
+</section>
+
+<section class="slide">
+  <h2>Built on NASA data, checked against NASA.</h2>
+  <p class="lead">Every skyline comes from the <b>LOLA elevation model</b> of NASA's Lunar Reconnaissance Orbiter, at 120 m. The results are tested against NASA's own.</p>
+  <div class="row" style="margin-top: 44px; gap: 28px;">
+    <div class="stat"><div class="big sun">0.004°</div><p>largest difference from <b>NASA/JPL Horizons</b> in the direction of the Sun and the Earth, over 9,810 reference values</p></div>
+    <div class="stat"><div class="big both">0.98</div><p>correlation with the <b>NASA LOLA illumination maps</b> at 400 places, for sunlight and for Earth visibility</p></div>
+    <div class="stat"><div class="big earth">8.3 s</div><p>largest difference from <b>NASA's eclipse predictions</b>: 58 contact times of the 14 lunar eclipses of 2025–2030</p></div>
+    <div class="stat"><div class="big">3</div><p><b>real landings</b> as checks: IM-1, Chandrayaan-3, and the eclipse seen by Blue Ghost Mission 1</p></div>
+  </div>
+  <p class="note" style="margin-top: 34px; font-size: 27px;">317 automated tests. Every figure can be reproduced with a command given in the repository. Geometry only: a planning aid, not a flight product.</p>
+  <div class="foot"><span>Lunar Landing Site Navigator</span><span>6 / 7</span></div>
+</section>
+
+<section class="slide">
+  <h2>For planners, educators and anyone curious.</h2>
+  <div class="row" style="margin-top: 30px; gap: 64px;">
+    <div class="col">
+      <ul>
+        <li><b>Mission planners</b> shortlist sites and dates in seconds, with numbers traceable to NASA sources</li>
+        <li><b>Educators</b> show why the pole is hard: the Sun circling the horizon, a ridge hiding it for days</li>
+        <li><b>Anyone</b> picks a place on the Moon and sees what a lander would see</li>
+        <li><b>Next:</b> name the best site and landing date for a mission. The engine already computes it</li>
+      </ul>
+    </div>
+    <div class="col" style="flex: 0.9;">
+      <div class="stat" style="padding: 36px 40px;">
+        <p style="margin: 0; font-size: 24px; color: var(--muted);">Try it, in any browser</p>
+        <p class="url" style="margin-top: 8px;">m4tt187.github.io/lunar-landing-site-navigator</p>
+        <p style="font-size: 24px; color: var(--muted); margin-top: 34px;">Source code, methods, data sources</p>
+        <p class="url" style="margin-top: 8px;">github.com/m4tt187/lunar-landing-site-navigator</p>
+        <p style="margin-top: 34px;">Open source, Apache-2.0. No server: everything runs in the browser, on public NASA data.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Team Eallweald, Inc. · 2026 NASA Space Apps Challenge · Challenge: Lunar Landing Site Navigator</span><span>7 / 7</span></div>
+</section>
+
+</body>
+</html>

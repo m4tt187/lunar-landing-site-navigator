@@ -34,8 +34,10 @@ Try it: https://m4tt187.github.io/lunar-landing-site-navigator/
 
 ## Link to Project Demo
 
-To be added when the demo is ready (seven slides at most, or a video of 30 seconds at
-most).
+https://m4tt187.github.io/lunar-landing-site-navigator/demo.pdf
+
+Seven slides. The source is `docs/demo/deck.html`; the images are screenshots of the
+application.
 
 ## Link to Final Project
 
@@ -198,7 +200,8 @@ No Space Agency Partner data is used.
 
 Software, all open source: Astronomy Engine 2.1.19 by Don Cross (MIT), Preact and
 @preact/signals (MIT), Vite (MIT), Vitest (MIT), tsx (MIT), TypeScript (Apache-2.0),
-Node.js and its type definitions (MIT), Python 3 for one script. For checks of the built
+Node.js and its type definitions (MIT), Python 3 for one script. The demo is set in the
+Inter typeface (SIL Open Font License 1.1). For checks of the built
 application: Playwright (Apache-2.0) driving a headless browser. For reading NASA's
 eclipse figures: Poppler (pdftoppm).
 
